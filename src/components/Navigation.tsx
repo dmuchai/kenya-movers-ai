@@ -1,0 +1,109 @@
+import { Button } from "@/components/ui/button";
+import { 
+  Truck, 
+  Menu, 
+  X, 
+  Home, 
+  Calculator, 
+  Users, 
+  HelpCircle,
+  Phone
+} from "lucide-react";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
+
+const Navigation = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const navigationItems = [
+    { label: "Home", icon: Home, href: "#home" },
+    { label: "Get Quote", icon: Calculator, href: "#quote" },
+    { label: "Movers", icon: Users, href: "#movers" },
+    { label: "Help", icon: HelpCircle, href: "#help" },
+    { label: "Contact", icon: Phone, href: "#contact" },
+  ];
+
+  return (
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-border shadow-sm">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <div className="flex items-center gap-2">
+            <div className="p-2 bg-gradient-to-r from-primary to-trust-blue rounded-lg">
+              <Truck className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-foreground">MoveEasy</h1>
+              <p className="text-xs text-muted-foreground">Kenya</p>
+            </div>
+          </div>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-8">
+            {navigationItems.map((item) => (
+              <a
+                key={item.label}
+                href={item.href}
+                className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+              >
+                <item.icon className="w-4 h-4" />
+                {item.label}
+              </a>
+            ))}
+          </div>
+
+          {/* Desktop CTA */}
+          <div className="hidden md:flex items-center gap-3">
+            <Button variant="outline" size="sm">
+              Sign In
+            </Button>
+            <Button variant="hero" size="sm">
+              Get Quote
+            </Button>
+          </div>
+
+          {/* Mobile menu button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </Button>
+        </div>
+
+        {/* Mobile Navigation */}
+        <div className={cn(
+          "md:hidden transition-all duration-300 overflow-hidden",
+          isMenuOpen ? "max-h-96 pb-4" : "max-h-0"
+        )}>
+          <div className="space-y-2 pt-2">
+            {navigationItems.map((item) => (
+              <a
+                key={item.label}
+                href={item.href}
+                className="flex items-center gap-3 p-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <item.icon className="w-5 h-5" />
+                {item.label}
+              </a>
+            ))}
+            
+            <div className="pt-2 space-y-2">
+              <Button variant="outline" className="w-full" size="sm">
+                Sign In
+              </Button>
+              <Button variant="hero" className="w-full" size="sm">
+                Get Quote
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+export default Navigation;
