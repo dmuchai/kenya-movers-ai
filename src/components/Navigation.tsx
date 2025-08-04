@@ -7,13 +7,23 @@ import {
   Calculator, 
   Users, 
   HelpCircle,
-  Phone
+  Phone,
+  LogOut
 } from "lucide-react";
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
 
   const navigationItems = [
     { label: "Home", icon: Home, href: "#home" },
@@ -54,12 +64,26 @@ const Navigation = () => {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-3">
-            <Button variant="outline" size="sm">
-              Sign In
-            </Button>
-            <Button variant="hero" size="sm">
-              Get Quote
-            </Button>
+            {user ? (
+              <>
+                <span className="text-sm text-muted-foreground">
+                  Welcome, {user.email?.split('@')[0]}
+                </span>
+                <Button variant="outline" size="sm" onClick={handleSignOut}>
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/auth">Sign In</Link>
+                </Button>
+                <Button variant="hero" size="sm">
+                  Get Quote
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -92,12 +116,26 @@ const Navigation = () => {
             ))}
             
             <div className="pt-2 space-y-2">
-              <Button variant="outline" className="w-full" size="sm">
-                Sign In
-              </Button>
-              <Button variant="hero" className="w-full" size="sm">
-                Get Quote
-              </Button>
+              {user ? (
+                <>
+                  <div className="px-3 py-2 text-sm text-muted-foreground">
+                    Welcome, {user.email?.split('@')[0]}
+                  </div>
+                  <Button variant="outline" className="w-full" size="sm" onClick={handleSignOut}>
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Sign Out
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button variant="outline" className="w-full" size="sm" asChild>
+                    <Link to="/auth">Sign In</Link>
+                  </Button>
+                  <Button variant="hero" className="w-full" size="sm">
+                    Get Quote
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
