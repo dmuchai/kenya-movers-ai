@@ -44,6 +44,59 @@ export type Database = {
         }
         Relationships: []
       }
+      quotes: {
+        Row: {
+          additional_services: string[] | null
+          created_at: string
+          estimated_cost: number | null
+          from_location: string
+          id: string
+          moving_date: string
+          property_size: string
+          special_requirements: string | null
+          status: string
+          to_location: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          additional_services?: string[] | null
+          created_at?: string
+          estimated_cost?: number | null
+          from_location: string
+          id?: string
+          moving_date: string
+          property_size: string
+          special_requirements?: string | null
+          status?: string
+          to_location: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          additional_services?: string[] | null
+          created_at?: string
+          estimated_cost?: number | null
+          from_location?: string
+          id?: string
+          moving_date?: string
+          property_size?: string
+          special_requirements?: string | null
+          status?: string
+          to_location?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

@@ -7,16 +7,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Textarea } from "@/components/ui/textarea";
 import { MapPin, Home, Building, Calendar as CalendarIcon, Package, ArrowRight, ChevronLeft } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 
 interface QuoteFormProps {
   onSubmit: (data: any) => void;
 }
 
 const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     fromLocation: "",
     toLocation: "",
@@ -25,6 +32,8 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
     currentFloor: "",
     destinationFloor: "",
     movingDate: null as Date | null,
+    additionalServices: [] as string[],
+    specialRequirements: "",
     inventory: {
       beds: 0,
       fridge: false,
@@ -49,13 +58,12 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
     { value: "shop", label: "Shop/Commercial" }
   ];
 
-  const residentialSizes = [
-    "Bedsitter", "1BR", "2BR", "3BR", "4BR", "5BR+", "Maisonette", "Villa"
+  const propertySizes = [
+    "studio", "1-bedroom", "2-bedroom", "3-bedroom", "4-bedroom", "house", "office"
   ];
 
-  const officeSizes = [
-    "Small Office (1-5 desks)", "Medium Office (6-15 desks)", 
-    "Large Office (16-30 desks)", "Corporate Office (30+ desks)"
+  const availableServices = [
+    "Packing", "Unpacking", "Furniture Assembly", "Cleaning", "Storage", "Insurance"
   ];
 
   const updateFormData = (field: string, value: any) => {
@@ -69,16 +77,78 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
     }));
   };
 
+  const toggleService = (service: string) => {
+    setFormData(prev => ({
+      ...prev,
+      additionalServices: prev.additionalServices.includes(service)
+        ? prev.additionalServices.filter(s => s !== service)
+        : [...prev.additionalServices, service]
+    }));
+  };
+
   const nextStep = () => {
-    if (step < 4) setStep(step + 1);
+    if (step < 5) setStep(step + 1);
   };
 
   const prevStep = () => {
     if (step > 1) setStep(step - 1);
   };
 
-  const handleSubmit = () => {
-    onSubmit(formData);
+  const handleSubmit = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to submit a quote request.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // Save quote to database
+      const { data: quoteData, error } = await supabase
+        .from('quotes')
+        .insert({
+          user_id: user.id,
+          from_location: formData.fromLocation,
+          to_location: formData.toLocation,
+          moving_date: formData.movingDate?.toISOString().split('T')[0],
+          property_size: formData.propertySize,
+          additional_services: formData.additionalServices,
+          special_requirements: formData.specialRequirements || null,
+        })
+        .select()
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      // Call the original onSubmit with the saved quote data
+      onSubmit({
+        ...formData,
+        id: quoteData.id,
+        status: quoteData.status,
+        created_at: quoteData.created_at,
+      });
+
+      toast({
+        title: "Quote request submitted!",
+        description: "Your quote has been saved and movers will be notified.",
+      });
+
+    } catch (error) {
+      console.error('Error saving quote:', error);
+      toast({
+        title: "Error submitting quote",
+        description: "There was a problem saving your quote. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const renderStep = () => {
@@ -134,67 +204,27 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
           <div className="space-y-6">
             <div className="text-center mb-6">
               <h2 className="text-2xl font-bold text-foreground mb-2">Property Details</h2>
-              <p className="text-muted-foreground">Tell us about your current home or office</p>
+              <p className="text-muted-foreground">Tell us about your property size</p>
             </div>
             
             <div className="space-y-4">
               <div>
                 <Label className="flex items-center gap-2 mb-2">
-                  <Building className="w-4 h-4 text-primary" />
-                  Property type
+                  <Home className="w-4 h-4 text-primary" />
+                  Property size
                 </Label>
-                <Select value={formData.propertyType} onValueChange={(value) => updateFormData("propertyType", value)}>
+                <Select value={formData.propertySize} onValueChange={(value) => updateFormData("propertySize", value)}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select property type" />
+                    <SelectValue placeholder="Select property size" />
                   </SelectTrigger>
                   <SelectContent>
-                    {propertyTypes.map(type => (
-                      <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
+                    {propertySizes.map(size => (
+                      <SelectItem key={size} value={size}>
+                        {size.charAt(0).toUpperCase() + size.slice(1)}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
-              
-              {formData.propertyType && (
-                <div>
-                  <Label className="flex items-center gap-2 mb-2">
-                    <Home className="w-4 h-4 text-trust-blue" />
-                    Size
-                  </Label>
-                  <Select value={formData.propertySize} onValueChange={(value) => updateFormData("propertySize", value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select size" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {(formData.propertyType === "residential" ? residentialSizes : officeSizes).map(size => (
-                        <SelectItem key={size} value={size}>{size}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="currentFloor" className="mb-2 block">Current floor</Label>
-                  <Input
-                    id="currentFloor"
-                    type="number"
-                    placeholder="e.g., 3"
-                    value={formData.currentFloor}
-                    onChange={(e) => updateFormData("currentFloor", e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="destinationFloor" className="mb-2 block">Destination floor</Label>
-                  <Input
-                    id="destinationFloor"
-                    type="number"
-                    placeholder="e.g., 1"
-                    value={formData.destinationFloor}
-                    onChange={(e) => updateFormData("destinationFloor", e.target.value)}
-                  />
-                </div>
               </div>
             </div>
           </div>
@@ -204,87 +234,31 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
         return (
           <div className="space-y-6">
             <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-foreground mb-2">What are you moving?</h2>
-              <p className="text-muted-foreground">Help us estimate the right truck size</p>
+              <h2 className="text-2xl font-bold text-foreground mb-2">Additional Services</h2>
+              <p className="text-muted-foreground">Select any additional services you need</p>
             </div>
             
-            <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="mb-2 block">Number of beds</Label>
-                  <Input
-                    type="number"
-                    min="0"
-                    value={formData.inventory.beds}
-                    onChange={(e) => updateInventory("beds", parseInt(e.target.value) || 0)}
+            <div className="space-y-3">
+              {availableServices.map(service => (
+                <div key={service} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={service}
+                    checked={formData.additionalServices.includes(service)}
+                    onCheckedChange={() => toggleService(service)}
                   />
+                  <Label htmlFor={service}>{service}</Label>
                 </div>
-                <div>
-                  <Label className="mb-2 block">Wardrobes</Label>
-                  <Input
-                    type="number"
-                    min="0"
-                    value={formData.inventory.wardrobe}
-                    onChange={(e) => updateInventory("wardrobe", parseInt(e.target.value) || 0)}
-                  />
-                </div>
-              </div>
-              
-              <div className="space-y-3">
-                <Label className="text-base font-semibold">Appliances & Electronics</Label>
-                <div className="space-y-3">
-                  {[
-                    { key: "fridge", label: "Refrigerator" },
-                    { key: "washingMachine", label: "Washing Machine" },
-                    { key: "tv", label: "TV" },
-                    { key: "diningTable", label: "Dining Table" }
-                  ].map(item => (
-                    <div key={item.key} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={item.key}
-                        checked={formData.inventory[item.key as keyof typeof formData.inventory] as boolean}
-                        onCheckedChange={(checked) => updateInventory(item.key, checked)}
-                      />
-                      <Label htmlFor={item.key}>{item.label}</Label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              
-              <div>
-                <Label className="mb-2 block">Sofa set (number of seats)</Label>
-                <div className="grid grid-cols-2 gap-4">
-                  <Input
-                    type="number"
-                    min="0"
-                    placeholder="e.g., 5"
-                    value={formData.inventory.sofaSeats}
-                    onChange={(e) => updateInventory("sofaSeats", parseInt(e.target.value) || 0)}
-                  />
-                  <Select value={formData.inventory.sofaShape} onValueChange={(value) => updateInventory("sofaShape", value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Shape" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="straight">Straight</SelectItem>
-                      <SelectItem value="l-shaped">L-shaped</SelectItem>
-                      <SelectItem value="u-shaped">U-shaped</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              
-              <div>
-                <Label htmlFor="boxes" className="mb-2 block">Estimated boxes/containers</Label>
-                <Input
-                  id="boxes"
-                  type="number"
-                  min="0"
-                  placeholder="e.g., 20"
-                  value={formData.inventory.boxes}
-                  onChange={(e) => updateInventory("boxes", parseInt(e.target.value) || 0)}
-                />
-              </div>
+              ))}
+            </div>
+
+            <div>
+              <Label htmlFor="requirements" className="mb-2 block">Special Requirements (optional)</Label>
+              <Textarea
+                id="requirements"
+                placeholder="Any special instructions or requirements..."
+                value={formData.specialRequirements}
+                onChange={(e) => updateFormData("specialRequirements", e.target.value)}
+              />
             </div>
           </div>
         );
@@ -323,18 +297,33 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
                 </PopoverContent>
               </Popover>
             </div>
+          </div>
+        );
+
+      case 5:
+        return (
+          <div className="space-y-6">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-foreground mb-2">Review Your Quote</h2>
+              <p className="text-muted-foreground">Please review your information before submitting</p>
+            </div>
             
-            {formData.movingDate && (
-              <div className="mt-8 p-6 bg-gradient-to-r from-primary/10 to-trust-blue/10 rounded-lg border border-primary/20">
-                <h3 className="font-semibold text-lg mb-3">Summary</h3>
-                <div className="space-y-2 text-sm">
-                  <p><span className="font-medium">Route:</span> {formData.fromLocation} → {formData.toLocation}</p>
-                  <p><span className="font-medium">Property:</span> {formData.propertySize} {formData.propertyType}</p>
+            <div className="p-6 bg-gradient-to-r from-primary/10 to-trust-blue/10 rounded-lg border border-primary/20">
+              <h3 className="font-semibold text-lg mb-3">Quote Summary</h3>
+              <div className="space-y-2 text-sm">
+                <p><span className="font-medium">Route:</span> {formData.fromLocation} → {formData.toLocation}</p>
+                <p><span className="font-medium">Property Size:</span> {formData.propertySize}</p>
+                {formData.movingDate && (
                   <p><span className="font-medium">Date:</span> {format(formData.movingDate, "PPP")}</p>
-                  <p><span className="font-medium">Items:</span> {formData.inventory.beds} beds, {formData.inventory.boxes} boxes, and more</p>
-                </div>
+                )}
+                {formData.additionalServices.length > 0 && (
+                  <p><span className="font-medium">Services:</span> {formData.additionalServices.join(", ")}</p>
+                )}
+                {formData.specialRequirements && (
+                  <p><span className="font-medium">Special Requirements:</span> {formData.specialRequirements}</p>
+                )}
               </div>
-            )}
+            </div>
           </div>
         );
 
@@ -355,7 +344,7 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
           {/* Progress bar */}
           <div className="flex justify-center mt-4">
             <div className="flex items-center space-x-2">
-              {[1, 2, 3, 4].map((i) => (
+              {[1, 2, 3, 4, 5].map((i) => (
                 <div key={i} className="flex items-center">
                   <div className={cn(
                     "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium",
@@ -363,7 +352,7 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
                   )}>
                     {i}
                   </div>
-                  {i < 4 && (
+                  {i < 5 && (
                     <div className={cn(
                       "w-12 h-1 mx-1",
                       i < step ? "bg-primary" : "bg-gray-200"
@@ -389,12 +378,13 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
               Previous
             </Button>
             
-            {step < 4 ? (
+            {step < 5 ? (
               <Button
                 onClick={nextStep}
                 disabled={
                   (step === 1 && (!formData.fromLocation || !formData.toLocation)) ||
-                  (step === 2 && (!formData.propertyType || !formData.propertySize))
+                  (step === 2 && !formData.propertySize) ||
+                  (step === 4 && !formData.movingDate)
                 }
                 className="flex items-center gap-2"
               >
@@ -404,11 +394,11 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
             ) : (
               <Button
                 onClick={handleSubmit}
-                disabled={!formData.movingDate}
+                disabled={loading}
                 variant="hero"
                 className="flex items-center gap-2"
               >
-                Get Quotes
+                {loading ? "Submitting..." : "Submit Quote"}
                 <ArrowRight className="w-4 h-4" />
               </Button>
             )}

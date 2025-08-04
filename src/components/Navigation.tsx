@@ -26,9 +26,9 @@ const Navigation = () => {
   };
 
   const navigationItems = [
-    { label: "Home", icon: Home, href: "#home" },
+    { label: "Home", icon: Home, href: "/" },
     { label: "Get Quote", icon: Calculator, href: "#quote" },
-    { label: "Movers", icon: Users, href: "#movers" },
+    { label: "My Quotes", icon: Users, href: "/quotes", authRequired: true },
     { label: "Help", icon: HelpCircle, href: "#help" },
     { label: "Contact", icon: Phone, href: "#contact" },
   ];
@@ -50,15 +50,17 @@ const Navigation = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            {navigationItems.map((item) => (
-              <a
+            {navigationItems
+              .filter(item => !item.authRequired || user)
+              .map((item) => (
+              <Link
                 key={item.label}
-                href={item.href}
+                to={item.href.startsWith('#') ? '/' : item.href}
                 className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
               >
                 <item.icon className="w-4 h-4" />
                 {item.label}
-              </a>
+              </Link>
             ))}
           </div>
 
@@ -103,16 +105,18 @@ const Navigation = () => {
           isMenuOpen ? "max-h-96 pb-4" : "max-h-0"
         )}>
           <div className="space-y-2 pt-2">
-            {navigationItems.map((item) => (
-              <a
+            {navigationItems
+              .filter(item => !item.authRequired || user)
+              .map((item) => (
+              <Link
                 key={item.label}
-                href={item.href}
+                to={item.href.startsWith('#') ? '/' : item.href}
                 className="flex items-center gap-3 p-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all"
                 onClick={() => setIsMenuOpen(false)}
               >
                 <item.icon className="w-5 h-5" />
                 {item.label}
-              </a>
+              </Link>
             ))}
             
             <div className="pt-2 space-y-2">
