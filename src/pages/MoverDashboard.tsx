@@ -71,16 +71,43 @@ export default function MoverDashboard() {
 
   const fetchMyResponses = async () => {
     try {
+      // First get the mover profile to filter responses
+      const { data: moverData } = await supabase
+        .from('movers')
+        .select('id')
+        .eq('user_id', user?.id)
+        .maybeSingle();
+
+      if (!moverData) {
+        setMyResponses([]);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('quote_responses')
-        .select(`
-          *,
-          quotes (*)
-        `)
+        .select('*')
+        .eq('mover_id', moverData.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setMyResponses(data || []);
+
+      // Fetch quote details for each response
+      const responsesWithQuotes = await Promise.all(
+        (data || []).map(async (response) => {
+          const { data: quoteData } = await supabase
+            .from('quotes')
+            .select('*')
+            .eq('id', response.quote_id)
+            .single();
+          
+          return {
+            ...response,
+            quotes: quoteData
+          };
+        })
+      );
+
+      setMyResponses(responsesWithQuotes.filter(r => r.quotes) as QuoteResponse[]);
     } catch (error) {
       console.error('Error fetching responses:', error);
       toast({

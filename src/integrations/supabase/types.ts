@@ -120,7 +120,22 @@ export type Database = {
           status?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_quote_responses_mover_id"
+            columns: ["mover_id"]
+            isOneToOne: false
+            referencedRelation: "movers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_quote_responses_quote_id"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       quotes: {
         Row: {
