@@ -29,6 +29,7 @@ const Navigation = () => {
     { label: "Home", icon: Home, href: "/" },
     { label: "Get Quote", icon: Calculator, href: "#quote" },
     { label: "My Quotes", icon: Users, href: "/quotes", authRequired: true },
+    { label: "Profile", icon: Users, href: "/profile", authRequired: true },
     { label: "Help", icon: HelpCircle, href: "#help" },
     { label: "Contact", icon: Phone, href: "#contact" },
   ];
