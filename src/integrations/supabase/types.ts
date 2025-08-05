@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      movers: {
+        Row: {
+          company_name: string
+          contact_email: string
+          contact_phone: string | null
+          created_at: string
+          description: string | null
+          hourly_rate: number | null
+          id: string
+          license_number: string | null
+          service_areas: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company_name: string
+          contact_email: string
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          hourly_rate?: number | null
+          id?: string
+          license_number?: string | null
+          service_areas?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company_name?: string
+          contact_email?: string
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          hourly_rate?: number | null
+          id?: string
+          license_number?: string | null
+          service_areas?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -41,6 +83,42 @@ export type Database = {
           preferred_contact_method?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      quote_responses: {
+        Row: {
+          created_at: string
+          estimated_duration: string | null
+          id: string
+          mover_id: string
+          quote_id: string
+          quoted_price: number
+          response_message: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          estimated_duration?: string | null
+          id?: string
+          mover_id: string
+          quote_id: string
+          quoted_price: number
+          response_message?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          estimated_duration?: string | null
+          id?: string
+          mover_id?: string
+          quote_id?: string
+          quoted_price?: number
+          response_message?: string | null
+          status?: string
+          updated_at?: string
         }
         Relationships: []
       }
