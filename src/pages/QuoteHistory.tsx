@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import { ReviewForm } from "@/components/ReviewForm";
 
 interface Quote {
   id: string;
@@ -27,6 +28,7 @@ const QuoteHistory = () => {
   const { toast } = useToast();
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showReviewForm, setShowReviewForm] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -247,7 +249,32 @@ const QuoteHistory = () => {
                       Book Mover
                     </Button>
                   )}
+                  {quote.status === 'completed' && (
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => setShowReviewForm(showReviewForm === quote.id ? null : quote.id)}
+                    >
+                      {showReviewForm === quote.id ? 'Cancel Review' : 'Write Review'}
+                    </Button>
+                  )}
                 </div>
+
+                {showReviewForm === quote.id && quote.status === 'completed' && (
+                  <div className="mt-4 pt-4 border-t">
+                    <ReviewForm
+                      quoteId={quote.id}
+                      moverId="temp-mover-id" // This should come from quote responses
+                      onReviewSubmitted={() => {
+                        setShowReviewForm(null);
+                        toast({
+                          title: "Review Submitted",
+                          description: "Thank you for your feedback!"
+                        });
+                      }}
+                    />
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))}
