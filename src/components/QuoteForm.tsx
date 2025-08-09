@@ -29,18 +29,24 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
     toLocation: "",
     propertyType: "",
     propertySize: "",
+    currentPropertyType: "",
+    destinationPropertyType: "",
     currentFloor: "",
     destinationFloor: "",
+    elevatorCurrent: false,
+    elevatorDestination: false,
     movingDate: null as Date | null,
     additionalServices: [] as string[],
     specialRequirements: "",
     inventory: {
       beds: 0,
       fridge: false,
+      fridgeLiters: 0,
       washingMachine: false,
       sofaSeats: 0,
       sofaShape: "",
       tv: false,
+      tvInches: 0,
       diningTable: false,
       wardrobe: 0,
       boxes: 0,
@@ -53,13 +59,14 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
   ];
 
   const propertyTypes = [
-    { value: "residential", label: "Residential" },
+    { value: "bungalow", label: "Bungalow" },
+    { value: "apartment", label: "Apartment" },
+    { value: "maisonette", label: "Maisonette" },
     { value: "office", label: "Office" },
-    { value: "shop", label: "Shop/Commercial" }
   ];
 
   const propertySizes = [
-    "studio", "1-bedroom", "2-bedroom", "3-bedroom", "4-bedroom", "house", "office"
+    "Bedsitter", "1BR", "2BR", "3BR", "4BR", "5BR+", "Maisonette", "Villa"
   ];
 
   const availableServices = [
@@ -203,28 +210,75 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
         return (
           <div className="space-y-6">
             <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-foreground mb-2">Property Details</h2>
-              <p className="text-muted-foreground">Tell us about your property size</p>
+              <h2 className="text-2xl font-bold text-foreground mb-2">Property Details & Access</h2>
+              <p className="text-muted-foreground">Types, floors, elevator access, and size</p>
             </div>
             
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label className="flex items-center gap-2 mb-2">
-                  <Home className="w-4 h-4 text-primary" />
-                  Property size
-                </Label>
-                <Select value={formData.propertySize} onValueChange={(value) => updateFormData("propertySize", value)}>
+                <Label className="mb-2 block">Current property type</Label>
+                <Select value={formData.currentPropertyType} onValueChange={(v) => updateFormData("currentPropertyType", v)}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select property size" />
+                    <SelectValue placeholder="Select type" />
                   </SelectTrigger>
                   <SelectContent>
-                    {propertySizes.map(size => (
-                      <SelectItem key={size} value={size}>
-                        {size.charAt(0).toUpperCase() + size.slice(1)}
-                      </SelectItem>
+                    {propertyTypes.map((t) => (
+                      <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+              <div>
+                <Label className="mb-2 block">Destination property type</Label>
+                <Select value={formData.destinationPropertyType} onValueChange={(v) => updateFormData("destinationPropertyType", v)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {propertyTypes.map((t) => (
+                      <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div>
+              <Label className="flex items-center gap-2 mb-2">
+                <Home className="w-4 h-4 text-primary" />
+                Bedrooms / Size
+              </Label>
+              <Select value={formData.propertySize} onValueChange={(value) => updateFormData("propertySize", value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select property size" />
+                </SelectTrigger>
+                <SelectContent>
+                  {propertySizes.map(size => (
+                    <SelectItem key={size} value={size}>{size}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label className="mb-2 block">Current floor (0 = Ground)</Label>
+                <Input type="number" min={0} value={formData.currentFloor} onChange={(e) => updateFormData("currentFloor", e.target.value)} />
+              </div>
+              <div>
+                <Label className="mb-2 block">Destination floor (0 = Ground)</Label>
+                <Input type="number" min={0} value={formData.destinationFloor} onChange={(e) => updateFormData("destinationFloor", e.target.value)} />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex items-center space-x-2">
+                <Checkbox id="elevatorCurrent" checked={formData.elevatorCurrent} onCheckedChange={(v) => updateFormData("elevatorCurrent", Boolean(v))} />
+                <Label htmlFor="elevatorCurrent">Elevator at current location</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox id="elevatorDestination" checked={formData.elevatorDestination} onCheckedChange={(v) => updateFormData("elevatorDestination", Boolean(v))} />
+                <Label htmlFor="elevatorDestination">Elevator at destination</Label>
               </div>
             </div>
           </div>
@@ -234,31 +288,71 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
         return (
           <div className="space-y-6">
             <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-foreground mb-2">Additional Services</h2>
-              <p className="text-muted-foreground">Select any additional services you need</p>
-            </div>
-            
-            <div className="space-y-3">
-              {availableServices.map(service => (
-                <div key={service} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={service}
-                    checked={formData.additionalServices.includes(service)}
-                    onCheckedChange={() => toggleService(service)}
-                  />
-                  <Label htmlFor={service}>{service}</Label>
-                </div>
-              ))}
+              <h2 className="text-2xl font-bold text-foreground mb-2">Inventory Details</h2>
+              <p className="text-muted-foreground">Tell us what needs to be moved</p>
             </div>
 
-            <div>
-              <Label htmlFor="requirements" className="mb-2 block">Special Requirements (optional)</Label>
-              <Textarea
-                id="requirements"
-                placeholder="Any special instructions or requirements..."
-                value={formData.specialRequirements}
-                onChange={(e) => updateFormData("specialRequirements", e.target.value)}
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label className="mb-2 block">Beds</Label>
+                <Input type="number" min={0} value={formData.inventory.beds}
+                  onChange={(e) => updateInventory("beds", Number(e.target.value))} />
+              </div>
+              <div>
+                <Label className="mb-2 block">Wardrobes</Label>
+                <Input type="number" min={0} value={formData.inventory.wardrobe}
+                  onChange={(e) => updateInventory("wardrobe", Number(e.target.value))} />
+              </div>
+              <div>
+                <Label className="mb-2 block">Sofa seats (total)</Label>
+                <Input type="number" min={0} value={formData.inventory.sofaSeats}
+                  onChange={(e) => updateInventory("sofaSeats", Number(e.target.value))} />
+              </div>
+              <div>
+                <Label className="mb-2 block">Boxes (estimate)</Label>
+                <Input type="number" min={0} value={formData.inventory.boxes}
+                  onChange={(e) => updateInventory("boxes", Number(e.target.value))} />
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <Checkbox id="fridge" checked={formData.inventory.fridge}
+                  onCheckedChange={(v) => updateInventory("fridge", Boolean(v))} />
+                <Label htmlFor="fridge">Fridge</Label>
+              </div>
+              {formData.inventory.fridge && (
+                <div className="pl-6">
+                  <Label className="mb-2 block">Fridge size (liters)</Label>
+                  <Input type="number" min={0} value={formData.inventory.fridgeLiters}
+                    onChange={(e) => updateInventory("fridgeLiters", Number(e.target.value))} />
+                </div>
+              )}
+
+              <div className="flex items-center space-x-2">
+                <Checkbox id="tv" checked={formData.inventory.tv}
+                  onCheckedChange={(v) => updateInventory("tv", Boolean(v))} />
+                <Label htmlFor="tv">TV</Label>
+              </div>
+              {formData.inventory.tv && (
+                <div className="pl-6">
+                  <Label className="mb-2 block">TV size (inches)</Label>
+                  <Input type="number" min={0} value={formData.inventory.tvInches}
+                    onChange={(e) => updateInventory("tvInches", Number(e.target.value))} />
+                </div>
+              )}
+
+              <div className="flex items-center space-x-2">
+                <Checkbox id="wm" checked={formData.inventory.washingMachine}
+                  onCheckedChange={(v) => updateInventory("washingMachine", Boolean(v))} />
+                <Label htmlFor="wm">Washing Machine</Label>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox id="dt" checked={formData.inventory.diningTable}
+                  onCheckedChange={(v) => updateInventory("diningTable", Boolean(v))} />
+                <Label htmlFor="dt">Dining Table</Label>
+              </div>
             </div>
           </div>
         );
