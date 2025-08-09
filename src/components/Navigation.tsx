@@ -28,7 +28,7 @@ const Navigation = () => {
 
   const navigationItems = [
     { label: "Home", icon: Home, href: "/" },
-    { label: "Get Quote", icon: Calculator, href: "#quote" },
+    { label: "Get Quote", icon: Calculator, href: "/?quote=start" },
     { label: "My Quotes", icon: Users, href: "/quotes", authRequired: true },
     { label: "Profile", icon: Users, href: "/profile", authRequired: true },
     { label: "Mover Dashboard", icon: Truck, href: "/mover-dashboard", authRequired: true },
@@ -85,8 +85,8 @@ const Navigation = () => {
                 <Button variant="outline" size="sm" asChild>
                   <Link to="/auth">Sign In</Link>
                 </Button>
-                <Button variant="hero" size="sm">
-                  Get Quote
+                <Button variant="hero" size="sm" asChild>
+                  <Link to="/?quote=start">Get Quote</Link>
                 </Button>
               </>
             )}
@@ -139,8 +139,8 @@ const Navigation = () => {
                   <Button variant="outline" className="w-full" size="sm" asChild>
                     <Link to="/auth">Sign In</Link>
                   </Button>
-                  <Button variant="hero" className="w-full" size="sm">
-                    Get Quote
+                  <Button variant="hero" className="w-full" size="sm" asChild>
+                    <Link to="/?quote=start">Get Quote</Link>
                   </Button>
                 </>
               )}

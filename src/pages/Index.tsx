@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
 import QuoteForm from "@/components/QuoteForm";
 import QuoteResults from "@/components/QuoteResults";
 import { useToast } from "@/hooks/use-toast";
-
+import { useLocation, useNavigate } from "react-router-dom";
 const Index = () => {
   const [currentView, setCurrentView] = useState<"hero" | "quote" | "results">("hero");
   const [quoteData, setQuoteData] = useState(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleQuoteSubmit = (data: any) => {
     setQuoteData(data);
@@ -35,8 +37,15 @@ const Index = () => {
 
   const startQuote = () => {
     setCurrentView("quote");
+    navigate("/?quote=start");
   };
 
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get("quote") === "start") {
+      setCurrentView("quote");
+    }
+  }, [location.search]);
   return (
     <div className="min-h-screen bg-background">
       <Navigation />

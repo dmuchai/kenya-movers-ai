@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, MapPin, Calculator, Users } from "lucide-react";
 import heroImage from "@/assets/hero-moving-truck.jpg";
+import { Link } from "react-router-dom";
 
 const Hero = () => {
   return (
@@ -42,9 +43,12 @@ const Hero = () => {
               variant="hero" 
               size="lg" 
               className="w-full sm:w-auto text-lg px-8 py-4"
+              asChild
             >
-              Get Free Quote
-              <ArrowRight className="w-5 h-5" />
+              <Link to="/?quote=start" aria-label="Start free moving quote">
+                Get Free Quote
+                <ArrowRight className="w-5 h-5" />
+              </Link>
             </Button>
             
             <Button 
