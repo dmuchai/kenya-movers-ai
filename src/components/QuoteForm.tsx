@@ -70,6 +70,22 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
     "Bedsitter", "1BR", "2BR", "3BR", "4BR", "5BR+", "Maisonette", "Villa"
   ];
 
+  const mapPropertySizeToDB = (size: string): string => {
+    switch (size) {
+      case 'Bedsitter': return 'studio';
+      case '1BR': return '1-bedroom';
+      case '2BR': return '2-bedroom';
+      case '3BR': return '3-bedroom';
+      case '4BR': return '4-bedroom';
+      case '5BR+':
+      case 'Maisonette':
+      case 'Villa':
+        return 'house';
+      default:
+        return 'house';
+    }
+  };
+
   const availableServices = [
     "Packing", "Unpacking", "Furniture Assembly", "Cleaning", "Storage", "Insurance"
   ];
@@ -115,7 +131,8 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
     setLoading(true);
 
     try {
-      // Save quote to database
+      // Map property size to DB-allowed values and save quote to database
+      const propertySizeDB = mapPropertySizeToDB(formData.propertySize);
       const { data: quoteData, error } = await supabase
         .from('quotes')
         .insert({
@@ -123,7 +140,7 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
           from_location: formData.fromLocation,
           to_location: formData.toLocation,
           moving_date: formData.movingDate?.toISOString().split('T')[0],
-          property_size: formData.propertySize,
+          property_size: propertySizeDB,
           additional_services: formData.additionalServices,
           special_requirements: formData.specialRequirements || null,
         })
