@@ -3,21 +3,24 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { 
-  Star, 
-  Truck, 
-  Clock, 
-  Shield, 
-  Phone, 
-  MessageCircle, 
+import {
+  Star,
+  Truck,
+  Clock,
+  Shield,
+  Phone,
+  MessageCircle,
   Bookmark,
   BookmarkCheck,
   ChevronRight,
   Zap,
   Users,
-  Award
+  Award,
+  Send,
+  Info
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { sendWhatsAppMessage } from '@/services/api';
 
 interface QuoteResultsProps {
   quoteData: any;
@@ -28,56 +31,11 @@ interface QuoteResultsProps {
 const QuoteResults = ({ quoteData, onBookMover, onCompare }: QuoteResultsProps) => {
   const [savedMovers, setSavedMovers] = useState<string[]>([]);
 
-  // Mock AI estimate based on form data
-  const calculateAIEstimate = () => {
-    let basePrice = 15000; // Base price in KSH
-    
-    // Distance factor
-    if (quoteData.fromLocation !== quoteData.toLocation) {
-      basePrice += 5000;
-    }
-    
-    // Property size factor
-    const sizeMultipliers = {
-      "Bedsitter": 0.7,
-      "1BR": 1,
-      "2BR": 1.4,
-      "3BR": 1.8,
-      "4BR": 2.2,
-      "5BR+": 2.8,
-      "Maisonette": 2.5,
-      "Villa": 3.2
-    };
-    
-    const multiplier = sizeMultipliers[quoteData.propertySize as keyof typeof sizeMultipliers] || 1;
-    basePrice *= multiplier;
-    
-    // Floor factor
-    const floorCost = (parseInt(quoteData.currentFloor) || 0) * 1000 + 
-                     (parseInt(quoteData.destinationFloor) || 0) * 1000;
-    basePrice += floorCost;
-    
-    // Inventory factor
-    const inventoryCount = quoteData.inventory.beds + 
-                          quoteData.inventory.wardrobe + 
-                          quoteData.inventory.sofaSeats +
-                          (quoteData.inventory.boxes || 0) * 0.1;
-    basePrice += inventoryCount * 800;
-    
-    // Appliances
-    const applianceCount = [
-      quoteData.inventory.fridge,
-      quoteData.inventory.washingMachine,
-      quoteData.inventory.tv,
-      quoteData.inventory.diningTable
-    ].filter(Boolean).length;
-    
-    basePrice += applianceCount * 2000;
-    
-    return Math.round(basePrice);
-  };
-
-  const aiEstimate = calculateAIEstimate();
+  const aiEstimate = quoteData.aiEstimate?.total || 0;
+  const breakdown = quoteData.aiEstimate?.breakdown || [];
+  const clarifying = quoteData.aiEstimate?.clarifyingQuestions || [];
+  const distanceText = quoteData.distance;
+  const durationText = quoteData.duration;
 
   // Mock moving companies data
   const movingCompanies = [
@@ -151,10 +109,13 @@ const QuoteResults = ({ quoteData, onBookMover, onCompare }: QuoteResultsProps) 
           <div className="flex items-center justify-between mb-4">
             <div>
               <p className="text-3xl font-bold text-primary">
-                KSH {aiEstimate.toLocaleString()}
+                KSH {aiEstimate ? aiEstimate.toLocaleString() : '—'}
               </p>
               <p className="text-muted-foreground">
                 {quoteData.fromLocation} → {quoteData.toLocation} • {quoteData.propertySize}
+                {distanceText && (
+                  <> • {distanceText}{durationText && ` / ${durationText}`}</>
+                )}
               </p>
             </div>
             <div className="text-right">
@@ -166,10 +127,53 @@ const QuoteResults = ({ quoteData, onBookMover, onCompare }: QuoteResultsProps) 
               </p>
             </div>
           </div>
-          
-          <div className="text-sm text-muted-foreground">
-            <p>✓ Includes basic loading, transportation, and unloading</p>
-            <p>• Additional services may apply extra charges</p>
+          <div className="grid md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <p className="text-sm font-medium mb-2 flex items-center gap-2"><Info className="w-4 h-4" /> Breakdown</p>
+              <ul className="text-xs space-y-1">
+                {breakdown.map((b: any) => (
+                  <li key={b.label} className="flex justify-between">
+                    <span>{b.label}</span>
+                    <span className="font-medium">KSH {b.amount.toLocaleString()}</span>
+                  </li>
+                ))}
+                {breakdown.length === 0 && <li className="text-muted-foreground">No breakdown available</li>}
+              </ul>
+            </div>
+            <div>
+              <p className="text-sm font-medium mb-2 flex items-center gap-2"><Info className="w-4 h-4" /> Clarifying Questions</p>
+              <ul className="text-xs space-y-1">
+                {clarifying.map((q: any) => (
+                  <li key={q.id}>• {q.question}</li>
+                ))}
+                {clarifying.length === 0 && <li className="text-muted-foreground">None needed</li>}
+              </ul>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+            <span>✓ Includes basic loading, transportation, and unloading</span>
+            <span>• Extra services may add costs</span>
+          </div>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={async () => {
+                const phone = window.prompt('Enter WhatsApp number (E.164, e.g. 2547XXXXXXXX)');
+                if (!phone) return;
+                try {
+                  const msg = `Moving estimate: KSH ${aiEstimate.toLocaleString()} for ${quoteData.propertySize} ${quoteData.fromLocation} -> ${quoteData.toLocation}${distanceText ? ' ('+distanceText+')' : ''}.`;
+                  await sendWhatsAppMessage({ to: phone, text: msg });
+                  alert('WhatsApp message sent');
+                } catch (e) {
+                  alert('Failed to send WhatsApp message');
+                  console.error(e);
+                }
+              }}
+              className="flex items-center gap-2"
+            >
+              <Send className="w-4 h-4" /> Send to WhatsApp
+            </Button>
           </div>
         </CardContent>
       </Card>

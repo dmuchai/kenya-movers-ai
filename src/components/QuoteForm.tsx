@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { fetchDistanceMatrix, invokeAIQuoteEstimation, generateAIQuoteEstimation } from '@/services/api';
 
 interface QuoteFormProps {
   onSubmit: (data: any) => void;
@@ -134,12 +135,31 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
       }
 
       // Call the original onSubmit with the saved quote data
-      onSubmit({
-        ...formData,
-        id: quoteData.id,
-        status: quoteData.status,
-        created_at: quoteData.created_at,
-      });
+      // New: fetch distance and generate AI estimate
+      try {
+        const dm = await fetchDistanceMatrix([formData.fromLocation], [formData.toLocation]);
+        const first = dm.distances?.[0];
+        const aiEstimate = await invokeAIQuoteEstimation({ ...formData, distance_meters: first?.distance_meters });
+        onSubmit({
+          ...formData,
+          id: quoteData.id,
+          status: quoteData.status,
+          created_at: quoteData.created_at,
+          distance: first ? first.text.distance : null,
+            duration: first ? first.text.duration : null,
+            distance_meters: first?.distance_meters,
+            duration_seconds: first?.duration_seconds,
+            aiEstimate,
+        });
+      } catch (e) {
+        console.warn('Distance matrix / AI estimate failed', e);
+        onSubmit({
+          ...formData,
+          id: quoteData.id,
+          status: quoteData.status,
+          created_at: quoteData.created_at,
+        });
+      }
 
       toast({
         title: "Quote request submitted!",
