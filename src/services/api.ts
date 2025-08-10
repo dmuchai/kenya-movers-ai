@@ -89,16 +89,33 @@ export async function invokeAIQuoteEstimation(input: any & { distance_meters?: n
     if (error) throw error
     const estimation = data?.estimation
     if (!estimation) throw new Error('No estimation in response')
-    // Normalize fields, ensure required numbers
+
+    // Normalize breakdown and compute a safe total
+    const breakdown = Array.isArray(estimation.breakdown)
+      ? estimation.breakdown.map((b: any) => ({
+          label: String(b?.label ?? ''),
+          amount: Number(b?.amount ?? 0),
+          rationale: String(b?.rationale ?? '')
+        }))
+      : []
+
+    let total = Number(estimation.total)
+    if (!Number.isFinite(total) || total <= 0) {
+      const sum = breakdown.reduce((acc, item) => acc + (Number.isFinite(item.amount) ? item.amount : 0), 0)
+      if (sum > 0) total = Math.round(sum)
+    }
+
+    if (!Number.isFinite(total) || total <= 0) throw new Error('Estimator returned invalid total')
+
     return {
       base: 0,
       distanceFactor: 0,
       laborFactor: 0,
       inventoryFactor: 0,
       servicesFactor: 0,
-      breakdown: estimation.breakdown || [],
-      clarifyingQuestions: estimation.clarifyingQuestions || [],
-      total: estimation.total || 0
+      breakdown,
+      clarifyingQuestions: Array.isArray(estimation.clarifyingQuestions) ? estimation.clarifyingQuestions : [],
+      total
     }
   } catch (e) {
     console.warn('AI estimator edge function failed, using heuristic', e)
