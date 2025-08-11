@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import LocationAutocomplete from "@/components/LocationAutocomplete";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -28,6 +29,8 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
   const [formData, setFormData] = useState({
     fromLocation: "",
     toLocation: "",
+    fromPlace: null as any,
+    toPlace: null as any,
     propertyType: "",
     propertySize: "",
     currentPropertyType: "",
@@ -153,30 +156,37 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
 
       // Call the original onSubmit with the saved quote data
       // New: fetch distance and generate AI estimate
-      try {
-        const dm = await fetchDistanceMatrix([formData.fromLocation], [formData.toLocation]);
-        const first = dm.distances?.[0];
-        const aiEstimate = await invokeAIQuoteEstimation({ ...formData, distance_meters: first?.distance_meters });
-        onSubmit({
-          ...formData,
-          id: quoteData.id,
-          status: quoteData.status,
-          created_at: quoteData.created_at,
-          distance: first ? first.text.distance : null,
+        try {
+          const origins = formData.fromPlace?.location
+            ? [`${formData.fromPlace.location.lat},${formData.fromPlace.location.lng}`]
+            : [formData.fromLocation]
+          const destinations = formData.toPlace?.location
+            ? [`${formData.toPlace.location.lat},${formData.toPlace.location.lng}`]
+            : [formData.toLocation]
+
+          const dm = await fetchDistanceMatrix(origins, destinations);
+          const first = dm.distances?.[0];
+          const aiEstimate = await invokeAIQuoteEstimation({ ...formData, distance_meters: first?.distance_meters });
+          onSubmit({
+            ...formData,
+            id: quoteData.id,
+            status: quoteData.status,
+            created_at: quoteData.created_at,
+            distance: first ? first.text.distance : null,
             duration: first ? first.text.duration : null,
             distance_meters: first?.distance_meters,
             duration_seconds: first?.duration_seconds,
             aiEstimate,
-        });
-      } catch (e) {
-        console.warn('Distance matrix / AI estimate failed', e);
-        onSubmit({
-          ...formData,
-          id: quoteData.id,
-          status: quoteData.status,
-          created_at: quoteData.created_at,
-        });
-      }
+          });
+        } catch (e) {
+          console.warn('Distance matrix / AI estimate failed', e);
+          onSubmit({
+            ...formData,
+            id: quoteData.id,
+            status: quoteData.status,
+            created_at: quoteData.created_at,
+          });
+        }
 
       toast({
         title: "Quote request submitted!",
@@ -211,16 +221,15 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
                   <MapPin className="w-4 h-4 text-primary" />
                   Moving from
                 </Label>
-                <Select value={formData.fromLocation} onValueChange={(value) => updateFormData("fromLocation", value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select your current city" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {kenyanCities.map(city => (
-                      <SelectItem key={city} value={city}>{city}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <LocationAutocomplete
+                  label=""
+                  value={formData.fromPlace}
+                  onChange={(val) => {
+                    updateFormData("fromPlace", val);
+                    updateFormData("fromLocation", val?.formatted_address || val?.description || "");
+                  }}
+                  placeholder="Search pickup location"
+                />
               </div>
               
               <div>
@@ -228,16 +237,15 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
                   <MapPin className="w-4 h-4 text-trust-blue" />
                   Moving to
                 </Label>
-                <Select value={formData.toLocation} onValueChange={(value) => updateFormData("toLocation", value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select your destination city" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {kenyanCities.map(city => (
-                      <SelectItem key={city} value={city}>{city}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <LocationAutocomplete
+                  label=""
+                  value={formData.toPlace}
+                  onChange={(val) => {
+                    updateFormData("toPlace", val);
+                    updateFormData("toLocation", val?.formatted_address || val?.description || "");
+                  }}
+                  placeholder="Search destination location"
+                />
               </div>
             </div>
           </div>

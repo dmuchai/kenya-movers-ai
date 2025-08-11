@@ -122,3 +122,23 @@ export async function invokeAIQuoteEstimation(input: any & { distance_meters?: n
     return generateAIQuoteEstimation(input)
   }
 }
+
+// Google Places API via Supabase edge function 'places'
+export interface PlaceSuggestion { description: string; place_id: string }
+export interface PlaceDetails { place_id: string; description: string; formatted_address: string; location: { lat: number; lng: number } }
+
+export async function placesAutocomplete(input: string) {
+  const { data, error } = await supabase.functions.invoke('places', {
+    body: { action: 'autocomplete', input }
+  })
+  if (error) throw error
+  return (data?.predictions || []) as PlaceSuggestion[]
+}
+
+export async function getPlaceDetails(place_id: string) {
+  const { data, error } = await supabase.functions.invoke('places', {
+    body: { action: 'details', place_id }
+  })
+  if (error) throw error
+  return data as PlaceDetails
+}
