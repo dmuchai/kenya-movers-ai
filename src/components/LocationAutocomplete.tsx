@@ -59,7 +59,7 @@ export default function LocationAutocomplete({ label, placeholder, value, onChan
 
   const handleSelect = async (it: { description: string; place_id: string }) => {
     setOpen(false);
-    setQuery(it.description);
+    setQuery("");
     try {
       const details = await getPlaceDetails(it.place_id);
       onChange({
@@ -77,7 +77,7 @@ export default function LocationAutocomplete({ label, placeholder, value, onChan
     <div ref={containerRef} className="relative">
       <Label className="mb-2 block">{label}</Label>
       <Input
-        value={open ? query : displayText}
+        value={query !== "" ? query : displayText}
         onChange={(e) => setQuery(e.target.value)}
         onFocus={() => setOpen(true)}
         placeholder={placeholder || "Search address, estate or landmark"}
