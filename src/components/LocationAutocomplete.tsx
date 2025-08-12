@@ -83,7 +83,7 @@ export default function LocationAutocomplete({ label, placeholder, value, onChan
         placeholder={placeholder || "Search address, estate or landmark"}
         className="h-11"
       />
-      {open && (items.length > 0 || loading) && (
+      {open && (
         <div className={cn(
           "absolute z-20 mt-1 w-full rounded-md border bg-background shadow",
           "max-h-64 overflow-auto"
@@ -91,17 +91,19 @@ export default function LocationAutocomplete({ label, placeholder, value, onChan
           {loading && (
             <div className="px-3 py-2 text-sm text-muted-foreground">Searching…</div>
           )}
-          {items.map((it) => (
-            <button
-              key={it.place_id}
-              type="button"
-              onClick={() => handleSelect(it)}
-              className="w-full text-left px-3 py-2 text-sm hover:bg-muted"
-            >
-              {it.description}
-            </button>
-          ))}
-          {!loading && items.length === 0 && (
+          {!loading && items.length > 0 && (
+            items.map((it) => (
+              <button
+                key={it.place_id}
+                type="button"
+                onClick={() => handleSelect(it)}
+                className="w-full text-left px-3 py-2 text-sm hover:bg-muted"
+              >
+                {it.description}
+              </button>
+            ))
+          )}
+          {!loading && items.length === 0 && query.length >= 3 && (
             <div className="px-3 py-2 text-sm text-muted-foreground">No suggestions</div>
           )}
         </div>
