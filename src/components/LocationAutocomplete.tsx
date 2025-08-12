@@ -87,10 +87,11 @@ export default function LocationAutocomplete({ label, placeholder, value, onChan
         onFocus={() => setOpen(true)}
         placeholder={placeholder || "Search address, estate or landmark"}
         className="h-11"
+        autoComplete="off"
       />
       {open && (
         <div className={cn(
-          "absolute z-20 mt-1 w-full rounded-md border bg-background shadow",
+          "absolute z-50 mt-1 w-full rounded-md border bg-background shadow",
           "max-h-64 overflow-auto"
         )}>
           {loading && (
