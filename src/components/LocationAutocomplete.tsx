@@ -38,8 +38,11 @@ export default function LocationAutocomplete({ label, placeholder, value, onChan
     if (!query || query.length < 3) {
       setItems([]);
       setOpen(false);
+      setLoading(false);
       return;
     }
+    // Open dropdown immediately so users see loading state
+    setOpen(true);
     setLoading(true);
     const t = setTimeout(async () => {
       try {
@@ -48,6 +51,8 @@ export default function LocationAutocomplete({ label, placeholder, value, onChan
         setOpen(true);
       } catch (e) {
         console.warn("places autocomplete failed", e);
+        setItems([]);
+        setOpen(true);
       } finally {
         setLoading(false);
       }
