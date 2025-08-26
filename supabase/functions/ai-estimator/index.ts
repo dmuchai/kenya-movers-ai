@@ -1,25 +1,27 @@
 // Supabase Edge Function: ai-estimator
-// Purpose: Use OpenAI (or compatible) Chat Completions API to:
-// 1. Produce clarifying questions (if data is incomplete)
-// 2. Produce a cost estimate with structured breakdown
-// POST JSON body: { quote: {...}, distance_meters?: number }
-// Returns JSON: { estimation: { total, breakdown[], clarifyingQuestions[] }}
-// Environment variables needed:
-//   OPENAI_API_KEY  (store via `supabase secrets set OPENAI_API_KEY=...`)
-// Optional:
-//   OPENAI_BASE_URL (for Azure/OpenAI compatible endpoints)
-//   OPENAI_MODEL (default gpt-4o-mini or gpt-4o)
-//   COST_BASE, COST_DISTANCE_FACTOR_KM, COST_LABOR_MULTIPLIER, ... (to tune heuristics)
-//
-// Security: This function runs server-side. Never expose OPENAI_API_KEY to the client.
-// Rate limiting can be added via RLS + a usage table (not implemented here).
+// AI-powered cost estimation using OpenAI
 
-// deno-lint-ignore-file no-explicit-any
-// @ts-nocheck
-
-interface EstimatorRequest {
+export interface EstimatorRequest {
   quote: any
   distance_meters?: number
+}
+
+export interface EstimationBreakdownItem {
+  label: string
+  amount: number
+  rationale: string
+}
+
+export interface ClarifyingQuestion {
+  id: string
+  field: string
+  question: string
+}
+
+export interface AIEstimation {
+  total: number
+  breakdown: EstimationBreakdownItem[]
+  clarifyingQuestions: ClarifyingQuestion[]
 }
 
 const corsHeaders = {
@@ -37,29 +39,31 @@ Deno.serve(async (req) => {
     const body = await req.json() as EstimatorRequest
     if (!body.quote) return new Response(JSON.stringify({ error: 'Missing quote object' }), { status: 400, headers: headersBase })
 
-  const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY')
-    if (!OPENAI_API_KEY) return new Response(JSON.stringify({ error: 'Missing OPENAI_API_KEY' }), { status: 500, headers: headersBase })
+    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY')
+    
+    // If no OpenAI key, fall back to heuristic estimation
+    if (!OPENAI_API_KEY) {
+      const estimation = generateHeuristicEstimation(body.quote, body.distance_meters)
+      return new Response(JSON.stringify({ estimation }), { status: 200, headers: headersBase })
+    }
 
     const OPENAI_BASE_URL = Deno.env.get('OPENAI_BASE_URL') || 'https://api.openai.com/v1'
     const OPENAI_MODEL = Deno.env.get('OPENAI_MODEL') || 'gpt-4o-mini'
 
-    // Build a system prompt instructing the model to output JSON only
-    const systemPrompt = `You are a structured estimator for a household moving service in Kenya.
-Return ONLY valid minified JSON with keys: total (number), breakdown (array of {label,amount,rationale}), clarifyingQuestions (array of {id,field,question}).
-Amounts in Kenyan Shillings. Consider distance, property size, floors, elevators, inventory, and additional services. If data missing, include clarifying questions.
-Ensure sum of breakdown amounts equals total.`
+    // Build system prompt for structured output
+    const systemPrompt = `You are a cost estimator for household moving services in Kenya.
+Return ONLY valid JSON with keys: total (number), breakdown (array of {label,amount,rationale}), clarifyingQuestions (array of {id,field,question}).
+Amounts in Kenyan Shillings. Consider distance, property size, floors, elevators, inventory, and additional services.
+Base rates: KES 15,000-25,000 for local moves, +KES 50-100 per km for distance, +20-50% for stairs/no elevator.
+Ensure breakdown amounts sum to total.`
 
     const userContent = {
       quote: body.quote,
       distance_meters: body.distance_meters,
+      context: 'Kenya moving service cost estimation'
     }
 
-    const messages = [
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: JSON.stringify(userContent) }
-    ]
-
-    const resp = await fetch(`${OPENAI_BASE_URL}/chat/completions`, {
+    const response = await fetch(`${OPENAI_BASE_URL}/chat/completions`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${OPENAI_API_KEY}`,
@@ -67,29 +71,94 @@ Ensure sum of breakdown amounts equals total.`
       },
       body: JSON.stringify({
         model: OPENAI_MODEL,
-        messages,
-        temperature: 0.3,
-        response_format: { type: 'json_object' }
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: JSON.stringify(userContent) }
+        ],
+        temperature: 0.1,
+        max_tokens: 1000
       })
     })
 
-    const data = await resp.json()
-    if (!resp.ok) {
-      console.error('OpenAI error', data)
-      return new Response(JSON.stringify({ error: 'OpenAI API error', details: data }), { status: 502, headers: headersBase })
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${response.status} ${response.statusText}`)
     }
 
-    const content = data.choices?.[0]?.message?.content
-    let estimation
+    const aiResponse = await response.json()
+    const content = aiResponse.choices?.[0]?.message?.content
+
+    if (!content) {
+      throw new Error('No content received from OpenAI')
+    }
+
     try {
-      estimation = JSON.parse(content)
-    } catch (_e) {
-      return new Response(JSON.stringify({ error: 'Model output parse error', raw: content }), { status: 500, headers: headersBase })
+      const estimation = JSON.parse(content) as AIEstimation
+      return new Response(JSON.stringify({ estimation }), { status: 200, headers: headersBase })
+    } catch (parseError) {
+      console.error('Failed to parse AI response:', content)
+      // Fall back to heuristic if AI response is malformed
+      const estimation = generateHeuristicEstimation(body.quote, body.distance_meters)
+      return new Response(JSON.stringify({ estimation }), { status: 200, headers: headersBase })
     }
 
-    return new Response(JSON.stringify({ estimation }), { status: 200, headers: headersBase })
-  } catch (e) {
-    console.error(e)
-    return new Response(JSON.stringify({ error: 'Unexpected error', details: String(e) }), { status: 500, headers: headersBase })
+  } catch (error) {
+    console.error('AI Estimator Error:', error)
+    // Always fall back to heuristic estimation on error
+    try {
+      const body = await req.json() as EstimatorRequest
+      const estimation = generateHeuristicEstimation(body.quote, body.distance_meters)
+      return new Response(JSON.stringify({ estimation }), { status: 200, headers: headersBase })
+    } catch {
+      return new Response(JSON.stringify({ error: 'Failed to generate estimation' }), { status: 500, headers: headersBase })
+    }
   }
 })
+
+// Fallback heuristic estimation
+function generateHeuristicEstimation(quote: any, distanceMeters?: number): AIEstimation {
+  const base = 15000 // Base cost in KES
+  const distanceKm = distanceMeters ? distanceMeters / 1000 : 10
+  const distanceFactor = Math.max(0, distanceKm - 5) * 75 // KES 75 per km after 5km
+  
+  // Property size multiplier
+  const sizeMultiplier = {
+    'studio': 0.8,
+    '1-bedroom': 1.0,
+    '2-bedroom': 1.3,
+    '3-bedroom': 1.6,
+    '4-bedroom': 2.0,
+    'house': 2.5,
+    'office': 1.8
+  }[quote.property_size] || 1.0
+
+  const baseCost = base * sizeMultiplier
+  const laborFactor = quote.inventory ? Object.keys(quote.inventory).length * 500 : 2000
+  const servicesFactor = (quote.additional_services?.length || 0) * 2500
+
+  const total = Math.round(baseCost + distanceFactor + laborFactor + servicesFactor)
+
+  const breakdown: EstimationBreakdownItem[] = [
+    { label: 'Base Service', amount: Math.round(baseCost), rationale: `${quote.property_size} property moving` },
+    { label: 'Distance', amount: Math.round(distanceFactor), rationale: `${distanceKm.toFixed(1)}km transportation` },
+    { label: 'Labor & Handling', amount: Math.round(laborFactor), rationale: 'Packing and moving labor' },
+    { label: 'Additional Services', amount: Math.round(servicesFactor), rationale: quote.additional_services?.join(', ') || 'Standard service' }
+  ]
+
+  const clarifyingQuestions: ClarifyingQuestion[] = []
+  if (!quote.inventory?.fridge) {
+    clarifyingQuestions.push({
+      id: 'appliances',
+      field: 'inventory.appliances',
+      question: 'Do you have large appliances (fridge, washing machine) that need special handling?'
+    })
+  }
+  if (!quote.elevatorCurrent) {
+    clarifyingQuestions.push({
+      id: 'access',
+      field: 'access',
+      question: 'Are there stairs or access restrictions at pickup location?'
+    })
+  }
+
+  return { total, breakdown, clarifyingQuestions }
+}

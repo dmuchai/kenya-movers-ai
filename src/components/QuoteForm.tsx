@@ -32,7 +32,8 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
     fromPlace: null as any,
     toPlace: null as any,
     propertyType: "",
-    propertySize: "",
+    currentPropertySize: "",
+    destinationPropertySize: "",
     currentPropertyType: "",
     destinationPropertyType: "",
     currentFloor: "",
@@ -135,7 +136,7 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
 
     try {
       // Map property size to DB-allowed values and save quote to database
-      const propertySizeDB = mapPropertySizeToDB(formData.propertySize);
+      const currentPropertySizeDB = mapPropertySizeToDB(formData.currentPropertySize);
       const { data: quoteData, error } = await supabase
         .from('quotes')
         .insert({
@@ -143,7 +144,7 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
           from_location: formData.fromLocation,
           to_location: formData.toLocation,
           moving_date: formData.movingDate?.toISOString().split('T')[0],
-          property_size: propertySizeDB,
+          property_size: currentPropertySizeDB,
           additional_services: formData.additionalServices,
           special_requirements: formData.specialRequirements || null,
         })
@@ -288,21 +289,39 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
               </div>
             </div>
 
-            <div>
-              <Label className="flex items-center gap-2 mb-2">
-                <Home className="w-4 h-4 text-primary" />
-                Bedrooms / Size
-              </Label>
-              <Select value={formData.propertySize} onValueChange={(value) => updateFormData("propertySize", value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select property size" />
-                </SelectTrigger>
-                <SelectContent>
-                  {propertySizes.map(size => (
-                    <SelectItem key={size} value={size}>{size}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label className="flex items-center gap-2 mb-2">
+                  <Home className="w-4 h-4 text-primary" />
+                  Current Property Size
+                </Label>
+                <Select value={formData.currentPropertySize} onValueChange={(value) => updateFormData("currentPropertySize", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select current property size" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {propertySizes.map(size => (
+                      <SelectItem key={size} value={size}>{size}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="flex items-center gap-2 mb-2">
+                  <Building className="w-4 h-4 text-primary" />
+                  Destination Property Size
+                </Label>
+                <Select value={formData.destinationPropertySize} onValueChange={(value) => updateFormData("destinationPropertySize", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select destination property size" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {propertySizes.map(size => (
+                      <SelectItem key={size} value={size}>{size}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -451,7 +470,8 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
               <h3 className="font-semibold text-lg mb-3">Quote Summary</h3>
               <div className="space-y-2 text-sm">
                 <p><span className="font-medium">Route:</span> {formData.fromLocation} → {formData.toLocation}</p>
-                <p><span className="font-medium">Property Size:</span> {formData.propertySize}</p>
+                <p><span className="font-medium">Current Property Size:</span> {formData.currentPropertySize}</p>
+                <p><span className="font-medium">Destination Property Size:</span> {formData.destinationPropertySize}</p>
                 {formData.movingDate && (
                   <p><span className="font-medium">Date:</span> {format(formData.movingDate, "PPP")}</p>
                 )}
@@ -522,7 +542,7 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
                 onClick={nextStep}
                 disabled={
                   (step === 1 && (!formData.fromLocation || !formData.toLocation)) ||
-                  (step === 2 && !formData.propertySize) ||
+                  (step === 2 && (!formData.currentPropertySize || !formData.destinationPropertySize)) ||
                   (step === 4 && !formData.movingDate)
                 }
                 className="flex items-center gap-2"
