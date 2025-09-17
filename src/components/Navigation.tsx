@@ -32,8 +32,8 @@ const Navigation = () => {
     { label: "My Quotes", icon: Users, href: "/quotes", authRequired: true },
     { label: "Profile", icon: Users, href: "/profile", authRequired: true },
     { label: "Mover Dashboard", icon: Truck, href: "/mover-dashboard", authRequired: true },
-    { label: "Help", icon: HelpCircle, href: "#help" },
-    { label: "Contact", icon: Phone, href: "#contact" },
+    { label: "Help", icon: HelpCircle, href: "/help" },
+    { label: "Contact", icon: Phone, href: "/contact" },
   ];
 
   return (
@@ -41,7 +41,7 @@ const Navigation = () => {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <div className="p-2 bg-gradient-to-r from-primary to-trust-blue rounded-lg">
               <Truck className="w-6 h-6 text-white" />
             </div>
@@ -49,7 +49,7 @@ const Navigation = () => {
               <h1 className="text-xl font-bold text-foreground">MoveEasy</h1>
               <p className="text-xs text-muted-foreground">Kenya</p>
             </div>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">

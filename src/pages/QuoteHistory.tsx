@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { ReviewForm } from "@/components/ReviewForm";
+import Navigation from "@/components/Navigation";
 
 interface Quote {
   id: string;
@@ -121,22 +122,27 @@ const QuoteHistory = () => {
 
   if (!user) {
     return (
-      <div className="max-w-4xl mx-auto p-6">
-        <Card>
-          <CardContent className="text-center py-12">
-            <h3 className="text-lg font-semibold mb-2">Authentication Required</h3>
-            <p className="text-muted-foreground">Please sign in to view your quote history.</p>
-          </CardContent>
-        </Card>
-      </div>
+      <>
+        <Navigation />
+        <div className="max-w-4xl mx-auto p-6 pt-24">
+          <Card>
+            <CardContent className="text-center py-12">
+              <h3 className="text-lg font-semibold mb-2">Authentication Required</h3>
+              <p className="text-muted-foreground">Please sign in to view your quote history.</p>
+            </CardContent>
+          </Card>
+        </div>
+      </>
     );
   }
 
   if (loading) {
     return (
-      <div className="max-w-4xl mx-auto p-6">
-        <div className="animate-pulse space-y-4">
-          {[1, 2, 3].map((i) => (
+      <>
+        <Navigation />
+        <div className="max-w-4xl mx-auto p-6 pt-24">
+          <div className="animate-pulse space-y-4">
+            {[1, 2, 3].map((i) => (
             <Card key={i}>
               <CardContent className="p-6">
                 <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
@@ -144,19 +150,22 @@ const QuoteHistory = () => {
               </CardContent>
             </Card>
           ))}
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold mb-2">Quote History</h2>
-        <p className="text-muted-foreground">
-          Track all your moving quote requests and their status.
-        </p>
-      </div>
+    <>
+      <Navigation />
+      <div className="max-w-4xl mx-auto p-6 pt-24">
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold mb-2">Quote History</h2>
+          <p className="text-muted-foreground">
+            Track all your moving quote requests and their status.
+          </p>
+        </div>
 
       {quotes.length === 0 ? (
         <Card>
@@ -280,7 +289,8 @@ const QuoteHistory = () => {
           ))}
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 };
 

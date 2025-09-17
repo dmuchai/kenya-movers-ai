@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
+import Navigation from '@/components/Navigation';
 
 interface Profile {
   full_name: string;
@@ -104,19 +105,24 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
+      <>
+        <Navigation />
+        <div className="flex justify-center items-center min-h-[400px] pt-20">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <Card className="max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle>Profile Settings</CardTitle>
-        </CardHeader>
-        <CardContent>
+    <>
+      <Navigation />
+      <div className="container mx-auto py-8 px-4 pt-24">
+        <Card className="max-w-2xl mx-auto">
+          <CardHeader>
+            <CardTitle>Profile Settings</CardTitle>
+          </CardHeader>
+          <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="fullName">Full Name</Label>
@@ -169,6 +175,7 @@ export default function Profile() {
           </form>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </>
   );
 }

@@ -9,6 +9,7 @@ import { Truck, MapPin, Calendar, DollarSign, Clock, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import MoverProfile from '@/components/MoverProfile';
 import QuoteResponseForm from '@/components/QuoteResponseForm';
+import Navigation from '@/components/Navigation';
 
 interface Quote {
   id: string;
@@ -146,22 +147,27 @@ export default function MoverDashboard() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
+      <>
+        <Navigation />
+        <div className="flex justify-center items-center min-h-[400px] pt-20">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="flex items-center gap-3 mb-8">
-        <div className="p-3 bg-gradient-to-r from-primary to-trust-blue rounded-lg">
-          <Truck className="w-8 h-8 text-white" />
-        </div>
-        <div>
-          <h1 className="text-3xl font-bold">Mover Dashboard</h1>
-          <p className="text-muted-foreground">Manage your moving business</p>
-        </div>
+    <>
+      <Navigation />
+      <div className="container mx-auto py-8 px-4 pt-24">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="p-3 bg-gradient-to-r from-primary to-trust-blue rounded-lg">
+            <Truck className="w-8 h-8 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold">Mover Dashboard</h1>
+            <p className="text-muted-foreground">Manage your moving business</p>
+          </div>
       </div>
 
       <Tabs defaultValue="quotes" className="space-y-6">
@@ -326,6 +332,7 @@ export default function MoverDashboard() {
           onSubmit={handleResponseSubmitted}
         />
       )}
-    </div>
+      </div>
+    </>
   );
 }

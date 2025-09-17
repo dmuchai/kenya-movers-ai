@@ -10,6 +10,8 @@ import Auth from "./pages/Auth";
 import QuoteHistory from "./pages/QuoteHistory";
 import Profile from "./pages/Profile";
 import MoverDashboard from "./pages/MoverDashboard";
+import Help from "./pages/Help";
+import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -42,6 +44,8 @@ const App = () => (
               <Route path="/quotes" element={<QuoteHistory />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/mover-dashboard" element={<MoverDashboard />} />
+              <Route path="/help" element={<Help />} />
+              <Route path="/contact" element={<Contact />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
