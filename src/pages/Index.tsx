@@ -53,15 +53,6 @@ const Index = () => {
       {currentView === "hero" && (
         <div id="home">
           <Hero />
-          {/* Call to action to start quote */}
-          <div className="max-w-4xl mx-auto px-4 py-16 text-center">
-            <button 
-              onClick={startQuote}
-              className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-trust-blue text-white px-8 py-4 rounded-lg text-lg font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
-            >
-              Start Your Free Quote
-            </button>
-          </div>
         </div>
       )}
       
