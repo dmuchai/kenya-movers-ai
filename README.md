@@ -11,7 +11,7 @@ Kenya Movers AI is a modern web application for instant, AI-powered moving quote
 
 - 🚚 **Instant Moving Quotes**: Get real-time, AI-powered cost estimates for your move.
 - 📍 **Location Autocomplete**: Search for any location in Kenya with Google Places API and static fallback for major towns.
-- 🏠 **Property Details**: Specify both current and destination property types and sizes for accurate quotes.
+- 🏠 **Property Details**: Specify property type, size, floor details, and elevator access for accurate quotes.
 - 📦 **Inventory & Services**: Add inventory, special requirements, and select extra services.
 - 🧑‍💼 **Mover Profiles**: View and review professional movers.
 - 🔒 **Authentication**: Secure login and quote history for users.

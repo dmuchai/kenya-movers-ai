@@ -33,7 +33,6 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
     toPlace: null as any,
     propertyType: "",
     currentPropertySize: "",
-    destinationPropertySize: "",
     currentPropertyType: "",
     destinationPropertyType: "",
     currentFloor: "",
@@ -257,7 +256,7 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
           <div className="space-y-6">
             <div className="text-center mb-6">
               <h2 className="text-2xl font-bold text-foreground mb-2">Property Details & Access</h2>
-              <p className="text-muted-foreground">Types, floors, elevator access, and size</p>
+              <p className="text-muted-foreground">Property type, size, floors, and elevator access</p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -293,27 +292,11 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
               <div>
                 <Label className="flex items-center gap-2 mb-2">
                   <Home className="w-4 h-4 text-primary" />
-                  Current Property Size
+                  Property Size
                 </Label>
                 <Select value={formData.currentPropertySize} onValueChange={(value) => updateFormData("currentPropertySize", value)}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select current property size" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {propertySizes.map(size => (
-                      <SelectItem key={size} value={size}>{size}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label className="flex items-center gap-2 mb-2">
-                  <Building className="w-4 h-4 text-primary" />
-                  Destination Property Size
-                </Label>
-                <Select value={formData.destinationPropertySize} onValueChange={(value) => updateFormData("destinationPropertySize", value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select destination property size" />
+                    <SelectValue placeholder="Select property size" />
                   </SelectTrigger>
                   <SelectContent>
                     {propertySizes.map(size => (
@@ -470,8 +453,7 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
               <h3 className="font-semibold text-lg mb-3">Quote Summary</h3>
               <div className="space-y-2 text-sm">
                 <p><span className="font-medium">Route:</span> {formData.fromLocation} → {formData.toLocation}</p>
-                <p><span className="font-medium">Current Property Size:</span> {formData.currentPropertySize}</p>
-                <p><span className="font-medium">Destination Property Size:</span> {formData.destinationPropertySize}</p>
+                <p><span className="font-medium">Property Size:</span> {formData.currentPropertySize}</p>
                 {formData.movingDate && (
                   <p><span className="font-medium">Date:</span> {format(formData.movingDate, "PPP")}</p>
                 )}
@@ -542,7 +524,7 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
                 onClick={nextStep}
                 disabled={
                   (step === 1 && (!formData.fromLocation || !formData.toLocation)) ||
-                  (step === 2 && (!formData.currentPropertySize || !formData.destinationPropertySize)) ||
+                  (step === 2 && !formData.currentPropertySize) ||
                   (step === 4 && !formData.movingDate)
                 }
                 className="flex items-center gap-2"
