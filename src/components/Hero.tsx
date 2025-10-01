@@ -1,84 +1,126 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, MapPin, Calculator, Users } from "lucide-react";
+import { ArrowRight, MapPin, Calculator, Users, Sparkles, TrendingUp } from "lucide-react";
 import heroImage from "@/assets/hero-moving-truck.jpg";
 import { Link } from "react-router-dom";
 
 const Hero = () => {
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-primary/5 to-trust-blue/5">
-      {/* Background Image */}
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-pattern">
+      {/* Enhanced Background with Gradient Overlay */}
       <div className="absolute inset-0 z-0">
         <img 
           src={heroImage} 
           alt="Moving truck in Kenya" 
-          className="w-full h-full object-cover opacity-20"
+          className="w-full h-full object-cover opacity-15"
         />
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-trust-blue/20"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-trust-blue/10"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-transparent"></div>
       </div>
       
+      {/* Floating Elements for Visual Interest */}
+      <div className="absolute top-20 left-10 w-20 h-20 bg-primary/5 rounded-full blur-xl animate-pulse"></div>
+      <div className="absolute bottom-32 right-16 w-32 h-32 bg-trust-blue/5 rounded-full blur-xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+      <div className="absolute top-1/3 right-20 w-16 h-16 bg-warm-orange/5 rounded-full blur-xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+      
       {/* Content */}
-      <div className="relative z-10 max-w-6xl mx-auto px-4 py-20 text-center">
-        <div className="space-y-8">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 text-sm font-medium text-primary shadow-md">
-            <MapPin className="w-4 h-4" />
-            Trusted across Kenya's major cities
+      <div className="relative z-10 container-enhanced py-20 text-center">
+        <div className="space-y-8 animate-slide-in-up">
+          {/* Enhanced Badge */}
+          <div className="inline-flex items-center gap-2 bg-white/95 backdrop-blur-md rounded-full px-6 py-3 text-sm font-semibold text-primary shadow-lg border border-primary/10 hover:shadow-xl transition-all duration-300">
+            <Sparkles className="w-4 h-4 text-trust-blue" />
+            Trusted by 10,000+ customers across Kenya
+            <TrendingUp className="w-4 h-4 text-success" />
           </div>
           
-          {/* Main Heading */}
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-foreground leading-tight">
+          {/* Enhanced Main Heading with Better Typography */}
+          <h1 className="text-hero animate-fade-in-scale" style={{ animationDelay: '0.2s' }}>
             Moving Made{" "}
-            <span className="bg-gradient-to-r from-primary to-trust-blue bg-clip-text text-transparent">
-              Simple
+            <span className="relative">
+              <span className="bg-gradient-to-r from-primary via-trust-blue to-primary bg-clip-text text-transparent animate-shimmer">
+                Effortless
+              </span>
+              <div className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-primary/30 to-trust-blue/30 rounded-full"></div>
             </span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Get instant quotes from top-rated moving companies across Nairobi, Mombasa, Kisumu, and all major Kenyan cities.
+          <p className="text-xl md:text-2xl text-neutral-600 max-w-4xl mx-auto leading-relaxed animate-slide-in-up font-medium" style={{ animationDelay: '0.4s' }}>
+            Get instant AI-powered quotes from Kenya's most trusted moving companies. 
+            <span className="text-primary font-semibold"> Compare prices, read reviews, and book in minutes.</span>
           </p>
           
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
+          {/* Enhanced CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6 animate-slide-in-up" style={{ animationDelay: '0.6s' }}>
             <Button 
-              variant="hero" 
-              size="lg" 
-              className="w-full sm:w-auto text-lg px-8 py-4 min-h-[56px] font-semibold"
+              className="btn-primary-enhanced w-full sm:w-auto text-lg px-10 py-4 min-h-[56px] font-bold group shadow-2xl"
               asChild
             >
               <Link to="/?quote=start" aria-label="Start free moving quote">
-                Get Free Quote
-                <ArrowRight className="w-5 h-5" />
+                <Calculator className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform duration-300" />
+                Get Free Quote Now
+                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
               </Link>
             </Button>
             
             <Button 
-              variant="outline" 
-              size="lg" 
-              className="w-full sm:w-auto text-lg px-8 py-4 min-h-[56px] bg-white/90 backdrop-blur-sm border-2 hover:bg-white font-semibold"
+              className="btn-secondary-enhanced w-full sm:w-auto text-lg px-8 py-4 min-h-[56px] font-semibold group"
             >
-              Compare Movers
+              <Users className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform duration-300" />
+              Browse Movers
             </Button>
           </div>
           
-          {/* Trust Indicators */}
-          <div className="pt-12">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-              <div className="flex flex-col items-center gap-3 p-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg">
-                <Calculator className="w-8 h-8 text-primary" />
-                <h3 className="font-semibold text-lg">AI-Powered Estimates</h3>
-                <p className="text-muted-foreground text-center">Get accurate pricing in seconds</p>
+          {/* Enhanced Trust Indicators */}
+          <div className="pt-16 animate-slide-in-up" style={{ animationDelay: '0.8s' }}>
+            <div className="text-subtle text-center mb-8">
+              Why choose MoveEasy?
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+              <div className="card-enhanced group p-8 hover-lift">
+                <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary-light rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <Calculator className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="font-bold text-xl mb-3 text-foreground">AI-Powered Estimates</h3>
+                <p className="text-neutral-600 leading-relaxed">Get accurate, instant pricing based on your specific moving requirements using advanced algorithms</p>
               </div>
               
-              <div className="flex flex-col items-center gap-3 p-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg">
-                <Users className="w-8 h-8 text-trust-blue" />
-                <h3 className="font-semibold text-lg">Verified Companies</h3>
-                <p className="text-muted-foreground text-center">Only trusted, rated movers</p>
+              <div className="card-enhanced group p-8 hover-lift">
+                <div className="w-16 h-16 bg-gradient-to-br from-trust-blue to-trust-blue-light rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <Users className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="font-bold text-xl mb-3 text-foreground">Verified Companies</h3>
+                <p className="text-neutral-600 leading-relaxed">Only pre-screened, licensed, and highly-rated moving companies with proven track records</p>
               </div>
               
-              <div className="flex flex-col items-center gap-3 p-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg">
-                <MapPin className="w-8 h-8 text-warm-orange" />
-                <h3 className="font-semibold text-lg">All Major Cities</h3>
-                <p className="text-muted-foreground text-center">Coverage across Kenya</p>
+              <div className="card-enhanced group p-8 hover-lift">
+                <div className="w-16 h-16 bg-gradient-to-br from-warm-orange to-warm-orange-light rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <MapPin className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="font-bold text-xl mb-3 text-foreground">Kenya-Wide Coverage</h3>
+                <p className="text-neutral-600 leading-relaxed">Comprehensive coverage across Nairobi, Mombasa, Kisumu, Nakuru, and all major Kenyan cities</p>
+              </div>
+            </div>
+          </div>
+          
+          {/* Enhanced Statistics */}
+          <div className="pt-12 animate-slide-in-up" style={{ animationDelay: '1s' }}>
+            <div className="bg-white/60 backdrop-blur-md rounded-2xl p-8 max-w-4xl mx-auto shadow-xl border border-white/20">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-primary mb-2">10K+</div>
+                  <div className="text-sm text-neutral-600 font-medium">Happy Customers</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-trust-blue mb-2">500+</div>
+                  <div className="text-sm text-neutral-600 font-medium">Verified Movers</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-warm-orange mb-2">47</div>
+                  <div className="text-sm text-neutral-600 font-medium">Cities Covered</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-success mb-2">4.9★</div>
+                  <div className="text-sm text-neutral-600 font-medium">Average Rating</div>
+                </div>
               </div>
             </div>
           </div>

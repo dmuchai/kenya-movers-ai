@@ -9,17 +9,24 @@ import { useLocation, useNavigate } from "react-router-dom";
 const Index = () => {
   const [currentView, setCurrentView] = useState<"hero" | "quote" | "results">("hero");
   const [quoteData, setQuoteData] = useState(null);
+  const [isLoadingResults, setIsLoadingResults] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
 
   const handleQuoteSubmit = (data: any) => {
-    setQuoteData(data);
-    setCurrentView("results");
-    toast({
-      title: "Quote Generated!",
-      description: "We found the best movers for you.",
-    });
+    setIsLoadingResults(true);
+    
+    // Simulate processing time for better UX
+    setTimeout(() => {
+      setQuoteData(data);
+      setCurrentView("results");
+      setIsLoadingResults(false);
+      toast({
+        title: "Quote Generated!",
+        description: "We found the best movers for you.",
+      });
+    }, 1500);
   };
 
   const handleBookMover = (moverId: string) => {
@@ -65,12 +72,13 @@ const Index = () => {
           </div>
         )}
         
-        {currentView === "results" && quoteData && (
+        {(currentView === "results" || isLoadingResults) && (
           <div id="results" className="pt-16">
             <QuoteResults 
               quoteData={quoteData}
               onBookMover={handleBookMover}
               onCompare={handleCompare}
+              loading={isLoadingResults}
             />
           </div>
         )}

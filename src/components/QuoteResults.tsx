@@ -21,15 +21,19 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { sendWhatsAppMessage } from '@/services/api';
+import { SkeletonQuoteCard, SkeletonMoverProfile } from "@/components/ui/skeleton";
+import { LoadingButton, ComponentLoader } from "@/components/ui/loading";
 
 interface QuoteResultsProps {
   quoteData: any;
   onBookMover: (moverId: string) => void;
   onCompare: () => void;
+  loading?: boolean;
 }
 
-const QuoteResults = ({ quoteData, onBookMover, onCompare }: QuoteResultsProps) => {
+const QuoteResults = ({ quoteData, onBookMover, onCompare, loading = false }: QuoteResultsProps) => {
   const [savedMovers, setSavedMovers] = useState<string[]>([]);
+  const [sendingMessage, setSendingMessage] = useState<string | null>(null);
 
   const aiEstimate = quoteData.aiEstimate?.total || 0;
   const breakdown = quoteData.aiEstimate?.breakdown || [];
@@ -92,18 +96,36 @@ const QuoteResults = ({ quoteData, onBookMover, onCompare }: QuoteResultsProps) 
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      {/* AI Estimate Card */}
-      <Card className="mb-8 border-2 border-primary/20 bg-gradient-to-r from-primary/5 to-trust-blue/5">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-3">
-            <div className="p-2 bg-primary/10 rounded-full">
-              <Zap className="w-6 h-6 text-primary" />
+      {loading ? (
+        <div className="space-y-6">
+          {/* Loading AI Estimate */}
+          <SkeletonQuoteCard />
+          
+          {/* Loading Movers */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between mb-4">
+              <div className="h-6 w-48 bg-muted animate-pulse rounded" />
+              <div className="h-8 w-24 bg-muted animate-pulse rounded" />
             </div>
-            <div>
-              <h2 className="text-2xl">AI Instant Estimate</h2>
-              <p className="text-sm text-muted-foreground font-normal">Based on your requirements</p>
-            </div>
-          </CardTitle>
+            {Array.from({ length: 3 }).map((_, i) => (
+              <SkeletonMoverProfile key={i} />
+            ))}
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* AI Estimate Card */}
+          <Card className="mb-8 border-2 border-primary/20 bg-gradient-to-r from-primary/5 to-trust-blue/5 animate-in slide-in-from-bottom-4 duration-500">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-3">
+                <div className="p-2 bg-primary/10 rounded-full">
+                  <Zap className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <h2 className="text-2xl">AI Instant Estimate</h2>
+                  <p className="text-sm text-muted-foreground font-normal">Based on your requirements</p>
+                </div>
+              </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between mb-4">
@@ -196,9 +218,10 @@ const QuoteResults = ({ quoteData, onBookMover, onCompare }: QuoteResultsProps) 
           <Card 
             key={company.id} 
             className={cn(
-              "transition-all duration-300 hover:shadow-lg hover:-translate-y-1",
+              "transition-all duration-300 hover:shadow-lg hover:-translate-y-1 group animate-in slide-in-from-bottom-4 duration-500",
               company.featured && "border-2 border-primary/30 bg-gradient-to-r from-primary/5 to-trust-blue/5"
             )}
+            style={{ animationDelay: `${index * 100}ms` }}
           >
             <CardContent className="p-6">
               <div className="flex flex-col lg:flex-row lg:items-center gap-6">
@@ -292,18 +315,22 @@ const QuoteResults = ({ quoteData, onBookMover, onCompare }: QuoteResultsProps) 
                   
                   <div className="space-y-2">
                     <div className="flex gap-2">
-                      <Button 
-                        className="flex-1" 
+                      <LoadingButton 
+                        className="flex-1 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]" 
                         onClick={() => onBookMover(company.id)}
+                        size="md"
                       >
                         Book Now
                         <ChevronRight className="w-4 h-4 ml-1" />
-                      </Button>
+                      </LoadingButton>
                       <Button
                         variant="outline"
                         size="icon"
                         onClick={() => toggleSaved(company.id)}
-                        className={savedMovers.includes(company.id) ? "text-primary" : ""}
+                        className={cn(
+                          "transition-all duration-200 hover:scale-[1.05] active:scale-[0.95]",
+                          savedMovers.includes(company.id) ? "text-primary border-primary bg-primary/5" : ""
+                        )}
                       >
                         {savedMovers.includes(company.id) ? (
                           <BookmarkCheck className="w-4 h-4" />
@@ -314,14 +341,36 @@ const QuoteResults = ({ quoteData, onBookMover, onCompare }: QuoteResultsProps) 
                     </div>
                     
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm" className="flex-1">
+                      <LoadingButton 
+                        variant="outline" 
+                        size="sm" 
+                        className="flex-1 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                        loading={sendingMessage === `call-${company.id}`}
+                        loadingText="Calling..."
+                        onClick={() => {
+                          setSendingMessage(`call-${company.id}`);
+                          setTimeout(() => setSendingMessage(null), 2000);
+                          // Handle call action
+                        }}
+                      >
                         <Phone className="w-4 h-4 mr-1" />
                         Call
-                      </Button>
-                      <Button variant="outline" size="sm" className="flex-1">
+                      </LoadingButton>
+                      <LoadingButton 
+                        variant="outline" 
+                        size="sm" 
+                        className="flex-1 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                        loading={sendingMessage === `chat-${company.id}`}
+                        loadingText="Opening..."
+                        onClick={() => {
+                          setSendingMessage(`chat-${company.id}`);
+                          setTimeout(() => setSendingMessage(null), 1500);
+                          // Handle chat action
+                        }}
+                      >
                         <MessageCircle className="w-4 h-4 mr-1" />
                         Chat
-                      </Button>
+                      </LoadingButton>
                     </div>
                   </div>
                 </div>
@@ -348,6 +397,8 @@ const QuoteResults = ({ quoteData, onBookMover, onCompare }: QuoteResultsProps) 
           </Button>
         </div>
       </div>
+        </>
+      )}
     </div>
   );
 };

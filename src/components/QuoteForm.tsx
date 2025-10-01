@@ -18,6 +18,10 @@ import { useToast } from "@/hooks/use-toast";
 import { fetchDistanceMatrix, invokeAIQuoteEstimation, generateAIQuoteEstimation } from '@/services/api';
 import FormProgress from "@/components/FormProgress";
 import { FormField, useFieldValidation } from "@/components/FormValidation";
+import { LoadingButton, LoadingOverlay, PulsingDot } from "@/components/ui/loading";
+import { useLoading } from "@/hooks/useLoading";
+import { useSwipeNavigation } from "@/hooks/useSwipeable";
+import { useHapticForm } from "@/hooks/useHapticFeedback";
 
 interface QuoteFormProps {
   onSubmit: (data: any) => void;
@@ -27,10 +31,15 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [step, setStep] = useState(1);
-  const [loading, setLoading] = useState(false);
+  const { loading, startLoading, stopLoading } = useLoading();
   const [stepValidation, setStepValidation] = useState<{ [key: number]: boolean }>({});
   const [stepErrors, setStepErrors] = useState<{ [key: number]: boolean }>({});
   const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
+  const [submitProgress, setSubmitProgress] = useState(0);
+  const [submitMessage, setSubmitMessage] = useState("");
+  const { onFieldChange, onStepComplete, onError } = useHapticForm();
+
+  // Enhanced form data state
   const [formData, setFormData] = useState({
     fromLocation: "",
     toLocation: "",
@@ -99,10 +108,12 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
   ];
 
   const updateFormData = (field: string, value: any) => {
+    onFieldChange(); // Haptic feedback for field changes
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const updateInventory = (item: string, value: any) => {
+    onFieldChange(); // Haptic feedback for inventory changes
     setFormData(prev => ({ 
       ...prev, 
       inventory: { ...prev.inventory, [item]: value }
@@ -194,13 +205,40 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
 
   const nextStep = () => {
     if (validateStep(step) && step < 5) {
+      onStepComplete(); // Haptic feedback for successful step completion
       setStep(step + 1);
+    } else if (!validateStep(step)) {
+      onError(); // Haptic feedback for validation error
     }
   };
 
   const prevStep = () => {
-    if (step > 1) setStep(step - 1);
+    if (step > 1) {
+      onFieldChange(); // Light haptic feedback for navigation
+      setStep(step - 1);
+    }
   };
+
+  // Enhanced navigation with validation checks for swipe gestures
+  const canNavigate = (direction: 'prev' | 'next') => {
+    if (direction === 'prev') return step > 1;
+    if (direction === 'next') return step < 5 && validateStep(step);
+    return false;
+  };
+
+  // Swipe navigation setup
+  const swipeHandlers = useSwipeNavigation(
+    step, 
+    5, 
+    (newStep) => {
+      if (newStep > step) {
+        nextStep();
+      } else {
+        prevStep();
+      }
+    },
+    canNavigate
+  );
 
   const handleSubmit = async () => {
     if (!user) {
@@ -222,7 +260,9 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
       return;
     }
 
-    setLoading(true);
+    startLoading();
+    setSubmitProgress(0);
+    setSubmitMessage("Saving quote details...");
 
     try {
       // Map property size to DB-allowed values and save quote to database
@@ -246,6 +286,9 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
       }
 
       // Call the original onSubmit with the saved quote data
+      setSubmitProgress(25);
+      setSubmitMessage("Calculating distance...");
+      
       // New: fetch distance and generate AI estimate
         try {
           const origins = formData.fromPlace?.location
@@ -255,28 +298,43 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
             ? [`${formData.toPlace.location.lat},${formData.toPlace.location.lng}`]
             : [formData.toLocation]
 
+          setSubmitProgress(50);
           const dm = await fetchDistanceMatrix(origins, destinations);
+          
+          setSubmitProgress(75);
+          setSubmitMessage("Generating AI estimate...");
           const first = dm.distances?.[0];
           const aiEstimate = await invokeAIQuoteEstimation({ ...formData, distance_meters: first?.distance_meters });
-          onSubmit({
-            ...formData,
-            id: quoteData.id,
-            status: quoteData.status,
-            created_at: quoteData.created_at,
-            distance: first ? first.text.distance : null,
-            duration: first ? first.text.duration : null,
-            distance_meters: first?.distance_meters,
-            duration_seconds: first?.duration_seconds,
-            aiEstimate,
-          });
+          
+          setSubmitProgress(100);
+          setSubmitMessage("Quote submitted successfully!");
+          
+          setTimeout(() => {
+            onSubmit({
+              ...formData,
+              id: quoteData.id,
+              status: quoteData.status,
+              created_at: quoteData.created_at,
+              distance: first ? first.text.distance : null,
+              duration: first ? first.text.duration : null,
+              distance_meters: first?.distance_meters,
+              duration_seconds: first?.duration_seconds,
+              aiEstimate,
+            });
+          }, 500);
         } catch (e) {
           console.warn('Distance matrix / AI estimate failed', e);
-          onSubmit({
-            ...formData,
-            id: quoteData.id,
-            status: quoteData.status,
-            created_at: quoteData.created_at,
-          });
+          setSubmitProgress(100);
+          setSubmitMessage("Quote saved - estimates will be calculated later");
+          
+          setTimeout(() => {
+            onSubmit({
+              ...formData,
+              id: quoteData.id,
+              status: quoteData.status,
+              created_at: quoteData.created_at,
+            });
+          }, 500);
         }
 
       toast({
@@ -292,7 +350,9 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      stopLoading();
+      setSubmitProgress(0);
+      setSubmitMessage("");
     }
   };
 
@@ -579,65 +639,105 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
-      <Card className="shadow-lg border-0 bg-gradient-to-b from-white to-gray-50/50">
-        <CardHeader className="text-center pb-6">
-          <CardTitle className="flex items-center justify-center gap-2 text-primary mb-6">
-            <Package className="w-6 h-6" />
-            Get Your Moving Quote
-          </CardTitle>
-          
-          {/* Enhanced Progress Indicator */}
-          <FormProgress 
-            currentStep={step}
-            totalSteps={5}
-            stepValidation={stepValidation}
-            stepErrors={stepErrors}
-          />
-        </CardHeader>
-        
-        <CardContent className="p-6">
-          {renderStep()}
-          
-          <div className="flex justify-between mt-8 gap-4">
-            <Button
-              variant="outline"
-              onClick={prevStep}
-              disabled={step === 1}
-              className="flex items-center gap-2 min-h-[48px] px-6"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              Previous
-            </Button>
+    <LoadingOverlay loading={loading} text={submitMessage}>
+      <div className="max-w-2xl mx-auto px-4 py-8">
+        <Card className="card-enhanced shadow-2xl border-0">
+          <CardHeader className="text-center pb-6">
+            <CardTitle className="flex items-center justify-center gap-2 text-primary mb-6">
+              <Package className="w-6 h-6" />
+              Get Your Moving Quote
+            </CardTitle>
             
-            {step < 5 ? (
-              <Button
-                onClick={nextStep}
-                disabled={
-                  (step === 1 && (!formData.fromLocation || !formData.toLocation)) ||
-                  (step === 2 && !formData.currentPropertySize) ||
-                  (step === 4 && !formData.movingDate)
-                }
-                className="flex items-center gap-2 min-h-[48px] px-6"
-              >
-                Next
-                <ArrowRight className="w-4 h-4" />
-              </Button>
-            ) : (
-              <Button
-                onClick={handleSubmit}
-                disabled={loading}
-                variant="hero"
-                className="flex items-center gap-2 min-h-[48px] px-6"
-              >
-                {loading ? "Submitting..." : "Submit Quote"}
-                <ArrowRight className="w-4 h-4" />
-              </Button>
+            {/* Enhanced Progress Indicator */}
+            <FormProgress 
+              currentStep={step}
+              totalSteps={5}
+              stepValidation={stepValidation}
+              stepErrors={stepErrors}
+            />
+          </CardHeader>
+          
+          {/* Enhanced form content with swipe navigation */}
+          <CardContent className="p-6" {...swipeHandlers.ref}>
+            {/* Swipe hint indicator */}
+            <div className="text-center mb-4 md:hidden">
+              <div className="text-xs text-neutral-400 font-medium">
+                💡 Swipe left/right to navigate between steps
+              </div>
+            </div>
+            
+            <div className="relative">
+              {/* Step content with enhanced animations */}
+              <div className="min-h-[400px] transition-all duration-300 ease-out">
+                {renderStep()}
+              </div>
+            </div>
+            
+            {/* Enhanced progress during submission */}
+            {loading && submitProgress > 0 && (
+              <div className="mt-6 p-4 bg-primary/5 rounded-lg border border-primary/20">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium">Processing...</span>
+                  <span className="text-sm text-muted-foreground">{submitProgress}%</span>
+                </div>
+                <div className="w-full bg-secondary rounded-full h-2">
+                  <div
+                    className="h-full bg-primary rounded-full transition-all duration-500 ease-out"
+                    style={{ width: `${submitProgress}%` }}
+                  />
+                </div>
+                {submitMessage && (
+                  <div className="flex items-center mt-2 text-sm text-muted-foreground">
+                    <PulsingDot size="sm" className="mr-2" />
+                    {submitMessage}
+                  </div>
+                )}
+              </div>
             )}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+            
+            <div className="flex justify-between mt-8 gap-4">
+              <Button
+                variant="outline"
+                onClick={prevStep}
+                disabled={step === 1 || loading}
+                className="flex items-center gap-2 min-h-[48px] px-6 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                Previous
+              </Button>
+              
+              {step < 5 ? (
+                <Button
+                  onClick={nextStep}
+                  disabled={
+                    loading ||
+                    (step === 1 && (!formData.fromLocation || !formData.toLocation)) ||
+                    (step === 2 && !formData.currentPropertySize) ||
+                    (step === 4 && !formData.movingDate)
+                  }
+                  className="flex items-center gap-2 min-h-[48px] px-6 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  Next
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              ) : (
+                <LoadingButton
+                  onClick={handleSubmit}
+                  loading={loading}
+                  loadingText={submitMessage || "Submitting..."}
+                  variant="default"
+                  size="lg"
+                  className="flex items-center gap-2 min-h-[48px] px-6 bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 hover:scale-[1.02]"
+                >
+                  Submit Quote
+                  <ArrowRight className="w-4 h-4" />
+                </LoadingButton>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </LoadingOverlay>
   );
 };
 
