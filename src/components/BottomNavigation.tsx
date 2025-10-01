@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Home, Calculator, History, User, Menu } from "lucide-react";
+import { Home, Calculator, History, User, Menu, Phone, HelpCircle } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -67,7 +67,7 @@ const BottomNavigation = () => {
               className="flex items-center gap-3 p-3 rounded-lg text-foreground hover:bg-primary/5 transition-colors"
               onClick={() => setShowFullMenu(false)}
             >
-              <Calculator className="w-5 h-5" />
+              <HelpCircle className="w-5 h-5" />
               Help
             </Link>
             <Link
@@ -75,7 +75,7 @@ const BottomNavigation = () => {
               className="flex items-center gap-3 p-3 rounded-lg text-foreground hover:bg-primary/5 transition-colors"
               onClick={() => setShowFullMenu(false)}
             >
-              <Calculator className="w-5 h-5" />
+              <Phone className="w-5 h-5" />
               Contact
             </Link>
           </div>

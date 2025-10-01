@@ -16,6 +16,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { fetchDistanceMatrix, invokeAIQuoteEstimation, generateAIQuoteEstimation } from '@/services/api';
+import FormProgress from "@/components/FormProgress";
+import { FormField, useFieldValidation } from "@/components/FormValidation";
 
 interface QuoteFormProps {
   onSubmit: (data: any) => void;
@@ -26,6 +28,9 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
   const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [stepValidation, setStepValidation] = useState<{ [key: number]: boolean }>({});
+  const [stepErrors, setStepErrors] = useState<{ [key: number]: boolean }>({});
+  const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
   const [formData, setFormData] = useState({
     fromLocation: "",
     toLocation: "",
@@ -104,6 +109,80 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
     }));
   };
 
+  // Validation functions
+  const validateStep = (stepNumber: number): boolean => {
+    const errors: { [key: string]: string } = {};
+    let isValid = true;
+
+    switch (stepNumber) {
+      case 1:
+        if (!formData.fromLocation.trim()) {
+          errors.fromLocation = "From location is required";
+          isValid = false;
+        }
+        if (!formData.toLocation.trim()) {
+          errors.toLocation = "To location is required";
+          isValid = false;
+        }
+        break;
+      case 2:
+        if (!formData.currentPropertySize) {
+          errors.currentPropertySize = "Property size is required";
+          isValid = false;
+        }
+        if (!formData.currentPropertyType) {
+          errors.currentPropertyType = "Property type is required";
+          isValid = false;
+        }
+        break;
+      case 3:
+        if (!formData.currentFloor) {
+          errors.currentFloor = "Current floor is required";
+          isValid = false;
+        }
+        if (!formData.destinationFloor) {
+          errors.destinationFloor = "Destination floor is required";
+          isValid = false;
+        }
+        break;
+      case 4:
+        if (!formData.movingDate) {
+          errors.movingDate = "Moving date is required";
+          isValid = false;
+        } else {
+          const selectedDate = new Date(formData.movingDate);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          if (selectedDate < today) {
+            errors.movingDate = "Moving date cannot be in the past";
+            isValid = false;
+          }
+        }
+        break;
+      case 5:
+        // Step 5 is optional services, no strict validation required
+        break;
+      default:
+        break;
+    }
+
+    setFieldErrors(prev => ({ ...prev, ...errors }));
+    setStepValidation(prev => ({ ...prev, [stepNumber]: isValid }));
+    setStepErrors(prev => ({ ...prev, [stepNumber]: !isValid }));
+    
+    return isValid;
+  };
+
+  const validateAllSteps = (): boolean => {
+    let allValid = true;
+    for (let i = 1; i <= 5; i++) {
+      if (!validateStep(i)) {
+        allValid = false;
+      }
+    }
+    return allValid;
+  };
+
   const toggleService = (service: string) => {
     setFormData(prev => ({
       ...prev,
@@ -114,7 +193,9 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
   };
 
   const nextStep = () => {
-    if (step < 5) setStep(step + 1);
+    if (validateStep(step) && step < 5) {
+      setStep(step + 1);
+    }
   };
 
   const prevStep = () => {
@@ -126,6 +207,16 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
       toast({
         title: "Authentication required",
         description: "Please sign in to submit a quote request.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate all steps before submission
+    if (!validateAllSteps()) {
+      toast({
+        title: "Please complete all required fields",
+        description: "Check the highlighted fields and try again.",
         variant: "destructive",
       });
       return;
@@ -216,7 +307,14 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
             </div>
             
             <div className="space-y-4">
-              <div>
+              <FormField
+                validation={useFieldValidation({
+                  field: "From location",
+                  value: formData.fromLocation,
+                  required: true
+                })}
+                hint="Search for your current address or city"
+              >
                 <Label htmlFor="from" className="flex items-center gap-2 mb-2">
                   <MapPin className="w-4 h-4 text-primary" />
                   Moving from
@@ -230,9 +328,16 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
                   }}
                   placeholder="Search pickup location"
                 />
-              </div>
+              </FormField>
               
-              <div>
+              <FormField
+                validation={useFieldValidation({
+                  field: "To location",
+                  value: formData.toLocation,
+                  required: true
+                })}
+                hint="Search for your destination address or city"
+              >
                 <Label htmlFor="to" className="flex items-center gap-2 mb-2">
                   <MapPin className="w-4 h-4 text-trust-blue" />
                   Moving to
@@ -246,7 +351,7 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
                   }}
                   placeholder="Search destination location"
                 />
-              </div>
+              </FormField>
             </div>
           </div>
         );
@@ -476,33 +581,19 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
       <Card className="shadow-lg border-0 bg-gradient-to-b from-white to-gray-50/50">
-        <CardHeader className="text-center">
-          <CardTitle className="flex items-center justify-center gap-2 text-primary">
+        <CardHeader className="text-center pb-6">
+          <CardTitle className="flex items-center justify-center gap-2 text-primary mb-6">
             <Package className="w-6 h-6" />
             Get Your Moving Quote
           </CardTitle>
           
-          {/* Progress bar */}
-          <div className="flex justify-center mt-4">
-            <div className="flex items-center space-x-2">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="flex items-center">
-                  <div className={cn(
-                    "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium",
-                    i <= step ? "bg-primary text-white" : "bg-gray-200 text-gray-500"
-                  )}>
-                    {i}
-                  </div>
-                  {i < 5 && (
-                    <div className={cn(
-                      "w-12 h-1 mx-1",
-                      i < step ? "bg-primary" : "bg-gray-200"
-                    )} />
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
+          {/* Enhanced Progress Indicator */}
+          <FormProgress 
+            currentStep={step}
+            totalSteps={5}
+            stepValidation={stepValidation}
+            stepErrors={stepErrors}
+          />
         </CardHeader>
         
         <CardContent className="p-6">

@@ -3,8 +3,6 @@
 
 MoveEasy Moving Planner is a modern web application for instant, AI-powered moving quotes in Kenya. It features live location autocomplete, dynamic quote estimation, mover profiles, and a seamless user experience for both customers and moving companies.
 
-**Live App:** [https://kenya-movers-ai.vercel.app](https://kenya-movers-ai.vercel.app)
-
 ---
 
 ## Features
