@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Navigation from "@/components/Navigation";
+import BottomNavigation from "@/components/BottomNavigation";
 import Hero from "@/components/Hero";
 import QuoteForm from "@/components/QuoteForm";
 import QuoteResults from "@/components/QuoteResults";
@@ -50,27 +51,33 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      {currentView === "hero" && (
-        <div id="home">
-          <Hero />
-        </div>
-      )}
+      {/* Main content with mobile bottom nav spacing */}
+      <main className="pb-20 md:pb-0">
+        {currentView === "hero" && (
+          <div id="home">
+            <Hero />
+          </div>
+        )}
+        
+        {currentView === "quote" && (
+          <div id="quote" className="pt-16">
+            <QuoteForm onSubmit={handleQuoteSubmit} />
+          </div>
+        )}
+        
+        {currentView === "results" && quoteData && (
+          <div id="results" className="pt-16">
+            <QuoteResults 
+              quoteData={quoteData}
+              onBookMover={handleBookMover}
+              onCompare={handleCompare}
+            />
+          </div>
+        )}
+      </main>
       
-      {currentView === "quote" && (
-        <div id="quote" className="pt-16">
-          <QuoteForm onSubmit={handleQuoteSubmit} />
-        </div>
-      )}
-      
-      {currentView === "results" && quoteData && (
-        <div id="results" className="pt-16">
-          <QuoteResults 
-            quoteData={quoteData}
-            onBookMover={handleBookMover}
-            onCompare={handleCompare}
-          />
-        </div>
-      )}
+      {/* Bottom Navigation for Mobile */}
+      <BottomNavigation />
     </div>
   );
 };

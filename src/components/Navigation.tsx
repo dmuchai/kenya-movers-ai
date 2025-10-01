@@ -96,10 +96,10 @@ const Navigation = () => {
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden"
+            className="md:hidden min-h-[44px] min-w-[44px]" // Improved touch target
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
-            {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </Button>
         </div>
 
@@ -108,17 +108,17 @@ const Navigation = () => {
           "md:hidden transition-all duration-300 overflow-hidden",
           isMenuOpen ? "max-h-96 pb-4" : "max-h-0"
         )}>
-          <div className="space-y-2 pt-2">
+          <div className="space-y-1 pt-2">
             {navigationItems
               .filter(item => !item.authRequired || user)
               .map((item) => (
               <Link
                 key={item.label}
                 to={item.href.startsWith('#') ? '/' : item.href}
-                className="flex items-center gap-3 p-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all"
+                className="flex items-center gap-4 p-4 rounded-lg text-base font-medium text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all min-h-[52px]" // Better touch targets
                 onClick={() => setIsMenuOpen(false)}
               >
-                <item.icon className="w-5 h-5" />
+                <item.icon className="w-6 h-6" />
                 {item.label}
               </Link>
             ))}
@@ -126,20 +126,20 @@ const Navigation = () => {
             <div className="pt-2 space-y-2">
               {user ? (
                 <>
-                  <div className="px-3 py-2 text-sm text-muted-foreground">
+                  <div className="px-4 py-3 text-base text-muted-foreground">
                     Welcome, {user.email?.split('@')[0]}
                   </div>
-                  <Button variant="outline" className="w-full" size="sm" onClick={handleSignOut}>
-                    <LogOut className="w-4 h-4 mr-2" />
+                  <Button variant="outline" className="w-full min-h-[48px]" size="default" onClick={handleSignOut}>
+                    <LogOut className="w-5 h-5 mr-2" />
                     Sign Out
                   </Button>
                 </>
               ) : (
                 <>
-                  <Button variant="outline" className="w-full" size="sm" asChild>
+                  <Button variant="outline" className="w-full min-h-[48px]" size="default" asChild>
                     <Link to="/auth">Sign In</Link>
                   </Button>
-                  <Button variant="hero" className="w-full" size="sm" asChild>
+                  <Button variant="hero" className="w-full min-h-[48px]" size="default" asChild>
                     <Link to="/?quote=start">Get Quote</Link>
                   </Button>
                 </>

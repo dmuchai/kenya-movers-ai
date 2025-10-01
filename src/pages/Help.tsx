@@ -14,7 +14,7 @@ const Help = () => {
             <HelpCircle className="w-16 h-16 text-primary mx-auto mb-4" />
             <h1 className="text-3xl font-bold mb-2">Help Center</h1>
             <p className="text-muted-foreground">
-              Find answers to common questions about Kenya Movers AI
+              Find answers to common questions about MoveEasy Moving Planner
             </p>
           </div>
 
@@ -26,7 +26,7 @@ const Help = () => {
                   Getting Started
                 </CardTitle>
                 <CardDescription>
-                  Learn how to use Kenya Movers AI for your moving needs
+                  Learn how to use MoveEasy Moving Planner for your moving needs
                 </CardDescription>
               </CardHeader>
               <CardContent>

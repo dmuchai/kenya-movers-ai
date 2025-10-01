@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import Navigation from '@/components/Navigation';
+import BottomNavigation from '@/components/BottomNavigation';
 
 interface Profile {
   full_name: string;
@@ -117,7 +118,7 @@ export default function Profile() {
   return (
     <>
       <Navigation />
-      <div className="container mx-auto py-8 px-4 pt-24">
+      <div className="container mx-auto py-8 px-4 pt-24 pb-24 md:pb-8">
         <Card className="max-w-2xl mx-auto">
           <CardHeader>
             <CardTitle>Profile Settings</CardTitle>
@@ -176,6 +177,7 @@ export default function Profile() {
         </CardContent>
       </Card>
       </div>
+      <BottomNavigation />
     </>
   );
 }

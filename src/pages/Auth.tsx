@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import Navigation from '@/components/Navigation';
+import BottomNavigation from '@/components/BottomNavigation';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
@@ -100,10 +101,10 @@ const Auth = () => {
   return (
     <>
       <Navigation />
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 to-secondary/10 p-4 pt-24">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 to-secondary/10 p-4 pt-24 pb-24 md:pb-4">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold">Welcome to Moving Quote</CardTitle>
+            <CardTitle className="text-2xl font-bold">Welcome to MoveEasy</CardTitle>
             <CardDescription>
               Sign in to your account or create a new one to get started
             </CardDescription>
@@ -200,6 +201,7 @@ const Auth = () => {
         </CardContent>
       </Card>
       </div>
+      <BottomNavigation />
     </>
   );
 };

@@ -508,12 +508,12 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
         <CardContent className="p-6">
           {renderStep()}
           
-          <div className="flex justify-between mt-8">
+          <div className="flex justify-between mt-8 gap-4">
             <Button
               variant="outline"
               onClick={prevStep}
               disabled={step === 1}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 min-h-[48px] px-6"
             >
               <ChevronLeft className="w-4 h-4" />
               Previous
@@ -527,7 +527,7 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
                   (step === 2 && !formData.currentPropertySize) ||
                   (step === 4 && !formData.movingDate)
                 }
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 min-h-[48px] px-6"
               >
                 Next
                 <ArrowRight className="w-4 h-4" />
@@ -537,7 +537,7 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
                 onClick={handleSubmit}
                 disabled={loading}
                 variant="hero"
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 min-h-[48px] px-6"
               >
                 {loading ? "Submitting..." : "Submit Quote"}
                 <ArrowRight className="w-4 h-4" />

@@ -1,4 +1,4 @@
-# Deployment Guide for Kenya Movers AI
+# Deployment Guide for MoveEasy Moving Planner
 
 ## 🚀 Production Deployment Checklist
 

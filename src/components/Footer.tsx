@@ -10,7 +10,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="space-y-4">
-            <h3 className="text-xl font-bold text-blue-400">Kenya Movers AI</h3>
+            <h3 className="text-xl font-bold text-blue-400">MoveEasy Moving Planner</h3>
             <p className="text-gray-300 text-sm leading-relaxed">
               Professional moving services across Kenya. We make your relocation stress-free 
               with our reliable, efficient, and affordable moving solutions.
@@ -126,7 +126,7 @@ const Footer = () => {
         <div className="border-t border-gray-700 mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="text-gray-400 text-sm">
-              © {currentYear} Kenya Movers AI. All rights reserved.
+              © {currentYear} MoveEasy Moving Planner. All rights reserved.
             </div>
             <div className="flex flex-wrap justify-center md:justify-end space-x-6 text-sm">
               <Link to="/privacy" className="text-gray-400 hover:text-blue-400 transition-colors">

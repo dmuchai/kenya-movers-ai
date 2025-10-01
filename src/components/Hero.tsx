@@ -42,7 +42,7 @@ const Hero = () => {
             <Button 
               variant="hero" 
               size="lg" 
-              className="w-full sm:w-auto text-lg px-8 py-4"
+              className="w-full sm:w-auto text-lg px-8 py-4 min-h-[56px] font-semibold"
               asChild
             >
               <Link to="/?quote=start" aria-label="Start free moving quote">
@@ -54,7 +54,7 @@ const Hero = () => {
             <Button 
               variant="outline" 
               size="lg" 
-              className="w-full sm:w-auto text-lg px-8 py-4 bg-white/90 backdrop-blur-sm border-2 hover:bg-white"
+              className="w-full sm:w-auto text-lg px-8 py-4 min-h-[56px] bg-white/90 backdrop-blur-sm border-2 hover:bg-white font-semibold"
             >
               Compare Movers
             </Button>

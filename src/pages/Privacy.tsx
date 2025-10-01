@@ -200,7 +200,7 @@ const Privacy = () => {
                   <p className="text-gray-700 mb-2"><strong>Privacy Inquiries:</strong> <a href="mailto:privacy@kenyamoversai.com" className="text-blue-600 hover:underline">privacy@kenyamoversai.com</a></p>
                   <p className="text-gray-700 mb-2"><strong>Phone:</strong> <a href="tel:+254700123456" className="text-blue-600 hover:underline">+254 700 123 456</a></p>
                   <p className="text-gray-700">
-                    <strong>Address:</strong> Kenya Movers AI, Data Protection Officer<br />
+                    <strong>Address:</strong> MoveEasy Moving Planner, Data Protection Officer<br />
                     Westlands Business Center, Waiyaki Way<br />
                     Westlands, Nairobi, Kenya
                   </p>

@@ -1,4 +1,4 @@
-// Test utilities and mock data for Kenya Movers AI
+// Test utilities and mock data for MoveEasy Moving Planner
 // Install @testing-library/react, @testing-library/jest-dom, and jest for full testing
 
 // Mock data for development and testing
