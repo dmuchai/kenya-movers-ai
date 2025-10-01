@@ -15,18 +15,21 @@ const Index = () => {
   const location = useLocation();
 
   const handleQuoteSubmit = (data: any) => {
+    console.log('Quote submitted to Index page:', data);
     setIsLoadingResults(true);
     
-    // Simulate processing time for better UX
+    // Set quote data immediately and show results
+    setQuoteData(data);
+    setCurrentView("results");
+    
+    // Short delay just for smooth transition
     setTimeout(() => {
-      setQuoteData(data);
-      setCurrentView("results");
       setIsLoadingResults(false);
       toast({
         title: "Quote Generated!",
         description: "We found the best movers for you.",
       });
-    }, 1500);
+    }, 500);
   };
 
   const handleBookMover = (moverId: string) => {

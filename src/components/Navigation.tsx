@@ -106,9 +106,9 @@ const Navigation = () => {
         {/* Mobile Navigation */}
         <div className={cn(
           "md:hidden transition-all duration-300 overflow-hidden",
-          isMenuOpen ? "max-h-96 pb-4" : "max-h-0"
+          isMenuOpen ? "max-h-[600px] pb-4" : "max-h-0"
         )}>
-          <div className="space-y-1 pt-2">
+          <div className="space-y-1 pt-2 px-4">
             {navigationItems
               .filter(item => !item.authRequired || user)
               .map((item) => (
@@ -123,13 +123,19 @@ const Navigation = () => {
               </Link>
             ))}
             
-            <div className="pt-2 space-y-2">
+            {/* Authentication Section */}
+            <div className="pt-4 space-y-3 border-t border-border/50 mt-4">
               {user ? (
                 <>
-                  <div className="px-4 py-3 text-base text-muted-foreground">
+                  <div className="px-4 py-2 text-base text-muted-foreground bg-muted/30 rounded-lg">
                     Welcome, {user.email?.split('@')[0]}
                   </div>
-                  <Button variant="outline" className="w-full min-h-[48px]" size="default" onClick={handleSignOut}>
+                  <Button 
+                    variant="outline" 
+                    className="w-full min-h-[48px] text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground" 
+                    size="default" 
+                    onClick={handleSignOut}
+                  >
                     <LogOut className="w-5 h-5 mr-2" />
                     Sign Out
                   </Button>

@@ -9,7 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
-import { MapPin, Home, Building, Calendar as CalendarIcon, Package, ArrowRight, ChevronLeft } from "lucide-react";
+import { MapPin, Home, Building, Calendar as CalendarIcon, Package, ArrowRight, ChevronLeft, User } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -48,6 +48,10 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
     propertyType: "",
     currentPropertySize: "",
     currentPropertyType: "",
+    // Contact info for anonymous quotes
+    contactName: "",
+    contactEmail: "",
+    contactPhone: "",
     destinationPropertyType: "",
     currentFloor: "",
     destinationFloor: "",
@@ -171,7 +175,24 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
         }
         break;
       case 5:
-        // Step 5 is optional services, no strict validation required
+        // For guest users, validate contact information
+        if (!user) {
+          if (!formData.contactName?.trim()) {
+            errors.contactName = "Name is required";
+            isValid = false;
+          }
+          if (!formData.contactEmail?.trim()) {
+            errors.contactEmail = "Email is required";
+            isValid = false;
+          } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.contactEmail)) {
+            errors.contactEmail = "Please enter a valid email address";
+            isValid = false;
+          }
+          if (!formData.contactPhone?.trim()) {
+            errors.contactPhone = "Phone number is required";
+            isValid = false;
+          }
+        }
         break;
       default:
         break;
@@ -259,23 +280,85 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
       // Map property size to DB-allowed values and save quote to database
       const currentPropertySizeDB = mapPropertySizeToDB(formData.currentPropertySize);
       
-      // Save quote with or without user ID (allows anonymous quotes)
-      const { data: quoteData, error } = await supabase
-        .from('quotes')
-        .insert({
-          user_id: user.id,
-          from_location: formData.fromLocation,
-          to_location: formData.toLocation,
-          moving_date: formData.movingDate?.toISOString().split('T')[0],
-          property_size: currentPropertySizeDB,
-          additional_services: formData.additionalServices,
-          special_requirements: formData.specialRequirements || null,
-        })
-        .select()
-        .single();
+      // Prepare quote data - include user_id only if user is logged in
+      const quoteInsertData: any = {
+        from_location: formData.fromLocation,
+        to_location: formData.toLocation,
+        moving_date: formData.movingDate?.toISOString().split('T')[0],
+        property_size: currentPropertySizeDB,
+        additional_services: formData.additionalServices,
+        special_requirements: formData.specialRequirements || null,
+      };
+      
+      // Add user_id if logged in, otherwise prepare data for anonymous submission
+      if (user) {
+        quoteInsertData.user_id = user.id;
+      } else {
+        // For anonymous quotes, store contact info in special_requirements
+        const contactInfo = `Contact: ${formData.contactName || 'Guest'} | Email: ${formData.contactEmail || 'N/A'} | Phone: ${formData.contactPhone || 'N/A'}`;
+        quoteInsertData.special_requirements = formData.specialRequirements 
+          ? `${formData.specialRequirements}\n\n${contactInfo}`
+          : contactInfo;
+        // Note: user_id will be handled by the edge function for anonymous quotes
+      }
+      
+      let quoteData;
+      let error;
+
+      if (user) {
+        // Authenticated users: use direct database insert
+        const result = await supabase
+          .from('quotes')
+          .insert(quoteInsertData)
+          .select()
+          .single();
+        quoteData = result.data;
+        error = result.error;
+      } else {
+        // Anonymous users: use edge function to bypass all constraints
+        try {
+          console.log('Submitting anonymous quote via edge function...');
+          
+          const { data, error: functionError } = await supabase.functions.invoke('submit-quote', {
+            body: { 
+              quoteData: quoteInsertData, 
+              isAnonymous: true,
+              contactInfo: {
+                name: formData.contactName,
+                email: formData.contactEmail,
+                phone: formData.contactPhone
+              }
+            }
+          });
+          
+          console.log('Function response:', data, 'Error:', functionError);
+          
+          if (functionError) {
+            console.error('Function invocation error:', functionError);
+            throw functionError;
+          }
+          if (!data || !data.success) {
+            const errorMsg = data?.error || 'Unknown error from submit-quote function';
+            console.error('Function returned error:', errorMsg);
+            throw new Error(errorMsg);
+          }
+          
+          quoteData = data.data;
+          console.log('Anonymous quote submitted successfully via function:', quoteData);
+        } catch (err) {
+          console.error('Anonymous quote submission failed:', err);
+          error = err;
+        }
+      }
 
       if (error) {
-        throw error;
+        console.error('Quote submission error:', error);
+        toast({
+          title: "Error submitting quote",
+          description: `Failed to save quote: ${error.message || 'Please try again'}`,
+          variant: "destructive",
+        });
+        return;
       }
 
       // Call the original onSubmit with the saved quote data
@@ -570,7 +653,7 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
 
               <div className="flex items-center space-x-2">
                 <Checkbox id="tv" checked={formData.inventory.tv}
-                  onCheckedChange={(v) => updateInventory("tv", Boolean(v))} />
+                  onCheckedChange={(v: boolean) => updateInventory("tv", v)} />
                 <Label htmlFor="tv">TV</Label>
               </div>
               {formData.inventory.tv && (
@@ -640,6 +723,71 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
               <h2 className="text-2xl font-bold text-foreground mb-2">Review Your Quote</h2>
               <p className="text-muted-foreground">Please review your information before submitting</p>
             </div>
+            
+            {/* Contact info for guest users */}
+            {!user && (
+              <div className="p-5 bg-primary/5 rounded-xl border border-primary/20 mb-6">
+                <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+                  <User className="w-5 h-5 text-primary" />
+                  Your Contact Information
+                </h3>
+                <p className="text-sm text-muted-foreground mb-4">We'll send your quote to this email</p>
+                <div className="space-y-4">
+                  <FormField
+                    validation={useFieldValidation({
+                      field: "Name",
+                      value: formData.contactName,
+                      required: true
+                    })}
+                  >
+                    <Label htmlFor="contactName">Full Name *</Label>
+                    <Input
+                      id="contactName"
+                      value={formData.contactName}
+                      onChange={(e) => updateFormData("contactName", e.target.value)}
+                      placeholder="Enter your name"
+                      className="input-enhanced"
+                    />
+                  </FormField>
+                  
+                  <FormField
+                    validation={useFieldValidation({
+                      field: "Email",
+                      value: formData.contactEmail,
+                      required: true
+                    })}
+                  >
+                    <Label htmlFor="contactEmail">Email Address *</Label>
+                    <Input
+                      id="contactEmail"
+                      type="email"
+                      value={formData.contactEmail}
+                      onChange={(e) => updateFormData("contactEmail", e.target.value)}
+                      placeholder="your.email@example.com"
+                      className="input-enhanced"
+                    />
+                  </FormField>
+                  
+                  <FormField
+                    validation={useFieldValidation({
+                      field: "Phone",
+                      value: formData.contactPhone,
+                      required: true
+                    })}
+                  >
+                    <Label htmlFor="contactPhone">Phone Number *</Label>
+                    <Input
+                      id="contactPhone"
+                      type="tel"
+                      value={formData.contactPhone}
+                      onChange={(e) => updateFormData("contactPhone", e.target.value)}
+                      placeholder="+254 700 000 000"
+                      className="input-enhanced"
+                    />
+                  </FormField>
+                </div>
+              </div>
+            )}
             
             <div className="p-6 bg-gradient-to-r from-primary/10 to-trust-blue/10 rounded-lg border border-primary/20">
               <h3 className="font-semibold text-lg mb-3">Quote Summary</h3>
