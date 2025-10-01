@@ -59,7 +59,10 @@ const App = () => (
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </div>
-              <Footer />
+              {/* Hide footer on mobile to keep focus on main actions */}
+              <div className="hidden md:block">
+                <Footer />
+              </div>
             </div>
           </BrowserRouter>
         </TooltipProvider>

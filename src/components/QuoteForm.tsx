@@ -241,15 +241,6 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
   );
 
   const handleSubmit = async () => {
-    if (!user) {
-      toast({
-        title: "Authentication required",
-        description: "Please sign in to submit a quote request.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     // Validate all steps before submission
     if (!validateAllSteps()) {
       toast({
@@ -267,6 +258,8 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
     try {
       // Map property size to DB-allowed values and save quote to database
       const currentPropertySizeDB = mapPropertySizeToDB(formData.currentPropertySize);
+      
+      // Save quote with or without user ID (allows anonymous quotes)
       const { data: quoteData, error } = await supabase
         .from('quotes')
         .insert({
@@ -361,6 +354,40 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
       case 1:
         return (
           <div className="space-y-6">
+            {/* Optional: Show friendly auth prompt for non-logged-in users */}
+            {!user && step === 1 && (
+              <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 mb-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <User className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-foreground mb-1">Save your quote?</h3>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Sign in to track your quotes and get personalized recommendations
+                    </p>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="default"
+                        onClick={() => window.location.href = '/auth'}
+                        className="text-xs"
+                      >
+                        Sign In
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-xs"
+                      >
+                        Continue as Guest
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <div className="text-center mb-6">
               <h2 className="text-2xl font-bold text-foreground mb-2">Where are you moving?</h2>
               <p className="text-muted-foreground">Tell us your current and new location</p>
