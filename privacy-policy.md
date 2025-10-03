@@ -34,6 +34,8 @@ We use the collected information to:
 
 ## Information Sharing and Disclosure
 
+**Personal Data Sale Policy**: We do not sell your personal information to third parties for monetary or other valuable consideration. Your personal data is only shared as explicitly described below with your consent or as required by law.
+
 ### With Moving Service Providers
 We share your moving request details (locations, property type, contact information) with relevant moving companies **with your explicit consent** to provide you with quotes and services. Your contact details are shared with a maximum of 5 verified moving providers per quote request to ensure competitive pricing while protecting your privacy.
 
