@@ -1,11 +1,14 @@
 # MoveEasy Play Store Screenshots Guide
 
+⚠️ **IMPORTANT**: All screenshots must comply with Google Play's 2:1 maximum aspect ratio requirement. Use **1080×1920px (9:16)** for guaranteed compliance.
+
 ## 📱 Required Screenshots for Play Store
 
 ### Phone Screenshots (2-8 required)
-- **Size**: 320-3840px wide (Google recommends 1080x1920px for portrait)
+- **Size**: 320-3840px wide (Google recommends 1080×1920px for portrait)
+- **Aspect ratio**: **Must not exceed 2:1** (Google Play requirement)
+- **Recommended**: 9:16 (1080×1920px) for optimal compatibility
 - **Format**: PNG or JPG
-- **Aspect ratio**: 16:9 or 9:16
 
 ### Tablet Screenshots (1-8 optional but recommended)
 - **Size**: 1024-3840px wide (Google recommends 1600x2560px)
@@ -50,15 +53,20 @@
 1. Open app in Chrome/Firefox
 2. Press F12 to open Developer Tools
 3. Click device toolbar icon (phone/tablet icon)
-4. Select device: iPhone 12 Pro (390x844) or Pixel 5 (393x851)
-5. Navigate to each screen
-6. Right-click → "Capture screenshot" or use screenshot extension
+4. **Select device**: Use "Responsive" mode and set custom size to **1080×1920** (9:16 ratio)
+   - OR select "Galaxy S20 Ultra" (1440×3200, then zoom to fit)
+   - **Important**: Ensure 9:16 aspect ratio for Google Play compliance
+5. Set device pixel ratio to 2.0 for crisp screenshots
+6. Navigate to each screen
+7. Right-click → "Capture screenshot" or use screenshot extension
 
 ### Method 2: Android Emulator
 1. Use Android Studio AVD Manager
-2. Create Pixel 6 (1080x2400) emulator
+2. Create custom device with **1080×1920** resolution (9:16 aspect ratio)
+   - OR use Pixel 6 emulator and adjust resolution settings
+   - **Critical**: Must maintain 9:16 ratio for Google Play compliance
 3. Install the APK
-4. Use emulator's screenshot feature
+4. Use emulator's screenshot feature (⌘+S or Ctrl+S)
 5. Navigate through the app
 
 ### Method 3: Physical Device
@@ -68,10 +76,11 @@
 
 ## 📐 Optimal Screenshot Sizes
 
-### Phone (Portrait)
-- **Recommended**: 1080x1920px (16:9)
-- **Alternative**: 1080x2340px (iPhone style)
-- **Minimum**: 320px wide
+### Phone (Portrait) - Google Play Compliant
+- **Required**: 1080×1920px (9:16 ratio) ⭐ **GOOGLE PLAY COMPLIANT**
+- **Alternative**: 1080×1440px (3:4 ratio) - also compliant
+- **Maximum aspect ratio**: 2:1 (Google Play requirement)
+- **Minimum**: 320px wide, 320px tall
 
 ### Tablet (Portrait)  
 - **Recommended**: 1600x2560px
@@ -79,6 +88,14 @@
 
 ## 📋 Screenshot Checklist
 
+### Google Play Compliance ⚠️ CRITICAL
+- [ ] **Aspect ratio**: All screenshots use 9:16 (1080×1920px) or other ratio ≤ 2:1
+- [ ] **Minimum size**: At least 320px in both width and height
+- [ ] **Maximum size**: No dimension exceeds 3840px
+- [ ] **File format**: PNG or JPG only
+- [ ] **File size**: Each screenshot under 8MB
+
+### Content Quality
 - [ ] All text is readable and professional
 - [ ] No personal data visible (use test data)
 - [ ] App logo/branding visible where appropriate
