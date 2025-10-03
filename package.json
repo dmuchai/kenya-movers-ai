@@ -12,7 +12,12 @@
     "lint:fix": "eslint . --fix",
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "playwright:install": "playwright install",
+    "playwright:update": "playwright install --force",
+    "playwright:check": "playwright install --dry-run",
+    "screenshots": "node generate-screenshots.js",
+    "security:browsers": "playwright install chromium --force && echo 'Chromium updated to latest patched version'"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.3",
