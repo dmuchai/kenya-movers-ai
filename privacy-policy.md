@@ -176,7 +176,52 @@ This privacy policy complies with the Data Protection Act, 2019 of Kenya and oth
 
 ## Consent
 
-By using the MoveEasy app, you consent to the collection and use of your information as described in this Privacy Policy.
+When you first use the MoveEasy app, we will ask for your explicit consent to:
+
+### Required Consent (Essential Services)
+- **Process your personal information** to provide moving services and generate quotes
+- **Store your contact details** securely in our systems
+- **Use location data** to match you with relevant moving companies in your area
+- **Communicate with you** about your moving requests and app updates
+
+### Optional Consent (You Can Choose)
+- **Share your contact information with moving companies** (up to 5 verified providers per request)
+- **Receive marketing communications** about moving tips and service updates
+- **Process analytics data** to improve app performance and user experience
+- **Transfer data internationally** to trusted service providers (US, EU) under adequate safeguards
+
+### Granular Consent Options
+You can provide consent for different types of data processing independently:
+
+1. **Moving Service Matching** (Required): Process your moving details to connect you with appropriate service providers
+2. **Contact Information Sharing** (Optional): Share your name, phone, and email with selected moving companies
+3. **Marketing Communications** (Optional): Receive promotional emails and app notifications
+4. **Analytics and Improvement** (Optional): Use anonymized data to enhance app functionality
+5. **International Data Processing** (Optional): Process your data through international service providers
+
+### Consent Management
+- **Clear Language**: All consent requests use plain English explanations
+- **Separate Choices**: Each type of processing has its own consent option
+- **No Pre-Ticked Boxes**: All consent checkboxes start unchecked
+- **Easy Withdrawal**: You can withdraw any consent at any time through app settings or by contacting us
+
+### How to Withdraw Consent
+You can withdraw your consent at any time by:
+- **In-App Settings**: Use the Privacy & Consent section in app settings
+- **Email Request**: Contact us at privacy@moveeasy.co.ke
+- **Data Protection Officer**: Email dpo@moveeasy.co.ke
+- **Written Request**: Send a letter to our registered address
+
+**Important**: Withdrawing consent will not affect the lawfulness of processing based on consent before its withdrawal. Some services may no longer be available if you withdraw essential consents.
+
+### Consent Records
+We maintain records of:
+- When you provided consent
+- What you consented to
+- How consent was obtained
+- Any changes or withdrawals of consent
+
+These records are kept for legal compliance purposes and to honor your privacy choices.
 
 ---
 
