@@ -81,14 +81,14 @@ moving, movers, relocation, Kenya, Nairobi, Mombasa, house moving, office reloca
 ## 🔗 Required Links
 
 ### Privacy Policy
-**URL**: https://your-domain.com/privacy
+**URL**: https://moving-planner-ke.vercel.app/privacy
 *(Required if collecting user data)*
 
 ### Terms of Service  
-**URL**: https://your-domain.com/terms
+**URL**: https://moving-planner-ke.vercel.app/terms
 
 ### Website
-**URL**: https://your-domain.com
+**URL**: https://moving-planner-ke.vercel.app
 
 ### Support Email
 **Email**: support@moveeasy.co.ke
@@ -129,8 +129,8 @@ moving, movers, relocation, Kenya, Nairobi, Mombasa, house moving, office reloca
 - [x] Full description (under 4000 chars)
 - [x] Feature graphic created
 - [ ] Screenshots captured
-- [ ] Privacy policy URL
-- [ ] Support contact info
+- [x] Privacy policy URL
+- [x] Support contact info
 
 ### Technical Ready  
 - [x] AAB file signed and ready
@@ -140,8 +140,8 @@ moving, movers, relocation, Kenya, Nairobi, Mombasa, house moving, office reloca
 - [x] Performance optimized
 
 ### Legal Ready
-- [ ] Privacy policy published
-- [ ] Terms of service published  
+- [x] Privacy policy published
+- [x] Terms of service published  
 - [ ] Content rating completed
 - [ ] App permissions justified
 
