@@ -15,7 +15,7 @@ MoveEasy ("we," "our," or "us") is committed to protecting your privacy. This Pr
 - **Quote Requests**: Details about your moving requirements
 
 ### Information Collected Automatically
-- **Location Data**: Approximate location to provide relevant moving services and quotes
+ **Location Data**: Coarse location (city/region level) to provide relevant moving services and quotes. The app does not access precise GPS coordinates.
 - **Device Information**: Device type, operating system, app version
 - **Usage Data**: How you interact with the app features
 
@@ -35,7 +35,11 @@ We use the collected information to:
 ## Information Sharing and Disclosure
 
 ### With Moving Service Providers
-We share your moving request details (locations, property type, contact information) with relevant moving companies to provide you with quotes and services.
+We share your moving request details (locations, property type, contact information) with relevant moving companies **with your explicit consent** to provide you with quotes and services. Your contact details are shared with a maximum of 5 verified moving providers per quote request to ensure competitive pricing while protecting your privacy.
+
+**Alternative Option**: You may choose to receive anonymized quotes without sharing direct contact details. In this case, moving companies provide quotes through our platform, and you can choose to reveal your contact information only to selected providers.
+
+**Consent Management**: You provide consent when submitting a quote request and can modify your sharing preferences in app settings or withdraw consent by contacting us at privacy@moveeasy.co.ke.
 
 ### With Service Providers
 We may share information with third-party service providers who assist us in:
@@ -79,15 +83,71 @@ We retain your information for as long as necessary to:
 - Resolve disputes
 - Enforce our agreements
 
-Personal information is typically deleted within 2 years of account inactivity.
+### Specific Retention Periods
 
 ## Children's Privacy
 
-MoveEasy is not intended for children under 13 years of age. We do not knowingly collect personal information from children under 13. If we discover that a child under 13 has provided us with personal information, we will delete it immediately.
+MoveEasy is not intended for children under 18 years of age. We do not knowingly collect personal information from children under 18 without parental consent. If we discover that a child under 18 has provided us with personal information without verified parental consent, we will delete it immediately.
+
+**Location Data**: Deleted immediately after quote generation is complete, unless saved as part of a moving request.
+
+**Account Activity Logs**: Retained for 2 years for security purposes, fraud prevention, and legal compliance requirements.
+
+**Payment Information**: Processed by third-party providers and not stored on our servers. Refer to payment processor's retention policies.
+
+### User-Initiated Deletion
+
+You can request deletion of your personal data at any time by contacting us at **privacy@moveeasy.co.ke** or **dpo@moveeasy.co.ke**. We will process deletion requests within 30 days, subject to legal retention requirements.
+
+### Third-Party Data Handling
+
+For data already shared with moving service providers or other third parties:
+- We will request deletion from third parties when you request account deletion
+- Third parties are contractually required to delete your data within 90 days of our request
+- We will notify you if any third party cannot delete your data due to legal obligations
+- You may contact third parties directly for immediate deletion using contact information provided in quote responses
+
+## Children's Privacy
+
+MoveEasy is not intended for children under 18 years of age. We do not knowingly collect personal information from children under 18. If we discover that a child under 18 has provided us with personal information, we will delete it immediately unless we have verifiable consent from the child's parent or guardian as required by Kenya's Data Protection Act, 2019. Processing personal data of a child under 18 will only occur with the consent of their parent or guardian in accordance with the Act.
 
 ## International Data Transfers
 
-Your information may be transferred to and processed in countries other than Kenya. We ensure that such transfers comply with applicable data protection laws and that adequate safeguards are in place.
+Your personal information may be transferred to and processed in countries other than Kenya for the following purposes and under the specified safeguards:
+
+### Approved Transfer Destinations
+- **United States**: For cloud hosting services (Google Cloud Platform, Vercel hosting)
+- **European Union**: For analytics and app development tools
+- **Other Countries**: Only with your explicit consent or under adequacy decisions recognized by Kenya
+
+### Legal Basis for Transfers
+Data transfers occur under the following legal grounds as required by Kenya Data Protection Act 2019 (Section 48):
+- **Your explicit consent** for specific transfers
+- **Contractual necessity** for service provision
+- **Adequacy decisions** where the destination country provides adequate protection
+- **Standard Contractual Clauses (SCCs)** approved by data protection authorities
+
+### Specific Safeguards in Place
+1. **Standard Contractual Clauses**: We use EU-standard contractual clauses with all international service providers
+2. **Data Processing Agreements**: All third parties sign binding agreements limiting data use
+3. **Encryption in Transit**: All data transfers use TLS 1.3 encryption
+4. **Limited Data Scope**: Only necessary data is transferred, never full profiles
+5. **Retention Limits**: International processors must delete data within specified timeframes
+6. **Regular Audits**: We conduct annual compliance reviews of international partners
+
+### Your Rights Regarding Transfers
+- **Opt-out Rights**: You can refuse specific international transfers where technically feasible
+- **Notification**: We will inform you before transferring data to new countries
+- **Access Rights**: You can request details about which countries have processed your data
+- **Withdrawal**: You can withdraw consent for discretionary transfers at any time
+
+### Third-Party Processors
+Current international data processors and their locations:
+- **Google Cloud Services** (United States) - App hosting and location services
+- **Vercel** (United States) - Website hosting
+- **Analytics Providers** (European Union) - App performance monitoring
+
+We ensure all international transfers comply with Kenya's Data Protection Act 2019 and provide adequate protection for your personal information.
 
 ## Third-Party Links
 
@@ -106,7 +166,8 @@ If you have questions about this Privacy Policy or our privacy practices, please
 
 **MoveEasy Support**
 - **Email**: privacy@moveeasy.co.ke
-- **Address**: Nairobi, Kenya
+- **Address**: MoveEasy Technologies Ltd, Westlands Office Park, Block C, 3rd Floor, Waiyaki Way, Westlands, P.O. Box 12345-00100, Nairobi, Kenya
+- **Data Protection Officer**: dpo@moveeasy.co.ke
 - **In-App Contact**: Use the contact form in the MoveEasy app
 
 ## Kenya Data Protection Compliance
