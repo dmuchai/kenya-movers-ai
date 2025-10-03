@@ -63,6 +63,34 @@ We implement appropriate security measures to protect your information:
 - **Regular Updates**: Security measures are regularly reviewed and updated
 - **Secure Storage**: Data is stored on secure servers
 
+### Data Breach Notification
+
+In the unlikely event of a data breach that poses a risk to your personal information, we are committed to transparency and compliance with Kenya Data Protection Act 2019:
+
+#### How You Will Be Notified
+- **Email Notification**: We will send a detailed notification to your registered email address
+- **In-App Alert**: A prominent notification will appear when you next open the MoveEasy app
+- **Website Notice**: A public notice will be posted on our website privacy page
+
+#### Notification Timeline
+- **Regulatory Notification**: We will notify the Office of the Data Protection Commissioner (ODPC) within 72 hours of becoming aware of the breach, as required by Kenya Data Protection Act 2019
+- **User Notification**: We will notify affected users without undue delay, typically within 72 hours of confirming the breach affects personal data
+
+#### What You Should Do After Notification
+1. **Change Your Password**: If the breach involves account credentials, immediately change your MoveEasy app password
+2. **Monitor Your Accounts**: Watch for unusual activity on accounts where you used similar login information
+3. **Review Moving Requests**: Check your recent moving quotes and requests for any unauthorized changes
+4. **Contact Support**: Reach out to our security team if you notice suspicious activity or have concerns
+5. **Stay Informed**: Monitor our communications for updates on the incident and remediation steps
+
+#### Breach Response Contact
+- **Security Team**: security@moveeasy.co.ke
+- **Data Protection Officer**: dpo@moveeasy.co.ke
+- **24/7 Support**: Use the emergency contact feature in the MoveEasy app
+- **Phone**: +254 700 123 456 (business hours: 8 AM - 6 PM EAT)
+
+We maintain detailed incident response procedures and will provide regular updates until the matter is fully resolved.
+
 ## Your Rights and Choices
 
 ### Access and Control

@@ -100,7 +100,7 @@ moving, movers, relocation, Kenya, Nairobi, Mombasa, house moving, office reloca
 - [x] Feature graphic (1024x500px) 
 
 ### Screenshots 📸
-- [ ] Phone screenshots (2-8 required)
+- [ ] Phone screenshots (2 required, up to 8 maximum) ⚠️ **MANDATORY**
 - [ ] Tablet screenshots (optional)
 
 ### Videos (Optional)
@@ -128,7 +128,7 @@ moving, movers, relocation, Kenya, Nairobi, Mombasa, house moving, office reloca
 - [x] Short description (under 80 chars)  
 - [x] Full description (under 4000 chars)
 - [x] Feature graphic created
-- [ ] Screenshots captured
+- [ ] Screenshots captured ⚠️ **REQUIRED FOR SUBMISSION**
 - [x] Privacy policy URL
 - [x] Support contact info
 
@@ -146,10 +146,12 @@ moving, movers, relocation, Kenya, Nairobi, Mombasa, house moving, office reloca
 - [ ] App permissions justified
 
 ## 🎯 Next Steps
-1. **Capture screenshots** using the guide
-2. **Create privacy policy** if collecting user data
+1. **🚨 REQUIRED: Capture screenshots** - Minimum 2 phone screenshots showing real app functionality
+2. **Complete content rating** and app permissions justification
 3. **Upload AAB** to Google Play Console
 4. **Fill store listing** with this content
 5. **Submit for review**
+
+⚠️ **Important**: Google Play Store requires at least 2 phone screenshots demonstrating actual app features before submission will be accepted.
 
 **Estimated review time**: 1-3 days for new developer accounts
