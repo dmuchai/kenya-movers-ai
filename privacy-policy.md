@@ -99,9 +99,43 @@ We maintain detailed incident response procedures and will provide regular updat
 - **Delete Account**: Request deletion of your account and associated data
 - **Opt-Out**: Unsubscribe from promotional communications
 
+### Kenya Data Protection Act 2019 Rights
+- **Right to Data Portability**: Request your personal data in a structured, machine-readable format for transfer to another service provider
+- **Right to Object**: Object to processing of your personal data for marketing, research, or other legitimate interests
+- **Right to Restrict Processing**: Request limitation of processing your personal data under certain circumstances (e.g., while verifying accuracy)
+- **Right to Lodge a Complaint**: File a complaint with the Office of the Data Protection Commissioner of Kenya if you believe your rights have been violated
+
 ### Location Data
 - **Permission Control**: Grant or revoke location permissions in device settings
 - **Limited Use**: Location data is only used for moving service matching
+
+### How to Exercise These Rights
+
+To exercise any of your data protection rights, please contact us with the following information:
+
+#### Required Information for Requests
+- **Full Name**: Your complete legal name as registered
+- **Account Identifier**: Email address or phone number associated with your MoveEasy account
+- **Identity Verification**: Copy of government-issued ID (passport, national ID, or driving license)
+- **Specific Request**: Clear description of the right you wish to exercise and any relevant details
+- **Preferred Response Method**: How you would like to receive our response (email, postal mail, or in-app notification)
+
+#### Contact Methods
+- **Email**: privacy@moveeasy.co.ke or dpo@moveeasy.co.ke
+- **Postal Address**: MoveEasy Technologies Ltd, Data Protection Officer, Westlands Office Park, Block C, 3rd Floor, Waiyaki Way, Westlands, P.O. Box 12345-00100, Nairobi, Kenya
+- **Phone**: +254 700 123 456 (business hours: 8 AM - 6 PM EAT)
+
+#### Response Timeline
+- **Standard Requests**: We will respond within 30 days of receiving your complete request
+- **Complex Requests**: May require up to 60 days for complex requests (we will notify you of any extension)
+- **Urgent Matters**: Data breach or security concerns will be addressed within 72 hours
+
+#### External Complaint Option
+If you are not satisfied with our response, you may lodge a complaint with:
+**Office of the Data Protection Commissioner of Kenya**
+- **Website**: https://odpc.go.ke
+- **Email**: info@odpc.go.ke
+- **Address**: KENCOM House, 17th Floor, Moi Avenue, Nairobi, Kenya
 
 ## Data Retention
 
