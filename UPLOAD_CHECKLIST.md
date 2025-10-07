@@ -21,7 +21,10 @@
 
 ### ✅ **Required Info**
 - [ ] Support email address
+- [ ] Developer physical address (required for all apps)
 - [ ] Privacy policy URL (if collecting data)
+- [ ] Target audience/age rating declared
+- [ ] App access details (login required, payment required, or unrestricted)
 - [ ] Content rating questionnaire completed
 
 ### ✅ **Final Steps**

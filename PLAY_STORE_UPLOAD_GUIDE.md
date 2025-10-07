@@ -209,7 +209,7 @@ Download MoveEasy today and experience stress-free moving!
 
 - [ ] Google Play Console account created and verified
 - [ ] $25 developer fee paid (if new account)
-- [ ] Privacy policy created (if collecting user data)
+- [ ] Privacy policy created and accessible (required - app collects location and user data)
 - [ ] Support email ready
 - [ ] All files ready in their folders
 - [ ] AAB file tested and working

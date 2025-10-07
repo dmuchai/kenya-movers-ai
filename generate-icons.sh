@@ -3,14 +3,78 @@
 # Exit immediately if any command fails
 set -e
 
-# Get the project root directory (same as script directory since script is in project root)
+# Determine project root directory with multiple fallback methods
+determine_project_root() {
+    local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    local project_root=""
+    
+    # Method 1: Use git repository root if available
+    if command -v git &> /dev/null && git rev-parse --show-toplevel &> /dev/null; then
+        project_root="$(git rev-parse --show-toplevel)"
+        echo "📍 Using git repository root: $project_root" >&2
+    # Method 2: Use script directory as fallback
+    elif [[ -n "$script_dir" ]]; then
+        project_root="$script_dir"
+        echo "📍 Using script directory as project root: $project_root" >&2
+    else
+        echo "❌ Error: Cannot determine project root directory" >&2
+        echo "💡 Please run this script from the project root or ensure git is available" >&2
+        exit 1
+    fi
+    
+    # Validate project root has expected structure
+    if [[ ! -d "$project_root" ]]; then
+        echo "❌ Error: Project root directory does not exist: $project_root" >&2
+        exit 1
+    fi
+    
+    echo "$project_root"
+}
+
+# Get the project root directory with robust detection
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$SCRIPT_DIR"
+PROJECT_ROOT="$(determine_project_root)"
 
 # Define paths relative to project root
 SOURCE_ICON="$PROJECT_ROOT/app-icon.svg"
 ANDROID_DIR="$PROJECT_ROOT/android/app/src/main/res"
 PUBLIC_DIR="$PROJECT_ROOT/public"
+
+# Validate expected project structure
+validate_project_structure() {
+    local missing_dirs=()
+    
+    # Check for android directory structure
+    if [[ ! -d "$PROJECT_ROOT/android" ]]; then
+        missing_dirs+=("android/")
+    fi
+    
+    if [[ ! -d "$PROJECT_ROOT/android/app" ]] && [[ -d "$PROJECT_ROOT/android" ]]; then
+        missing_dirs+=("android/app/")
+    fi
+    
+    # Check for public directory (for web builds)
+    if [[ ! -d "$PUBLIC_DIR" ]]; then
+        echo "📁 Creating public directory: $PUBLIC_DIR"
+        mkdir -p "$PUBLIC_DIR" || {
+            echo "❌ Error: Failed to create public directory: $PUBLIC_DIR" >&2
+            exit 1
+        }
+    fi
+    
+    # Report missing critical directories
+    if [[ ${#missing_dirs[@]} -gt 0 ]]; then
+        echo "⚠️  Warning: Missing expected project directories:" >&2
+        for dir in "${missing_dirs[@]}"; do
+            echo "   - $PROJECT_ROOT/$dir" >&2
+        done
+        echo "💡 This might not be a React Native/Capacitor project root." >&2
+        echo "🔍 Current project root: $PROJECT_ROOT" >&2
+        
+        # Don't exit - just warn, as the script might still work for web icons
+        echo "📝 Continuing anyway - some icon generation may fail..." >&2
+    fi
+}
 
 # Check if ImageMagick is installed
 if ! command -v convert &> /dev/null; then
@@ -22,6 +86,9 @@ if ! command -v convert &> /dev/null; then
     echo "  - Windows: Download from https://imagemagick.org/script/download.php" >&2
     exit 1
 fi
+
+# Validate project structure before proceeding
+validate_project_structure
 
 # Function to run convert with comprehensive error handling
 run_convert() {

@@ -17,9 +17,8 @@ Your app is running at **http://localhost:8080** - let's capture the key screens
 2. Click device toolbar (📱 icon)
 3. Select "iPhone 12 Pro" or "Pixel 5"
 4. Navigate to home page
-5. Scroll to show hero section
+5. Ensure hero section is fully visible (should be at top)
 6. Take screenshot
-
 ---
 
 ### 2. **QUOTE FORM - EMPTY STATE** ⭐ MUST HAVE
@@ -157,13 +156,4 @@ Your app is running at **http://localhost:8080** - let's capture the key screens
 ```
 
 ## 📁 Save Screenshots To
-```
-📁 /home/dennis-muchai/kenya-movers-ai/play-store-screenshots/
-   📄 01-hero-phone.png
-   📄 02-quote-form-empty-phone.png  
-   📄 03-quote-form-filled-phone.png
-   📄 04-contact-form-phone.png
-   📄 05-hero-tablet.png (optional)
-```
-
-Once you have the screenshots, we can proceed with writing the Play Store description!
+## 📁 Save Screenshots To

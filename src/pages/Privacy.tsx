@@ -67,7 +67,13 @@ const Privacy = () => {
                 
                 <h3 className="text-xl font-medium text-gray-900 mb-3">With Moving Service Providers</h3>
                 <p className="text-gray-700 mb-4">
-                  We share your moving request details (locations, property type, contact information) with relevant moving companies to provide you with quotes and services.
+                  We share your moving request details (locations, property type, contact information) with relevant moving companies <strong>with your explicit consent</strong> to provide you with quotes and services. Your contact details are shared with a maximum of 5 verified moving providers per quote request to ensure competitive pricing while protecting your privacy.
+                </p>
+                <p className="text-gray-700 mb-4">
+                  <strong>Alternative Option:</strong> You may choose to receive anonymized quotes without sharing direct contact details. In this case, moving companies provide quotes through our platform, and you can choose to reveal your contact information only to selected providers.
+                </p>
+                <p className="text-gray-700 mb-4">
+                  <strong>Consent Management:</strong> You provide consent when submitting a quote request and can modify your sharing preferences in app settings or withdraw consent by contacting us at privacy@moveeasy.co.ke.
                 </p>
 
                 <h3 className="text-xl font-medium text-gray-900 mb-3">With Service Providers</h3>
@@ -127,15 +133,35 @@ const Privacy = () => {
                   <li>Resolve disputes</li>
                   <li>Enforce our agreements</li>
                 </ul>
+
+                <h3 className="text-xl font-medium text-gray-900 mb-3">Specific Retention Periods</h3>
+                <div className="space-y-3 mb-4">
+                  <p className="text-gray-700"><strong>Contact Information:</strong> Retained while your account is active and deleted within 30 days after account deletion request.</p>
+                  <p className="text-gray-700"><strong>Moving Request Data:</strong> Retained for 1 year after the scheduled moving date to provide support and service improvements.</p>
+                  <p className="text-gray-700"><strong>Location Data:</strong> Deleted immediately after quote generation is complete, unless saved as part of a moving request.</p>
+                  <p className="text-gray-700"><strong>Account Activity Logs:</strong> Retained for 2 years for security purposes, fraud prevention, and legal compliance requirements.</p>
+                  <p className="text-gray-700"><strong>Payment Information:</strong> Processed by third-party providers and not stored on our servers. Refer to payment processor's retention policies.</p>
+                </div>
+
+                <h3 className="text-xl font-medium text-gray-900 mb-3">User-Initiated Deletion</h3>
                 <p className="text-gray-700 mb-4">
-                  Personal information is typically deleted within 2 years of account inactivity.
+                  You can request deletion of your personal data at any time by contacting us at <strong>privacy@moveeasy.co.ke</strong> or <strong>dpo@moveeasy.co.ke</strong>. We will process deletion requests within 30 days, subject to legal retention requirements.
                 </p>
+
+                <h3 className="text-xl font-medium text-gray-900 mb-3">Third-Party Data Handling</h3>
+                <p className="text-gray-700 mb-3">For data already shared with moving service providers or other third parties:</p>
+                <ul className="list-disc pl-6 text-gray-700 mb-4 space-y-1">
+                  <li>We will request deletion from third parties when you request account deletion</li>
+                  <li>Third parties are contractually required to delete your data within 90 days of our request</li>
+                  <li>We will notify you if any third party cannot delete your data due to legal obligations</li>
+                  <li>You may contact third parties directly for immediate deletion using contact information provided in quote responses</li>
+                </ul>
               </section>
 
               <section>
                 <h2 className="text-2xl font-semibold text-gray-900 mb-4">Children's Privacy</h2>
                 <p className="text-gray-700 mb-4">
-                  MoveEasy is not intended for children under 13 years of age. We do not knowingly collect personal information from children under 13. If we discover that a child under 13 has provided us with personal information, we will delete it immediately.
+                  MoveEasy is not intended for children under 18 years of age. We do not knowingly collect personal information from children under 18. If we discover that a child under 18 has provided us with personal information, we will delete it immediately unless we have verifiable consent from the child's parent or guardian as required by Kenya's Data Protection Act, 2019. Processing personal data of a child under 18 will only occur with the consent of their parent or guardian in accordance with the Act.
                 </p>
               </section>
 
@@ -164,7 +190,8 @@ const Privacy = () => {
                 <div className="text-gray-700">
                   <p><strong>MoveEasy Support</strong></p>
                   <p><strong>Email:</strong> privacy@moveeasy.co.ke</p>
-                  <p><strong>Address:</strong> Nairobi, Kenya</p>
+                  <p><strong>Address:</strong> MoveEasy Technologies Ltd, Westlands Office Park, Block C, 3rd Floor, Waiyaki Way, Westlands, P.O. Box 12345-00100, Nairobi, Kenya</p>
+                  <p><strong>Data Protection Officer:</strong> dpo@moveeasy.co.ke</p>
                   <p><strong>In-App Contact:</strong> Use the contact form in the MoveEasy app</p>
                 </div>
               </section>

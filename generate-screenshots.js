@@ -44,7 +44,7 @@ const SCREENSHOTS = [
     path: '/',
     waitFor: 'networkidle',
     actions: [
-      { type: 'scroll', selector: '#quote-form' }
+      { type: 'scrollToElement', selector: '[data-testid="quote-form"], #quote-form, .quote-form' }
     ]
   },
   {
@@ -53,11 +53,10 @@ const SCREENSHOTS = [
     path: '/',
     waitFor: 'networkidle',
     actions: [
-      { type: 'scroll', selector: '#quote-form' },
-      { type: 'fill', selector: 'input[placeholder*="pickup"], input[placeholder*="from"]', value: 'Nairobi CBD, Kenya' },
-      { type: 'fill', selector: 'input[placeholder*="destination"], input[placeholder*="to"]', value: 'Mombasa, Kenya' },
-      { type: 'select', selector: 'select', value: '3' },
-      { type: 'wait', duration: 1000 }
+      { type: 'scrollToElement', selector: '[data-testid="quote-form"], #quote-form, .quote-form' },
+      { type: 'fillAndWait', selector: '[data-testid="pickup-input"], input[name="pickup"], input[placeholder*="pickup"]', value: 'Nairobi CBD, Kenya' },
+      { type: 'fillAndWait', selector: '[data-testid="destination-input"], input[name="destination"], input[placeholder*="destination"]', value: 'Mombasa, Kenya' },
+      { type: 'selectAndWait', selector: '[data-testid="property-type"], select[name="propertyType"], select', value: '3' }
     ]
   },
   {
@@ -66,11 +65,8 @@ const SCREENSHOTS = [
     path: '/',
     waitFor: 'networkidle', 
     actions: [
-      { type: 'scroll', selector: '#quote-form' },
-      { type: 'fill', selector: 'input[placeholder*="pickup"], input[placeholder*="from"]', value: 'Nairobi CBD, Kenya' },
-      { type: 'fill', selector: 'input[placeholder*="destination"], input[placeholder*="to"]', value: 'Mombasa, Kenya' },
-      { type: 'click', selector: 'button[type="submit"], .quote-button' },
-      { type: 'wait', duration: 2000 }
+      { type: 'fillQuoteForm', pickup: 'Nairobi CBD, Kenya', destination: 'Mombasa, Kenya' },
+      { type: 'clickAndWait', selector: '[data-testid="submit-quote"], button[type="submit"], .quote-button', waitForSelector: '[data-testid="contact-form"], .contact-form, form' }
     ]
   },
   {
@@ -79,19 +75,61 @@ const SCREENSHOTS = [
     path: '/',
     waitFor: 'networkidle',
     actions: [
-      { type: 'scroll', selector: '#quote-form' },
-      { type: 'fill', selector: 'input[placeholder*="pickup"], input[placeholder*="from"]', value: 'Nairobi CBD, Kenya' },
-      { type: 'fill', selector: 'input[placeholder*="destination"], input[placeholder*="to"]', value: 'Mombasa, Kenya' },
-      { type: 'click', selector: 'button[type="submit"], .quote-button' },
-      { type: 'wait', duration: 3000 },
-      { type: 'fill', selector: 'input[placeholder*="name"], input[type="text"]', value: 'John Doe' },
-      { type: 'fill', selector: 'input[placeholder*="email"], input[type="email"]', value: 'john@example.com' },
-      { type: 'fill', selector: 'input[placeholder*="phone"], input[type="tel"]', value: '+254712345678' },
-      { type: 'click', selector: 'button[type="submit"]' },
-      { type: 'wait', duration: 5000 }
+      { type: 'fillQuoteForm', pickup: 'Nairobi CBD, Kenya', destination: 'Mombasa, Kenya' },
+      { type: 'clickAndWait', selector: '[data-testid="submit-quote"], button[type="submit"], .quote-button', waitForSelector: '[data-testid="contact-form"], .contact-form, form' },
+      { type: 'fillContactForm', name: 'John Doe', email: 'john@example.com', phone: '+254712345678' },
+      { type: 'clickAndWait', selector: '[data-testid="submit-contact"], button[type="submit"]', waitForSelector: '[data-testid="quote-results"], .quote-results, .results' }
     ]
   }
 ];
+
+// Helper functions for common action sequences
+const ActionHelpers = {
+  // Fill quote form with pickup and destination
+  async fillQuoteForm(page, { pickup, destination }) {
+    await this.scrollToElement(page, { selector: '[data-testid="quote-form"], #quote-form, .quote-form' });
+    await this.fillAndWait(page, { selector: '[data-testid="pickup-input"], input[name="pickup"], input[placeholder*="pickup"]', value: pickup });
+    await this.fillAndWait(page, { selector: '[data-testid="destination-input"], input[name="destination"], input[placeholder*="destination"]', value: destination });
+  },
+
+  // Fill contact form with user details
+  async fillContactForm(page, { name, email, phone }) {
+    await this.fillAndWait(page, { selector: '[data-testid="name-input"], input[name="name"], input[placeholder*="name"]', value: name });
+    await this.fillAndWait(page, { selector: '[data-testid="email-input"], input[name="email"], input[type="email"]', value: email });
+    await this.fillAndWait(page, { selector: '[data-testid="phone-input"], input[name="phone"], input[type="tel"]', value: phone });
+  },
+
+  // Scroll to element with explicit wait
+  async scrollToElement(page, { selector }) {
+    const element = await page.waitForSelector(selector, { timeout: 10000 });
+    await element.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(300); // Brief pause for smooth scrolling
+  },
+
+  // Fill input with explicit wait for element
+  async fillAndWait(page, { selector, value }) {
+    const element = await page.waitForSelector(selector, { timeout: 10000 });
+    await element.fill(value);
+    await page.waitForTimeout(300); // Brief pause for input processing
+  },
+
+  // Select option with explicit wait
+  async selectAndWait(page, { selector, value }) {
+    const element = await page.waitForSelector(selector, { timeout: 10000 });
+    await element.selectOption(value);
+    await page.waitForTimeout(300); // Brief pause for selection processing
+  },
+
+  // Click element and wait for a specific condition
+  async clickAndWait(page, { selector, waitForSelector }) {
+    const element = await page.waitForSelector(selector, { timeout: 10000 });
+    await element.click();
+    if (waitForSelector) {
+      await page.waitForSelector(waitForSelector, { timeout: 15000 });
+    }
+    await page.waitForTimeout(500); // Brief pause for UI updates
+  }
+};
 
 async function createScreenshotsDirectory() {
   if (!fs.existsSync(SCREENSHOTS_DIR)) {
@@ -116,27 +154,57 @@ async function takeScreenshot(browser, device, screenshot) {
       timeout: 30000 
     });
     
-    // Perform actions
+    // Perform actions using helper functions
     for (const action of screenshot.actions) {
-      switch (action.type) {
-        case 'fill':
-          await page.fill(action.selector, action.value);
-          break;
-        case 'click':
-          await page.click(action.selector);
-          break;
-        case 'select':
-          await page.selectOption(action.selector, action.value);
-          break;
-        case 'scroll':
-          await page.locator(action.selector).scrollIntoViewIfNeeded();
-          break;
-        case 'wait':
-          await page.waitForTimeout(action.duration);
-          break;
+      try {
+        switch (action.type) {
+          case 'fillQuoteForm':
+            await ActionHelpers.fillQuoteForm(page, action);
+            break;
+          case 'fillContactForm':
+            await ActionHelpers.fillContactForm(page, action);
+            break;
+          case 'scrollToElement':
+            await ActionHelpers.scrollToElement(page, action);
+            break;
+          case 'fillAndWait':
+            await ActionHelpers.fillAndWait(page, action);
+            break;
+          case 'selectAndWait':
+            await ActionHelpers.selectAndWait(page, action);
+            break;
+          case 'clickAndWait':
+            await ActionHelpers.clickAndWait(page, action);
+            break;
+          // Legacy support for old action types
+          case 'fill':
+            const fillElement = await page.waitForSelector(action.selector, { timeout: 10000 });
+            await fillElement.fill(action.value);
+            break;
+          case 'click':
+            const clickElement = await page.waitForSelector(action.selector, { timeout: 10000 });
+            await clickElement.click();
+            break;
+          case 'select':
+            const selectElement = await page.waitForSelector(action.selector, { timeout: 10000 });
+            await selectElement.selectOption(action.value);
+            break;
+          case 'scroll':
+            const scrollElement = await page.waitForSelector(action.selector, { timeout: 10000 });
+            await scrollElement.scrollIntoViewIfNeeded();
+            break;
+          case 'wait':
+            await page.waitForTimeout(action.duration);
+            break;
+        }
+        
+        // Brief pause between actions for better reliability
+        await page.waitForTimeout(200);
+        
+      } catch (actionError) {
+        console.warn(`⚠️  Action failed for ${action.type}: ${actionError.message}`);
+        // Continue with other actions rather than failing completely
       }
-      // Small delay between actions
-      await page.waitForTimeout(500);
     }
     
     // Take screenshot
@@ -165,8 +233,8 @@ async function generateScreenshots() {
   await createScreenshotsDirectory();
   
   const browser = await chromium.launch({ 
-    headless: false, // Set to true for faster execution
-    slowMo: 100 // Slow down for debugging
+    headless: process.env.HEADLESS !== 'false',
+    slowMo: process.env.DEBUG ? 100 : 0
   });
   
   try {
@@ -195,7 +263,10 @@ async function generateScreenshots() {
 
 // Run the screenshot generator
 if (require.main === module) {
-  generateScreenshots().catch(console.error);
+  generateScreenshots().catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
 }
 
 module.exports = { generateScreenshots };

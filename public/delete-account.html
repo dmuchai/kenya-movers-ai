@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Account - MoveEasy</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            line-height: 1.6;
+            color: #333;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #e74c3c;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        .submit-btn {
+            background-color: #e74c3c;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+        .submit-btn:hover {
+            background-color: #c0392b;
+        }
+        .info-box {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border-color: #ffeaa7;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🗑️ Delete MoveEasy Account</h1>
+        <p>Request permanent deletion of your account and associated data</p>
+    </div>
+
+    <div class="info-box warning">
+        <h3>⚠️ Important Information</h3>
+        <ul>
+            <li><strong>Permanent Action:</strong> Account deletion cannot be undone</li>
+            <li><strong>Data Removal:</strong> All your personal data, quotes, and moving history will be permanently deleted</li>
+            <li><strong>Processing Time:</strong> Deletion requests are processed within 30 days</li>
+            <li><strong>Third Parties:</strong> We will request deletion from moving service providers (may take up to 90 days)</li>
+        </ul>
+    </div>
+
+    <form action="mailto:privacy@moveeasy.co.ke" method="post" enctype="text/plain">
+        <div class="form-group">
+            <label for="fullName">Full Name *</label>
+            <input type="text" id="fullName" name="fullName" required>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email Address (associated with your MoveEasy account) *</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+
+        <div class="form-group">
+            <label for="phone">Phone Number (associated with your account)</label>
+            <input type="tel" id="phone" name="phone">
+        </div>
+
+        <div class="form-group">
+            <label for="reason">Reason for Deletion (optional)</label>
+            <textarea id="reason" name="reason" placeholder="Please let us know why you're deleting your account (optional)"></textarea>
+        </div>
+
+        <div class="info-box">
+            <h4>📋 Next Steps:</h4>
+            <ol>
+                <li>Click "Submit Deletion Request" below</li>
+                <li>Your email client will open with a pre-filled message</li>
+                <li>Send the email to complete your request</li>
+                <li>We'll confirm receipt and process within 30 days</li>
+                <li>You'll receive confirmation when deletion is complete</li>
+            </ol>
+        </div>
+
+        <button type="submit" class="submit-btn">📧 Submit Deletion Request</button>
+    </form>
+
+    <div class="info-box" style="margin-top: 30px;">
+        <h4>📞 Alternative Contact Methods:</h4>
+        <p><strong>Email:</strong> privacy@moveeasy.co.ke or dpo@moveeasy.co.ke</p>
+        <p><strong>Phone:</strong> +254 700 123 456 (8 AM - 6 PM EAT)</p>
+        <p><strong>Postal Address:</strong> MoveEasy Technologies Ltd, Data Protection Officer, Westlands Office Park, Block C, 3rd Floor, Waiyaki Way, Westlands, P.O. Box 12345-00100, Nairobi, Kenya</p>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px; color: #666;">
+        <p><a href="https://moving-planner-ke.vercel.app/privacy">View Full Privacy Policy</a> | <a href="https://moving-planner-ke.vercel.app">Return to MoveEasy</a></p>
+    </div>
+</body>
+</html>
