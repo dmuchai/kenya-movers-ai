@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,8 +10,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import Navigation from '@/components/Navigation';
 import BottomNavigation from '@/components/BottomNavigation';
+import { Truck, Users } from 'lucide-react';
 
 const Auth = () => {
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get('redirect');
+  const isMoverContext = redirectTo === '/mover-dashboard' || redirectTo?.includes('mover');
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -89,7 +94,8 @@ const Auth = () => {
           title: "Welcome back!",
           description: "You've been successfully signed in.",
         });
-        navigate('/');
+        // Redirect to the intended page or home
+        navigate(redirectTo || '/');
       }
     } catch (err) {
       setError('An unexpected error occurred. Please try again.');
@@ -104,10 +110,35 @@ const Auth = () => {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 to-secondary/10 p-4 pt-24 pb-24 md:pb-4">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold">Welcome to MoveEasy</CardTitle>
-            <CardDescription>
-              Sign in to your account or create a new one to get started
-            </CardDescription>
+            {isMoverContext ? (
+              <>
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-primary to-trust-blue rounded-full mx-auto mb-4">
+                  <Truck className="w-8 h-8 text-white" />
+                </div>
+                <CardTitle className="text-2xl font-bold">Mover Sign In</CardTitle>
+                <CardDescription>
+                  Sign in to access your Mover Dashboard and manage your business
+                </CardDescription>
+                <Alert className="mt-4 text-left">
+                  <AlertDescription>
+                    <strong>Don't have a mover account?</strong>{' '}
+                    <Link to="/mover-registration" className="text-primary font-semibold hover:underline">
+                      Register your moving company
+                    </Link>
+                  </AlertDescription>
+                </Alert>
+              </>
+            ) : (
+              <>
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-primary to-secondary rounded-full mx-auto mb-4">
+                  <Users className="w-8 h-8 text-white" />
+                </div>
+                <CardTitle className="text-2xl font-bold">Welcome to MoveEasy</CardTitle>
+                <CardDescription>
+                  Sign in to your account or create a new one to get started
+                </CardDescription>
+              </>
+            )}
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="signin" className="w-full">

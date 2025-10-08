@@ -197,10 +197,16 @@ export default function MoverDashboard() {
               </p>
               <Button 
                 className="w-full" 
-                onClick={() => window.location.href = '/auth'}
+                onClick={() => window.location.href = '/auth?redirect=/mover-dashboard'}
               >
-                Sign In
+                Sign In as Mover
               </Button>
+              <p className="text-sm text-center text-muted-foreground">
+                Don't have a mover account?{' '}
+                <a href="/mover-registration" className="text-primary font-semibold hover:underline">
+                  Register here
+                </a>
+              </p>
             </CardContent>
           </Card>
         </div>
