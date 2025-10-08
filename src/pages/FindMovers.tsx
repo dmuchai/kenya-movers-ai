@@ -205,28 +205,23 @@ export default function FindMovers() {
 
             <Separator />
 
-  <div>
-    <Label className="mb-3 block">Vehicle Types</Label>
-    <div className="space-y-2">
-      {VEHICLE_TYPES.map(vehicle => (
-        <label
-          htmlFor={`vehicle-${vehicle.value}`}
-          key={vehicle.value}
-          className="flex items-center gap-3 cursor-pointer"
-        >
-          <Checkbox
-            id={`vehicle-${vehicle.value}`}
-            checked={selectedVehicleTypes.includes(vehicle.value)}
-            onCheckedChange={() => toggleVehicleType(vehicle.value)}
-          />
-          <span className="text-sm">{vehicle.label}</span>
-        </label>
-      ))}
-    </div>
-  </div>
+            {/* Vehicle Types Filter */}
+            <div>
+              <Label className="mb-3 block">Vehicle Types</Label>
+              <div className="space-y-2">
+                {VEHICLE_TYPES.map(vehicle => (
+                  <label
+                    htmlFor={`vehicle-${vehicle.value}`}
+                    key={vehicle.value}
+                    className="flex items-center gap-3 cursor-pointer"
+                  >
+                    <Checkbox
+                      id={`vehicle-${vehicle.value}`}
+                      checked={selectedVehicleTypes.includes(vehicle.value)}
+                      onCheckedChange={() => toggleVehicleType(vehicle.value)}
                     />
                     <span className="text-sm">{vehicle.label}</span>
-                  </div>
+                  </label>
                 ))}
               </div>
             </div>
@@ -325,25 +320,22 @@ function MoverCard({ mover }: MoverCardProps) {
                     {type.replace(/_/g, ' ')}
                   </Badge>
                 ))}
-  // TODO: Implement navigation to mover profile and quote request flow
-  <div className="flex flex-wrap gap-2">
-    <Button 
-      size="sm" 
-      variant="default"
-      onClick={() => { /* TODO: Navigate to mover profile */ }}
-    >
-      View Profile
-    </Button>
-    <Button 
-      size="sm" 
-      variant="outline"
-      onClick={() => { /* TODO: Open quote request modal */ }}
-    >
-      Request Quote
-    </Button>
-  </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap gap-2">
+                <Button 
+                  size="sm" 
+                  variant="default"
+                  onClick={() => { /* TODO: Navigate to mover profile */ }}
+                >
+                  View Profile
                 </Button>
-                <Button size="sm" variant="outline">
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  onClick={() => { /* TODO: Open quote request modal */ }}
+                >
                   Request Quote
                 </Button>
               </div>
