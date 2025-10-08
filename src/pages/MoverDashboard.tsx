@@ -35,22 +35,40 @@ interface QuoteResponse {
 }
 
 export default function MoverDashboard() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const { toast } = useToast();
   const [availableQuotes, setAvailableQuotes] = useState<Quote[]>([]);
   const [myResponses, setMyResponses] = useState<QuoteResponse[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isMover, setIsMover] = useState(false);
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
   const [showResponseForm, setShowResponseForm] = useState(false);
 
   useEffect(() => {
-    if (user) {
-      fetchQuotes();
-      fetchMyResponses();
-    } else {
-      // If no user, stop loading immediately
-      setLoading(false);
-    }
+    const checkMoverStatus = async () => {
+      if (user) {
+        // Check if user has a mover profile
+        const { data: moverData } = await supabase
+          .from('movers')
+          .select('id')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        
+        setIsMover(!!moverData);
+        
+        if (moverData) {
+          fetchQuotes();
+          fetchMyResponses();
+        } else {
+          setLoading(false);
+        }
+      } else {
+        // If no user, stop loading immediately
+        setLoading(false);
+      }
+    };
+    
+    checkMoverStatus();
   }, [user]);
 
   const fetchQuotes = async () => {
@@ -155,6 +173,76 @@ export default function MoverDashboard() {
         <Navigation />
         <div className="flex justify-center items-center min-h-[400px] pt-20">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      </>
+    );
+  }
+
+  // Redirect to auth if not logged in
+  if (!user) {
+    return (
+      <>
+        <Navigation />
+        <div className="container mx-auto py-8 px-4 pt-24">
+          <Card className="max-w-md mx-auto">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Truck className="w-6 h-6" />
+                Authentication Required
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-muted-foreground">
+                You need to sign in to access the Mover Dashboard.
+              </p>
+              <Button 
+                className="w-full" 
+                onClick={() => window.location.href = '/auth'}
+              >
+                Sign In
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </>
+    );
+  }
+
+  // Check if user is a registered mover
+  if (!isMover && !loading) {
+    return (
+      <>
+        <Navigation />
+        <div className="container mx-auto py-8 px-4 pt-24">
+          <Card className="max-w-md mx-auto">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Truck className="w-6 h-6" />
+                Mover Access Only
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-muted-foreground">
+                This dashboard is only accessible to registered moving companies.
+                If you're a mover, please complete your company registration first.
+              </p>
+              <div className="flex gap-2">
+                <Button 
+                  className="flex-1" 
+                  variant="outline"
+                  onClick={() => window.location.href = '/'}
+                >
+                  Go Home
+                </Button>
+                <Button 
+                  className="flex-1"
+                  onClick={() => window.location.href = '/mover-registration'}
+                >
+                  Register as Mover
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </>
     );
