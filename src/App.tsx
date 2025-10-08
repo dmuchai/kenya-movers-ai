@@ -12,6 +12,7 @@ import QuoteHistory from "./pages/QuoteHistory";
 import Profile from "./pages/Profile";
 import MoverDashboard from "./pages/MoverDashboard";
 import MoverRegistration from "./pages/MoverRegistration";
+import FindMovers from "./pages/FindMovers";
 import Help from "./pages/Help";
 import Contact from "./pages/Contact";
 import Privacy from "./pages/Privacy";
@@ -52,6 +53,7 @@ const App = () => (
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/mover-dashboard" element={<MoverDashboard />} />
                   <Route path="/mover-registration" element={<MoverRegistration />} />
+                  <Route path="/find-movers" element={<FindMovers />} />
                   <Route path="/help" element={<Help />} />
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/privacy" element={<Privacy />} />
