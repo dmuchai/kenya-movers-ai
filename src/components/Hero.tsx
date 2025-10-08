@@ -77,6 +77,32 @@ const Hero = () => {
             </Button>
           </div>
           
+          {/* Mover CTA - Distinct Section */}
+          <div className="pt-8 animate-slide-in-up" style={{ animationDelay: '0.7s' }}>
+            <div className="card-enhanced max-w-2xl mx-auto p-6 bg-gradient-to-r from-primary/5 to-trust-blue/5 border-2 border-primary/20">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="text-left">
+                  <h3 className="font-bold text-lg text-foreground mb-1 flex items-center gap-2">
+                    <Users className="w-5 h-5 text-primary" />
+                    Are you a Moving Company?
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Join our network and grow your business
+                  </p>
+                </div>
+                <Button 
+                  className="bg-gradient-to-r from-primary to-trust-blue text-white font-semibold px-6 py-3 hover:shadow-lg transition-all"
+                  asChild
+                >
+                  <Link to="/mover-registration">
+                    Join as a Mover
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+          
           {/* Enhanced Trust Indicators */}
           <div className="pt-16 animate-slide-in-up" style={{ animationDelay: '0.8s' }}>
             <div className="text-subtle text-center mb-8">

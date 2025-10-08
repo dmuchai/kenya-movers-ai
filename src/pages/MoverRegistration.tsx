@@ -11,6 +11,8 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { moverService } from '@/services/moverService';
 import { storageService } from '@/services/storageService';
+import { Truck } from 'lucide-react';
+import Navigation from '@/components/Navigation';
 
 // Import step components
 import BusinessInfoStep from '@/components/mover-registration/BusinessInfoStep';
@@ -341,12 +343,43 @@ export default function MoverRegistration() {
   };
 
   return (
-    <div className="container max-w-4xl mx-auto py-8 px-4">
+    <>
+      <Navigation />
+      <div className="container max-w-5xl mx-auto py-8 px-4 pt-24">
+        {/* Welcome Header */}
+        <div className="mb-8 text-center">
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-primary to-trust-blue rounded-full mb-4">
+          <Truck className="w-8 h-8 text-white" />
+        </div>
+        <h1 className="text-4xl font-bold mb-4">
+          Join Kenya's Leading Moving Platform
+        </h1>
+        <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-6">
+          Register your moving company and connect with thousands of customers looking for trusted movers
+        </p>
+        
+        {/* Benefits Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto mt-8 mb-8">
+          <div className="p-4 bg-primary/5 rounded-lg border border-primary/10">
+            <div className="text-2xl font-bold text-primary mb-1">1000+</div>
+            <div className="text-sm text-muted-foreground">Monthly Quote Requests</div>
+          </div>
+          <div className="p-4 bg-success/5 rounded-lg border border-success/10">
+            <div className="text-2xl font-bold text-success mb-1">24/7</div>
+            <div className="text-sm text-muted-foreground">Business Opportunities</div>
+          </div>
+          <div className="p-4 bg-trust-blue/5 rounded-lg border border-trust-blue/10">
+            <div className="text-2xl font-bold text-trust-blue mb-1">Free</div>
+            <div className="text-sm text-muted-foreground">No Monthly Fees</div>
+          </div>
+        </div>
+      </div>
+
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Mover Registration</CardTitle>
+          <CardTitle className="text-2xl">Complete Your Registration</CardTitle>
           <CardDescription>
-            Complete all steps to register as a mover on MoveEasy
+            Fill out all required information to get verified and start receiving quote requests
           </CardDescription>
           <div className="mt-4">
             <Progress value={progress} className="h-2" />
@@ -401,5 +434,6 @@ export default function MoverRegistration() {
         </CardContent>
       </Card>
     </div>
+    </>
   );
 }
