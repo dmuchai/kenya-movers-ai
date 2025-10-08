@@ -137,11 +137,14 @@ export const bookingService = {
         dropoff_location: `POINT(${input.dropoff_longitude} ${input.dropoff_latitude})`,
         scheduled_date: input.scheduled_date,
         scheduled_time_start: input.scheduled_time_start,
+        scheduled_time_end: input.scheduled_time_end,
         property_size: input.property_size,
         estimated_price: input.estimated_price,
         inventory: input.inventory || {},
         additional_services: input.additional_services || [],
         special_instructions: input.special_instructions,
+        customer_notes: input.customer_notes,
+        quote_id: input.quote_id,
         has_fragile_items: input.has_fragile_items || false,
         requires_insurance: input.requires_insurance || false,
         status: 'pending' as BookingStatus,
@@ -171,8 +174,84 @@ export const bookingService = {
 
   /**
    * Assign mover to booking
+   * Validates booking state, mover existence, and quoted price before assignment
    */
   assignMover: async (bookingId: string, moverId: string, quotedPrice: number): Promise<Booking> => {
+    // Configuration: Maximum reasonable price for validation
+    const MAX_REASONABLE_PRICE = 500000; // 500,000 KES (adjust based on business requirements)
+    const MAX_PRICE_DEVIATION_MULTIPLIER = 3; // Quoted price can be max 3x estimated price
+    
+    // Step 1: Fetch existing booking and validate it exists
+    const { data: existingBooking, error: fetchError } = await supabase
+      .from('bookings')
+      .select('*')
+      .eq('id', bookingId)
+      .single();
+    
+    if (fetchError) {
+      throw new Error(`Failed to fetch booking: ${fetchError.message}`);
+    }
+    
+    if (!existingBooking) {
+      throw new Error(`Booking not found with id: ${bookingId}`);
+    }
+    
+    // Step 2: Validate booking status - only allow assignment if booking is in valid pre-assignment state
+    const allowedStatuses: BookingStatus[] = ['pending'];
+    
+    if (!allowedStatuses.includes(existingBooking.status as BookingStatus)) {
+      throw new Error(
+        `Cannot assign mover to booking with status '${existingBooking.status}'. ` +
+        `Booking must be in one of these states: ${allowedStatuses.join(', ')}`
+      );
+    }
+    
+    // Step 3: Validate quoted price is positive
+    if (quotedPrice <= 0) {
+      throw new Error(`Invalid quoted price: ${quotedPrice}. Price must be greater than 0.`);
+    }
+    
+    // Step 4: Validate quoted price is within reasonable bounds
+    if (quotedPrice > MAX_REASONABLE_PRICE) {
+      throw new Error(
+        `Quoted price ${quotedPrice} KES exceeds maximum reasonable price of ${MAX_REASONABLE_PRICE} KES. ` +
+        `Please review the quote or contact administrator.`
+      );
+    }
+    
+    // Step 5: Compare quoted price against estimated price (allow reasonable deviation)
+    if (existingBooking.estimated_price) {
+      const maxAllowedQuote = existingBooking.estimated_price * MAX_PRICE_DEVIATION_MULTIPLIER;
+      
+      if (quotedPrice > maxAllowedQuote) {
+        throw new Error(
+          `Quoted price ${quotedPrice} KES is too high compared to estimated price ${existingBooking.estimated_price} KES. ` +
+          `Maximum allowed is ${maxAllowedQuote} KES (${MAX_PRICE_DEVIATION_MULTIPLIER}x estimate). ` +
+          `Please provide a more reasonable quote.`
+        );
+      }
+    }
+    
+    // Step 6: Validate mover exists and has mover role
+    const { data: mover, error: moverError } = await supabase
+      .from('movers')
+      .select('id, user_id, verification_status')
+      .eq('id', moverId)
+      .single();
+    
+    if (moverError || !mover) {
+      throw new Error(`Mover not found with id: ${moverId}. Please ensure the mover exists and is registered.`);
+    }
+    
+    // Optional: Check mover verification status
+    if (mover.verification_status !== 'verified') {
+      throw new Error(
+        `Mover ${moverId} is not verified (status: ${mover.verification_status}). ` +
+        `Only verified movers can accept bookings.`
+      );
+    }
+    
+    // Step 7: Perform the update after all validations pass
     const { data, error } = await supabase
       .from('bookings')
       .update({
@@ -185,15 +264,15 @@ export const bookingService = {
       .select()
       .single();
     
-    if (error) throw error;
+    if (error) {
+      throw new Error(`Failed to assign mover to booking: ${error.message}`);
+    }
+    
     return data;
   },
 
-  /**
-   * Update booking status
-   */
   updateStatus: async (bookingId: string, status: BookingStatus): Promise<Booking> => {
-    const updates: any = { status };
+    const updates: BookingUpdate = { status };
     
     // Add timestamps based on status
     if (status === 'in_progress') {
@@ -204,13 +283,29 @@ export const bookingService = {
       updates.cancelled_at = new Date().toISOString();
     }
     
+    // Validate state transition
+    const booking = await bookingService.getById(bookingId);
+    if (!booking) {
+      throw new Error(`Booking ${bookingId} not found`);
+    }
+
+    const terminalStates: BookingStatus[] = [
+      'completed',
+      'cancelled_customer',
+      'cancelled_mover',
+      'cancelled_system'
+    ];
+    if (terminalStates.includes(booking.status)) {
+      throw new Error(`Cannot change status from terminal state: ${booking.status}`);
+    }
+    
     const { data, error } = await supabase
       .from('bookings')
       .update(updates)
       .eq('id', bookingId)
       .select()
       .single();
-    
+
     if (error) throw error;
     return data;
   },

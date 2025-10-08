@@ -1,6 +1,40 @@
 # Database Schema Diagram
 ## MoveEasy Marketplace ERD (Entity Relationship Diagram)
 
+> **                              └──────────────────────────────────────────────────────────────┘
+
+```
+
+**DIAGRAM LEGEND:**
+- `(PK)` = Primary Key
+- `(FK)` = Foreign Key  
+- `(UQ)` = Unique Constraint
+- `(FK,UQ)` = Foreign Key with Unique Constraint (enforces 1:1 relationship)
+- `◄───` = References/Points to
+- `(NEW)` = New table added in this schema version
+
+════════════════════════════════════════════════════════════════════════════════════════
+
+KEY RELATIONSHIPS:
+
+1. auth.users (1) → (1) profiles → (1) movers
+   One user can have one mover profile
+   
+   ⚠️ FK & UNIQUE CONSTRAINT:
+   • auth.users.id (PK)
+     └─> profiles.id (FK references auth.users.id)
+         └─> movers.user_id (FK references profiles.id + UNIQUE)
+   
+   IMPLEMENTATION:
+   • movers.user_id references profiles.id (NOT auth.users.id)
+   • movers.user_id MUST have UNIQUE constraint for 1:1 relationship
+   • Prevents multiple mover profiles per user account
+   • SQL: ALTER TABLE movers ADD CONSTRAINT movers_user_id_unique UNIQUE (user_id);ANT - Foreign Key & Unique Constraint:**  
+> The `movers.user_id` column:
+> 1. References `profiles.id` (NOT `auth.users.id`)
+> 2. Must have a UNIQUE constraint to enforce 1:1 relationship  
+> FK Chain: `auth.users.id` → `profiles.id` → `movers.user_id` (UNIQUE)
+
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                        MOVEEASY DATABASE SCHEMA                              │
@@ -12,10 +46,11 @@
 │  (Supabase)      │              │   (existing)     │              │    (NEW)         │
 ├──────────────────┤              ├──────────────────┤              ├──────────────────┤
 │ id (PK)          │◄─────────────│ id (PK, FK)      │◄─────────────│ id (PK)          │
-│ email            │              │ full_name        │              │ user_id (FK)     │
-│ phone            │              │ role             │              │ business_name    │
-│ created_at       │              │ created_at       │              │ vehicle_types[]  │
-└──────────────────┘              └──────────────────┘              │ verification_status│
+│ email            │              │    FK→auth.users │              │ user_id (FK,UQ)  │
+│ phone            │              │ full_name        │              │    FK→profiles   │
+│ created_at       │              │ role             │              │ business_name    │
+└──────────────────┘              │ created_at       │              │ vehicle_types[]  │
+                                  └──────────────────┘              │ verification_status│
                                                                     │ availability_status│
                                                                     │ rating           │
                                                                     │ total_moves      │
@@ -137,6 +172,43 @@ CUSTOM TYPES (ENUMS):
 
 ════════════════════════════════════════════════════════════════════════════════════════
 
+UNIQUE CONSTRAINTS:
+
+⚠️ Critical constraints to enforce data integrity and relationship cardinality:
+
+┌────────────────────────┬─────────────────────────────────────────────────────┐
+│ Table.Column           │ Purpose                                             │
+├────────────────────────┼─────────────────────────────────────────────────────┤
+│ movers.user_id         │ ⭐ Ensures one mover profile per user (1:1)         │
+│                        │ Prevents duplicate mover registrations              │
+│                        │ SQL: UNIQUE (user_id)                               │
+├────────────────────────┼─────────────────────────────────────────────────────┤
+│ profiles.id            │ Already unique (PK) - one profile per auth user    │
+├────────────────────────┼─────────────────────────────────────────────────────┤
+│ bookings.booking_number│ Unique human-readable booking reference             │
+│                        │ SQL: UNIQUE (booking_number)                        │
+└────────────────────────┴─────────────────────────────────────────────────────┘
+
+**Implementation Example:**
+```sql
+-- Add UNIQUE constraint to movers.user_id
+ALTER TABLE public.movers
+ADD CONSTRAINT movers_user_id_unique UNIQUE (user_id);
+
+-- Verify constraint exists
+SELECT constraint_name, constraint_type 
+FROM information_schema.table_constraints 
+WHERE table_name = 'movers' AND constraint_type = 'UNIQUE';
+```
+
+**Benefits:**
+• Database-level enforcement (cannot be bypassed by application code)
+• Prevents race conditions in concurrent mover registrations
+• Maintains referential integrity in auth → profiles → movers chain
+• Enables efficient lookups by user_id
+
+════════════════════════════════════════════════════════════════════════════════════════
+
 KEY FEATURES:
 
 ✅ PostGIS Integration
@@ -204,12 +276,159 @@ TYPICAL DATA FLOW:
    set availability_status = 'online' → 
    start receiving booking_requests
 
-3. PAYMENT FLOW
-   Booking accepted → customer pays → 
-   payment (status = 'held_escrow') → 
-   move completed → 
-   payment (status = 'completed', release escrow) → 
-   payout to mover (amount - commission)
+3. PAYMENT FLOW & ESCROW RELEASE
+
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│ INITIAL PAYMENT                                                                     │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+
+   Booking accepted (status = 'accepted') → 
+   Customer pays via M-Pesa/Card → 
+   payment_status = 'held_escrow' + is_held_in_escrow = TRUE →
+   booking_status = 'in_progress' (move day)
+
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│ COMPLETION TRIGGERS (Deterministic State Transitions)                               │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+
+   **PRIMARY PATH: Both-Party Confirmation (Required for escrow release)**
+   
+   Step 1: Mover marks delivered
+           → booking_status = 'completed'
+           → completed_at = NOW()
+           → awaiting customer confirmation
+   
+   Step 2: Customer confirms delivery
+           → booking.completion_signature captured
+           → booking.customer_satisfaction_score recorded
+           → TRIGGER escrow release sequence
+   
+   **ESCROW RELEASE SEQUENCE:**
+   
+   IF (booking_status = 'completed' AND completion_signature IS NOT NULL)
+   OR (completed_at + 72 hours < NOW() AND has_dispute = FALSE)
+   THEN:
+     1. payment_status = 'completed'
+     2. is_held_in_escrow = FALSE
+     3. escrow_released_at = NOW()
+     4. escrow_release_reason = 'both_party_confirmed' | 'auto_release_72h'
+     5. Calculate and initiate mover payout:
+        - mover_payout_amount = amount - commission_amount - insurance_fee
+        - Transfer to mover's M-Pesa/bank account
+        - commission_amount retained by platform
+   
+   **AUTO-RELEASE RULE (Fallback if customer doesn't respond):**
+   
+   • Timeout: 72 hours after completed_at timestamp
+   • Condition: has_dispute = FALSE (no active dispute filed)
+   • Action: Auto-release escrow using sequence above with reason 'auto_release_72h'
+   • Notification: Customer receives "Auto-confirmed after 72h" message
+   
+   **PAYOUT TIMING:**
+   
+   • Escrow release triggers immediate payout processing
+   • M-Pesa payouts: 0-24 hours (subject to M-Pesa availability)
+   • Bank transfers: 1-3 business days
+   • Commission retained by platform in real-time during escrow release
+
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│ DISPUTE HANDLING (State Transitions & Escrow Hold)                                  │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+
+   **DISPUTE FILING (Before or during 72h window):**
+   
+   Customer/Mover files dispute → 
+     booking.has_dispute = TRUE
+     booking.dispute_status = 'open'
+     booking.dispute_reason = [customer input]
+     booking_status remains 'completed' OR reverts to 'disputed'
+     payment_status remains 'held_escrow' (ESCROW FROZEN)
+   
+   **STATE TRANSITIONS:**
+   
+   held_escrow → disputed_held (escrow frozen during investigation)
+              ↓
+   dispute_status = 'investigating' (admin reviews case, collects evidence)
+              ↓
+           RESOLUTION PATHS:
+              ↓
+   ┌──────────────────────┬───────────────────────┐
+   │                      │                       │
+   │ FAVOR MOVER          │ FAVOR CUSTOMER        │
+   │ dispute_status =     │ dispute_status =      │
+   │ 'resolved'           │ 'resolved'            │
+   │                      │                       │
+   │ payment_status =     │ payment_status =      │
+   │ 'completed'          │ 'refunded'            │
+   │ Release escrow       │ Return funds to       │
+   │ to mover             │ customer              │
+   │ (full payout)        │ (full/partial         │
+   │                      │  refund based on      │
+   │ booking_status =     │  ruling)              │
+   │ 'completed'          │                       │
+   │                      │ booking_status =      │
+   └──────────────────────┘ 'cancelled_system'    │
+                           OR 'disputed'          │
+                           (marked resolved)      │
+                                                  │
+                           refund_amount set      │
+                           refunded_at = NOW()    │
+                           └────────────────────────┘
+   
+   **DISPUTE FIELDS & TIMEOUT:**
+   
+   • dispute_status: 'open' → 'investigating' → 'resolved'
+   • dispute_reason: TEXT (customer/mover explanation)
+   • reported_issues: TEXT[] (array of specific complaints)
+   • Admin review SLA: 48-72 hours for resolution
+   • If dispute unresolved after 7 days: escalate to manual arbitration
+   
+   **ESCROW PROTECTION:**
+   
+   • Once dispute filed, auto-release is DISABLED
+   • Payment cannot be completed until dispute_status = 'resolved'
+   • Dispute must be resolved by admin before any fund movement
+   • No timeout-based auto-completion during active dispute
+
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│ RELEVANT SCHEMA FIELDS                                                              │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+
+   **bookings table:**
+     - booking_status: booking_status_enum
+     - completed_at: TIMESTAMPTZ (trigger for 72h auto-release)
+     - completion_signature: TEXT (customer confirmation proof)
+     - has_dispute: BOOLEAN
+     - dispute_status: TEXT ('open', 'investigating', 'resolved')
+     - dispute_reason: TEXT
+   
+   **payments table:**
+     - payment_status: payment_status_enum ('held_escrow' | 'completed' | 'refunded')
+     - is_held_in_escrow: BOOLEAN
+     - escrow_released_at: TIMESTAMPTZ
+     - escrow_release_reason: TEXT ('both_party_confirmed' | 'auto_release_72h')
+     - refund_amount: DECIMAL(10,2)
+     - refunded_at: TIMESTAMPTZ
+
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│ IMPLEMENTATION NOTES                                                                │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+
+   1. Use pg_cron to schedule hourly job checking for:
+      - Payments with (completed_at + 72 hours < NOW() AND has_dispute = FALSE)
+      - Auto-trigger escrow release for qualifying bookings
+   
+   2. Prevent race conditions:
+      - Lock payment row during escrow release
+      - Use transaction isolation for status updates
+   
+   3. Audit trail:
+      - Log all state transitions in payments.metadata JSONB
+      - Track who triggered release (customer, auto, admin)
+   
+   4. Both-party confirmation is MANDATORY unless:
+      - 72h timeout reached AND no dispute filed
+      - Admin manually overrides (with reason logged)
 
 ════════════════════════════════════════════════════════════════════════════════════════
 

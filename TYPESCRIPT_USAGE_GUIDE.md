@@ -45,10 +45,11 @@ import { supabase } from '@/integrations/supabase/client';
 // Get all verified movers
 const getVerifiedMovers = async () => {
   const { data, error } = await supabase
+  const { data, error } = await supabase
     .from('movers')
     .select('*')
     .eq('verification_status', 'verified')
-    .eq('deleted_at', null);
+    .is('deleted_at', null);
   
   if (error) throw error;
   
@@ -188,6 +189,11 @@ interface CreatePaymentInput {
 }
 
 const createPayment = async (input: CreatePaymentInput) => {
+  // Validate commission rate is within acceptable range
+  if (input.commission_rate < 0 || input.commission_rate > 100) {
+    throw new Error('Commission rate must be between 0 and 100');
+  }
+  
   const commissionAmount = (input.amount * input.commission_rate) / 100;
   const moverPayoutAmount = input.amount - commissionAmount;
   
@@ -512,7 +518,23 @@ export const useBookingSubscription = (customerId: string) => {
           // Update your state here
         }
       )
-      .subscribe();
+      .subscribe((status, err) => {
+        // Handle channel lifecycle status
+        if (status === 'SUBSCRIBED') {
+          console.log('✅ Successfully subscribed to booking updates');
+        } else if (status === 'CLOSED') {
+          console.log('⚠️ Channel closed');
+          // NOTE: Implement reconnection logic here (e.g., exponential backoff retry)
+          // Consider using a reconnection strategy to re-establish the subscription
+        } else if (status === 'CHANNEL_ERROR') {
+          console.error('❌ Channel error:', err);
+          // NOTE: Implement error recovery and backoff logic
+          // Common causes: network issues, auth token expiration, rate limits
+          // Recommended: Use exponential backoff (1s, 2s, 4s, 8s, etc.) before retrying
+        } else {
+          console.log('Channel status:', status);
+        }
+      });
     
     return () => {
       supabase.removeChannel(channel);

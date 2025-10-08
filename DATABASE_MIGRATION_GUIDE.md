@@ -64,17 +64,67 @@ supabase db dump > backup_$(date +%Y%m%d_%H%M%S).sql
 
 ---
 
-### **Step 2: Access Supabase SQL Editor**
+### **Step 2: Verify PostGIS Extension (REQUIRED - Fail Fast)**
 
-1. Open your Supabase project dashboard
-2. Navigate to **SQL Editor** in the left sidebar
-3. You'll see the SQL query interface
+⚠️ **CRITICAL**: The schema requires PostGIS for geospatial features. Verify it's enabled **BEFORE** running any migrations to fail fast if missing.
 
-![SQL Editor Location](https://supabase.com/docs/img/sql-editor-location.png)
+**Why check first?** If PostGIS is not enabled, all migrations will fail with geography/geometry type errors. Checking now saves time and prevents partial migration failures.
+
+#### **Check if PostGIS is enabled:**
+```sql
+-- Run this in SQL Editor
+SELECT 
+  extname AS extension_name,
+  extversion AS version,
+  'PostGIS is enabled ✓' AS status
+FROM pg_extension 
+WHERE extname = 'postgis';
+```
+
+**Expected Result:**
+```
+extension_name | version | status
+postgis        | 3.x.x   | PostGIS is enabled ✓
+```
+
+#### **If NOT enabled (no rows returned):**
+```sql
+-- Enable PostGIS extension
+CREATE EXTENSION IF NOT EXISTS postgis;
+
+-- Verify it was enabled
+SELECT extname, extversion FROM pg_extension WHERE extname = 'postgis';
+```
+
+**After enabling**, you should see:
+- `postgis` extension listed
+- Version 3.0 or higher recommended
+
+#### **Troubleshooting:**
+- **Error: "permission denied"** → Contact your Supabase admin or check project permissions
+- **Extension not available** → PostGIS should be available by default in Supabase; contact support
+- **Version < 3.0** → Still usable, but update recommended for better performance
+
+✅ **Checkpoint**: Only proceed to Step 3 if PostGIS is confirmed enabled.
 
 ---
 
-### **Step 3: Execute Migration Part 1 (Core Tables)**
+### **Step 3: Access Supabase SQL Editor**
+
+1. Open your Supabase project dashboard at `https://supabase.com/dashboard`
+2. Select your project from the project list
+3. In the left sidebar, look for the **SQL Editor** icon (it looks like a database or terminal icon)
+4. Click on **SQL Editor** to open the SQL query interface
+5. You should see:
+   - A query editor panel in the center
+   - A "Run" button (or use Ctrl+Enter / Cmd+Enter to execute)
+   - Optional: A history of previous queries on the left
+
+**Tip**: The SQL Editor is typically located below "Database" and above "Functions" in the sidebar menu.
+
+---
+
+### **Step 4: Execute Migration Part 1 (Core Tables)**
 
 **File**: `supabase/migrations/20251008_part1_marketplace_schema.sql`
 
@@ -108,7 +158,7 @@ WHERE table_schema = 'public'
 
 ---
 
-### **Step 4: Execute Migration Part 2 (Additional Tables)**
+### **Step 5: Execute Migration Part 2 (Additional Tables)**
 
 **File**: `supabase/migrations/20251008_part2_marketplace_schema.sql`
 
@@ -140,7 +190,7 @@ ORDER BY table_name;
 
 ---
 
-### **Step 5: Execute Migration Part 3 (RLS & Functions)**
+### **Step 6: Execute Migration Part 3 (RLS & Functions)**
 
 **File**: `supabase/migrations/20251008_part3_rls_and_functions.sql`
 
@@ -186,24 +236,41 @@ WHERE routine_schema = 'public'
 
 ---
 
-### **Step 6: Verify PostGIS Extension**
+### **Step 7: PostGIS Extension Verification Complete**
 
-The schema uses PostGIS for geospatial queries. Verify it's enabled:
+✅ **Note**: PostGIS extension verification was completed in **Step 2**. If you skipped that step, go back and verify PostGIS is enabled before proceeding.
 
-```sql
-SELECT * FROM pg_extension WHERE extname = 'postgis';
-```
-
-**If not enabled**, run:
-```sql
-CREATE EXTENSION IF NOT EXISTS postgis;
-```
+All geospatial functions (geography, geometry types, ST_* functions) should now be available.
 
 ---
 
-### **Step 7: Insert Sample Data (Optional but Recommended)**
+### **Step 8: Insert Sample Data (Optional but Recommended)**
 
-Create test data to verify everything works:
+Create test data to verify everything works.
+
+**⚠️ IMPORTANT**: The `auth.uid()` function returns `NULL` when run from the SQL Editor because the SQL session is not authenticated through Supabase Auth. You must retrieve a valid user ID first.
+
+#### **Get a Valid User ID**
+
+Run this query to find an existing user:
+```sql
+-- Get the first user from your auth.users table
+SELECT id, email 
+FROM auth.users 
+LIMIT 1;
+```
+
+**Copy the `id` value** (it will look like: `a1b2c3d4-e5f6-7890-abcd-ef1234567890`)
+
+If no users exist, you need to create one through your application's sign-up flow first, or create one manually:
+```sql
+-- Optional: Create a test user (if none exist)
+-- You'll need to use Supabase Auth API or your app's sign-up for proper user creation
+```
+
+#### **Insert Test Mover**
+
+**Replace `'YOUR_USER_ID_HERE'`** with the actual user ID you copied above:
 
 ```sql
 -- Insert a test mover
@@ -215,7 +282,7 @@ INSERT INTO public.movers (
   service_radius_km,
   verification_status
 ) VALUES (
-  auth.uid(), -- Your current user
+  'YOUR_USER_ID_HERE'::uuid, -- Replace with actual user ID from auth.users
   'Test Movers Kenya',
   '+254712345678',
   ARRAY['pickup', 'box_truck_small']::vehicle_type[],
@@ -224,7 +291,49 @@ INSERT INTO public.movers (
 );
 
 -- Verify insertion
-SELECT id, business_name, verification_status 
+SELECT id, business_name, verification_status, user_id
+FROM public.movers 
+WHERE business_name = 'Test Movers Kenya';
+```
+
+**Alternative**: If you want to use `auth.uid()` dynamically (though it will be NULL in SQL Editor):
+```sql
+-- This uses COALESCE to provide a fallback
+DO $$
+DECLARE
+  v_user_id uuid;
+BEGIN
+  -- Try to get current auth user, fallback to first user in system
+  v_user_id := COALESCE(
+    auth.uid(),
+    (SELECT id FROM auth.users LIMIT 1)
+  );
+  
+  -- Insert with the resolved user_id
+  INSERT INTO public.movers (
+    user_id,
+    business_name,
+    phone_primary,
+    vehicle_types,
+    service_radius_km,
+    verification_status
+  ) VALUES (
+SELECT COUNT(*) as function_count
+FROM information_schema.routines 
+WHERE routine_schema = 'public' 
+  AND (routine_name LIKE '%mover%' OR routine_name LIKE '%booking%');
+    'Test Movers Kenya',
+    '+254712345678',
+    ARRAY['pickup', 'box_truck_small']::vehicle_type[],
+    15,
+    'verified'
+  );
+  
+  RAISE NOTICE 'Inserted test mover with user_id: %', v_user_id;
+END $$;
+
+-- Verify insertion
+SELECT id, business_name, verification_status, user_id
 FROM public.movers 
 WHERE business_name = 'Test Movers Kenya';
 ```
@@ -289,18 +398,15 @@ WHERE routine_schema = 'public'
 ## 🚨 Troubleshooting
 
 ### **Error: "relation already exists"**
-**Solution**: Tables may already exist from previous attempts.
-```sql
 -- Check existing tables
 SELECT tablename FROM pg_tables WHERE schemaname = 'public';
 
--- Drop if needed (CAREFUL - this deletes data!)
+-- WARNING: DROP CASCADE will permanently delete the table, all data,
+-- and ALL dependent objects (foreign keys, views, triggers, etc.)
+-- This cannot be undone without a backup!
+-- Only run this if you're certain you want to start fresh:
 DROP TABLE IF EXISTS public.movers CASCADE;
 -- Then re-run migration
-```
-
-### **Error: "type already exists"**
-**Solution**: Enum types already defined.
 ```sql
 -- Drop and recreate
 DROP TYPE IF EXISTS verification_status CASCADE;
@@ -395,32 +501,107 @@ WHERE user_id != auth.uid();
 
 If something goes wrong, restore from backup:
 
-### **Option 1: Supabase Dashboard**
+### **Option 1: Supabase Dashboard (RECOMMENDED)**
 1. Go to Database → Backups
 2. Find your pre-migration backup
 3. Click "Restore"
 4. Confirm restoration
 
-### **Option 2: SQL Rollback**
-```sql
--- Drop all new tables (CAREFUL!)
-DROP TABLE IF EXISTS public.notifications CASCADE;
-DROP TABLE IF EXISTS public.booking_requests CASCADE;
-DROP TABLE IF EXISTS public.mover_availability_schedule CASCADE;
-DROP TABLE IF EXISTS public.mover_locations CASCADE;
-DROP TABLE IF EXISTS public.ratings CASCADE;
-DROP TABLE IF EXISTS public.payments CASCADE;
-DROP TABLE IF EXISTS public.bookings CASCADE;
-DROP TABLE IF EXISTS public.movers CASCADE;
+---
 
--- Drop enums
-DROP TYPE IF EXISTS verification_status CASCADE;
-DROP TYPE IF EXISTS availability_status CASCADE;
-DROP TYPE IF EXISTS booking_status CASCADE;
-DROP TYPE IF EXISTS payment_status CASCADE;
-DROP TYPE IF EXISTS payment_method CASCADE;
-DROP TYPE IF EXISTS vehicle_type CASCADE;
-DROP TYPE IF EXISTS rating_type CASCADE;
+### **Option 2: SQL Rollback**
+
+```sql
+/*
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║                    ⚠️  CRITICAL WARNING - READ THIS FIRST ⚠️              ║
+║                                                                           ║
+║  THE FOLLOWING OPERATIONS ARE IRREVERSIBLE AND WILL PERMANENTLY DELETE:  ║
+║                                                                           ║
+║  • ALL TABLES (movers, bookings, payments, ratings, etc.)                ║
+║  • ALL DATA stored in those tables                                       ║
+║  • ALL FOREIGN KEY RELATIONSHIPS                                         ║
+║  • ALL INDEXES, TRIGGERS, AND CONSTRAINTS                                ║
+║  • ALL ROW-LEVEL SECURITY POLICIES                                       ║
+║                                                                           ║
+║  ⛔ MANDATORY STEPS BEFORE PROCEEDING:                                    ║
+║                                                                           ║
+║  1. CREATE A FULL DATABASE BACKUP                                        ║
+║     → Supabase Dashboard > Database > Backups > Create Backup            ║
+║                                                                           ║
+║  2. VERIFY YOU ARE IN THE CORRECT ENVIRONMENT                            ║
+║     → Run: SELECT current_database();                                    ║
+║     → CONFIRM this is NOT your production database                       ║
+║                                                                           ║
+║  3. EXPORT CRITICAL DATA (if needed for recovery)                        ║
+║     → Run: COPY (SELECT * FROM public.movers) TO '/tmp/movers.csv';     ║
+║     → Repeat for other tables you need to preserve                       ║
+║                                                                           ║
+║  4. REQUIRED CONFIRMATION - Type this command first:                     ║
+║     → SELECT 'I confirm this is NOT production and I have a backup'      ║
+║          AS confirmation;                                                ║
+║                                                                           ║
+║  5. ONLY AFTER COMPLETING STEPS 1-4, uncomment and run the DROP commands ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+*/
+
+-- STEP 1: VERIFY ENVIRONMENT (REQUIRED)
+SELECT 
+  current_database() AS database_name,
+  current_user AS current_user,
+  version() AS postgres_version;
+
+-- STEP 2: CONFIRMATION (REQUIRED - READ THE WARNING ABOVE)
+SELECT 'I confirm this is NOT production and I have a backup' AS confirmation;
+
+-- STEP 3: UNCOMMENT THE FOLLOWING LINES TO EXECUTE ROLLBACK
+-- ⚠️  WARNING: Remove the '--' comment prefix ONLY after completing verification steps
+
+-- Drop all new tables (CASCADE will delete dependent objects)
+-- DROP TABLE IF EXISTS public.notifications CASCADE;
+-- DROP TABLE IF EXISTS public.booking_requests CASCADE;
+-- DROP TABLE IF EXISTS public.mover_availability_schedule CASCADE;
+-- DROP TABLE IF EXISTS public.mover_locations CASCADE;
+-- DROP TABLE IF EXISTS public.ratings CASCADE;
+-- DROP TABLE IF EXISTS public.payments CASCADE;
+-- DROP TABLE IF EXISTS public.bookings CASCADE;
+-- DROP TABLE IF EXISTS public.movers CASCADE;
+
+-- Drop enums (CASCADE will handle dependencies)
+-- DROP TYPE IF EXISTS verification_status CASCADE;
+-- DROP TYPE IF EXISTS availability_status CASCADE;
+-- DROP TYPE IF EXISTS booking_status CASCADE;
+-- DROP TYPE IF EXISTS payment_status CASCADE;
+-- DROP TYPE IF EXISTS payment_method CASCADE;
+-- DROP TYPE IF EXISTS vehicle_type CASCADE;
+-- DROP TYPE IF EXISTS rating_type CASCADE;
+
+-- STEP 4: VERIFY ROLLBACK COMPLETION
+-- SELECT COUNT(*) as remaining_tables
+-- FROM information_schema.tables 
+-- WHERE table_schema = 'public' 
+--   AND table_name IN (
+--     'movers', 'bookings', 'payments', 'ratings', 
+--     'mover_locations', 'mover_availability_schedule',
+--     'booking_requests', 'notifications'
+--   );
+-- Expected: remaining_tables = 0
+
+/*
+╔═══════════════════════════════════════════════════════════════════════════╗
+║  ✅ IF ROLLBACK SUCCESSFUL:                                               ║
+║     • All tables should be removed                                        ║
+║     • All data is permanently deleted                                     ║
+║     • You can now restore from backup or re-run migrations                ║
+║                                                                           ║
+║  ⛔ IF YOU MADE A MISTAKE:                                                 ║
+║     • STOP IMMEDIATELY                                                    ║
+║     • Restore from your backup (Option 1 above)                           ║
+║     • Contact your database administrator if unsure                       ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+*/
 ```
 
 ---

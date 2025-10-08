@@ -41,6 +41,13 @@ export default function ServiceAreaStep({ data, onUpdate, onNext }: ServiceAreaS
       const coords = await locationService.getCurrentLocation();
       const address = await locationService.reverseGeocode(coords.latitude, coords.longitude);
       
+      const newLocationValue: LocationValue = {
+        formatted_address: address,
+        location: { lat: coords.latitude, lng: coords.longitude }
+      };
+      
+      setLocationValue(newLocationValue);
+
       onUpdate({
         primary_location: {
           latitude: coords.latitude,
@@ -55,7 +62,14 @@ export default function ServiceAreaStep({ data, onUpdate, onNext }: ServiceAreaS
     }
   };
 
-  const isValid = data.primary_location?.latitude !== 0 && data.primary_location?.longitude !== 0;
+  // Check that primary_location exists and has valid, non-zero coordinates
+  const isValid =
+    data.primary_location != null &&
+    typeof data.primary_location.latitude === 'number' &&
+    typeof data.primary_location.longitude === 'number' &&
+    !isNaN(data.primary_location.latitude) &&
+    !isNaN(data.primary_location.longitude) &&
+    !(data.primary_location.latitude === 0 && data.primary_location.longitude === 0);
 
   return (
     <div className="space-y-6">
@@ -95,8 +109,8 @@ export default function ServiceAreaStep({ data, onUpdate, onNext }: ServiceAreaS
             </Button>
           </div>
 
-          {data.primary_location?.address && (
-            <div className="mt-3 p-3 bg-muted rounded-lg flex items-start gap-2">
+          {data.primary_location && (
+            <div className="mt-4 p-3 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg flex gap-3">
               <MapPin className="h-4 w-4 text-primary mt-0.5" />
               <div className="flex-1">
                 <p className="text-sm font-medium">Selected Location</p>
@@ -152,10 +166,22 @@ export default function ServiceAreaStep({ data, onUpdate, onNext }: ServiceAreaS
         </div>
 
         {!isValid && (
-          <p className="text-sm text-destructive">
-            Please select your primary operating location
-          </p>
+          <div className="p-4 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <p className="text-sm text-red-600 dark:text-red-400">
+              <strong>Location Required:</strong> Please select your primary operating location before proceeding.
+            </p>
+          </div>
         )}
+
+        <div className="flex justify-end pt-4">
+          <Button 
+            onClick={onNext}
+            disabled={!isValid}
+            size="lg"
+          >
+            Next
+          </Button>
+        </div>
       </div>
     </div>
   );

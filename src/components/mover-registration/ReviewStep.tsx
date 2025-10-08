@@ -5,6 +5,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { RegistrationData } from '@/pages/MoverRegistration';
 import { Building2, Phone, Mail, Truck, MapPin, FileText, CheckCircle2 } from 'lucide-react';
@@ -81,11 +82,18 @@ export default function ReviewStep({ data, onUpdate, onNext }: ReviewStepProps) 
             <div>
               <p className="text-sm font-medium text-muted-foreground mb-2">Vehicle Types</p>
               <div className="flex flex-wrap gap-2">
-                {data.vehicle_types.map(type => (
-                  <Badge key={type} variant="secondary">
-                    {VEHICLE_TYPE_LABELS[type] || type}
-                  </Badge>
-                ))}
+                {(() => {
+                  const types = Array.isArray(data.vehicle_types) ? data.vehicle_types : [];
+                  return types.length > 0 ? (
+                    types.map(type => (
+                      <Badge key={type} variant="secondary">
+                        {VEHICLE_TYPE_LABELS[type] || type}
+                      </Badge>
+                    ))
+                  ) : (
+                    <span className="text-sm text-muted-foreground">No vehicle types specified</span>
+                  );
+                })()}
               </div>
             </div>
             
@@ -119,18 +127,34 @@ export default function ReviewStep({ data, onUpdate, onNext }: ReviewStepProps) 
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <ReviewField 
-              label="Primary Location" 
-              value={data.primary_location.address}
-              icon={<MapPin className="h-3 w-3" />}
-            />
-            <ReviewField 
-              label="Service Radius" 
-              value={`${data.service_radius_km} km`} 
-            />
-            <div className="text-xs text-muted-foreground">
-              Coverage: {data.service_radius_km} km from {data.primary_location.address}
-            </div>
+            {data.primary_location?.address ? (
+              <ReviewField 
+                label="Primary Location" 
+                value={data.primary_location.address}
+                icon={<MapPin className="h-3 w-3" />}
+              />
+            ) : (
+              <ReviewField 
+                label="Primary Location" 
+                value="Not specified"
+              />
+            )}
+            {data.service_radius_km != null ? (
+              <ReviewField 
+                label="Service Radius" 
+                value={`${data.service_radius_km} km`} 
+              />
+            ) : (
+              <ReviewField 
+                label="Service Radius" 
+                value="Not specified"
+              />
+            )}
+            {data.primary_location?.address && data.service_radius_km != null && (
+              <div className="text-xs text-muted-foreground">
+                Coverage: {data.service_radius_km} km from {data.primary_location.address}
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -171,6 +195,17 @@ export default function ReviewStep({ data, onUpdate, onNext }: ReviewStepProps) 
             </ul>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Submit Button */}
+      <div className="flex justify-end pt-4">
+        <Button 
+          onClick={onNext}
+          size="lg"
+          className="min-w-[200px]"
+        >
+          Submit Application
+        </Button>
       </div>
     </div>
   );

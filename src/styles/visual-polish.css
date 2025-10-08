@@ -11,11 +11,11 @@
   }
   
   .btn-secondary-enhanced {
-    @apply bg-gradient-to-r from-secondary to-muted text-foreground;
+    @apply bg-gradient-to-r from-white to-neutral-50 text-neutral-900;
     @apply font-medium px-6 py-3 rounded-lg;
-    @apply shadow-sm hover:shadow-md transition-all duration-300;
+    @apply shadow-md hover:shadow-lg transition-all duration-300;
     @apply hover:scale-105 active:scale-95;
-    @apply border border-border;
+    @apply border-2 border-neutral-200 hover:border-primary/30;
   }
   
   .btn-glass {

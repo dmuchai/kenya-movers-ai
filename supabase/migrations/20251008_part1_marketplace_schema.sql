@@ -143,7 +143,7 @@ CREATE TABLE public.movers (
   verification_status verification_status_enum DEFAULT 'pending',
   verification_notes TEXT, -- Admin notes during verification
   verified_at TIMESTAMPTZ,
-  verified_by UUID REFERENCES auth.users(id),
+  verified_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
   
   -- Documents (stored as URLs to Supabase Storage)
   documents JSONB DEFAULT '{
@@ -249,7 +249,7 @@ CREATE TABLE public.bookings (
   -- Relationships
   customer_id UUID NOT NULL REFERENCES auth.users(id),
   mover_id UUID REFERENCES public.movers(id),
-  quote_id UUID REFERENCES public.quotes(id), -- Link to original quote
+  quote_id UUID, -- REFERENCES public.quotes(id), -- Link to original quote (table created separately)
   
   -- Status
   status booking_status_enum DEFAULT 'pending',
@@ -397,19 +397,27 @@ CREATE TRIGGER trigger_bookings_updated_at
 
 -- Status history tracking
 CREATE OR REPLACE FUNCTION track_booking_status_change()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER AS $
+DECLARE
+  user_id TEXT;
 BEGIN
   IF NEW.status IS DISTINCT FROM OLD.status THEN
+    BEGIN
+      user_id := current_setting('request.jwt.claims', true)::jsonb->>'sub';
+    EXCEPTION WHEN OTHERS THEN
+      user_id := NULL;
+    END;
+
     NEW.status_history := OLD.status_history || jsonb_build_object(
       'from_status', OLD.status,
       'to_status', NEW.status,
       'changed_at', NOW(),
-      'changed_by', current_setting('request.jwt.claims', true)::jsonb->>'sub'
+      'changed_by', user_id
     );
   END IF;
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$ LANGUAGE plpgsql;
 
 CREATE TRIGGER trigger_track_booking_status
   BEFORE UPDATE OF status ON public.bookings

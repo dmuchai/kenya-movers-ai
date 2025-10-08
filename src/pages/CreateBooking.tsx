@@ -271,7 +271,11 @@ export default function CreateBooking() {
                       mode="single"
                       selected={formData.scheduled_date}
                       onSelect={(date) => setFormData(prev => ({ ...prev, scheduled_date: date }))}
-                      disabled={(date) => date < new Date()}
+// At the top of the file, add:
+import { startOfDay } from 'date-fns';
+
+// …later in your JSX where the calendar is rendered:
+                      disabled={(date) => date < startOfDay(new Date())}
                       initialFocus
                     />
                   </PopoverContent>

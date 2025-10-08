@@ -20,7 +20,7 @@ A complete multi-step registration wizard with:
 - Business description/bio
 
 #### **Step 2: Vehicle Information** (`VehicleInfoStep.tsx`)
-- Vehicle type selection (6 types: pickup, box trucks, van, container)
+- Vehicle type selection (4 types: pickup, box trucks, van, container)
 - Vehicle plate numbers
 - Maximum capacity
 - Helper/crew information

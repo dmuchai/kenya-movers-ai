@@ -12,6 +12,8 @@
     "lint:fix": "eslint . --fix",
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
+    "types:generate": "npx supabase gen types typescript --project-id eyfvvtpbttmsqubxglyg > src/integrations/supabase/database-generated.ts",
+    "types:generate:local": "npx supabase gen types typescript --local > src/integrations/supabase/database-generated.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "playwright:install": "playwright install",
     "playwright:update": "playwright install --force",
@@ -77,6 +79,7 @@
   "devDependencies": {
     "@eslint/js": "^9.9.0",
     "@tailwindcss/typography": "^0.5.15",
+    "@types/geojson": "^7946.0.16",
     "@types/node": "^22.5.5",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",

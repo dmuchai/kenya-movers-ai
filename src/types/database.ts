@@ -8,6 +8,8 @@
  * import { Mover, Booking, Payment } from '@/types/database'
  */
 
+import type { Point, Polygon } from 'geojson';
+
 // ============================================================================
 // ENUMS (matching database custom types)
 // ============================================================================
@@ -86,13 +88,13 @@ export interface Mover {
   helper_count: number;
   
   // Service Areas (PostGIS geography types serialized as GeoJSON)
-  service_areas?: any[]; // GeoJSON polygons
-  primary_location?: any; // GeoJSON point
+  service_areas?: Polygon[];
+  primary_location?: Point;
   service_radius_km: number;
   
   // Availability
   availability_status: AvailabilityStatus;
-  current_location?: any; // GeoJSON point
+  current_location?: Point;
   current_location_updated_at?: string;
   is_accepting_bookings: boolean;
   
@@ -173,7 +175,7 @@ export interface Booking {
   
   // Location Details
   pickup_address: string;
-  pickup_location: any; // GeoJSON point
+  pickup_location: Point;
   pickup_location_details: {
     floor_number?: number;
     has_elevator: boolean;
@@ -183,7 +185,7 @@ export interface Booking {
   };
   
   dropoff_address: string;
-  dropoff_location: any; // GeoJSON point
+  dropoff_location: Point;
   dropoff_location_details: {
     floor_number?: number;
     has_elevator: boolean;
@@ -239,12 +241,12 @@ export interface Booking {
   
   // Real-time Tracking
   tracking_data: Array<{
-    location: any; // GeoJSON point
+    location: Point;
     timestamp: string;
     heading?: number;
     speed?: number;
   }>;
-  last_tracked_location?: any; // GeoJSON point
+  last_tracked_location?: Point;
   last_tracked_at?: string;
   
   // Communication
@@ -397,7 +399,7 @@ export interface MoverLocation {
   booking_id?: string;
   
   // Location Data
-  location: any; // GeoJSON point
+  location: Point;
   latitude: number;
   longitude: number;
   
@@ -649,7 +651,7 @@ export type Database = {
     Functions: {
       find_nearby_movers: {
         Args: {
-          p_location: any;
+          p_location: Point | string; // GeoJSON Point or WKT string (e.g., 'POINT(lng lat)')
           p_radius_km?: number;
           p_min_rating?: number;
         };
@@ -657,15 +659,15 @@ export type Database = {
       };
       calculate_distance_km: {
         Args: {
-          p_location1: any;
-          p_location2: any;
+          p_location1: Point | string; // GeoJSON Point or WKT string
+          p_location2: Point | string; // GeoJSON Point or WKT string
         };
         Returns: number;
       };
       is_location_in_service_area: {
         Args: {
           p_mover_id: string;
-          p_location: any;
+          p_location: Point | string; // GeoJSON Point or WKT string
         };
         Returns: boolean;
       };

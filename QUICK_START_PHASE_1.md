@@ -82,13 +82,17 @@ USING (bucket_id = 'mover-profiles');
 
 CREATE POLICY "Authenticated upload"
 ON storage.objects FOR INSERT
-WITH CHECK (bucket_id = 'mover-profiles' AND auth.role() = 'authenticated');
+WITH CHECK (bucket_id = 'mover-profiles' AND auth.uid() IS NOT NULL);
 
 -- mover-documents bucket (private)
 CREATE POLICY "Admin read access"
 ON storage.objects FOR SELECT
-USING (bucket_id = 'mover-documents');
-```
+USING (
+  bucket_id = 'mover-documents' 
+  AND auth.uid() IN (
+    SELECT id FROM auth.users WHERE raw_user_meta_data->>'role' = 'admin'
+  )
+);
 
 ### 3. Add Routes to Your App
 

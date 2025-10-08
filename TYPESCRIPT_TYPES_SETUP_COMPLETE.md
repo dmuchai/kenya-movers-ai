@@ -5,7 +5,7 @@
 ### 1. Generated TypeScript Types from Supabase Database ✅
 ```bash
 npx supabase login  # Logged in successfully
-npx supabase gen types typescript --project-id eyfvvtpbttmsqubxglyg --schema public > src/integrations/supabase/types.ts
+npx supabase gen types typescript --project-id $SUPABASE_PROJECT_ID --schema public > src/integrations/supabase/types.ts
 ```
 
 **Result**: Generated 88KB of TypeScript types that perfectly match your database schema!

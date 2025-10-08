@@ -529,7 +529,7 @@ CREATE INDEX IF NOT EXISTS idx_payments_mover_completed
 -- ============================================================================
 
 -- Grant access to authenticated users
-GRANT SELECT ON public.movers TO authenticated;
+GRANT SELECT, INSERT, UPDATE ON public.movers TO authenticated;
 GRANT SELECT, INSERT, UPDATE ON public.bookings TO authenticated;
 GRANT SELECT ON public.payments TO authenticated;
 GRANT SELECT, INSERT, UPDATE ON public.ratings TO authenticated;

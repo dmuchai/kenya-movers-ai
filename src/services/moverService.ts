@@ -82,6 +82,7 @@ export const moverService = {
       .from('movers')
       .select('*')
       .eq('id', id)
+      .is('deleted_at', null)
       .single();
     
     if (error) {
@@ -90,7 +91,6 @@ export const moverService = {
     }
     return data;
   },
-
   /**
    * Get mover by user ID
    */
@@ -99,6 +99,7 @@ export const moverService = {
       .from('movers')
       .select('*')
       .eq('user_id', userId)
+      .is('deleted_at', null)
       .single();
     
     if (error) {
@@ -106,6 +107,7 @@ export const moverService = {
       throw error;
     }
     return data;
+  },
   },
 
   /**
@@ -132,46 +134,25 @@ export const moverService = {
     
     if (error) throw error;
     return data;
-  },
-
-  /**
-   * Update mover profile
-   */
   update: async (id: string, updates: UpdateMoverInput): Promise<Mover> => {
+    // Verify mover exists and is not deleted
+    const existing = await moverService.getById(id);
+    if (!existing) {
+      throw new Error('Mover not found or has been deleted');
+    }
+
     const { data, error } = await supabase
       .from('movers')
       .update(updates)
       .eq('id', id)
+      .is('deleted_at', null)
       .select()
       .single();
-    
+
     if (error) throw error;
     return data;
   },
-
-  /**
-   * Update mover availability status
-   */
-  updateAvailability: async (
-    id: string, 
-    status: AvailabilityStatus, 
-    isAcceptingBookings: boolean
-  ): Promise<Mover> => {
-    const { data, error } = await supabase
-      .from('movers')
-      .update({
-        availability_status: status,
-        is_accepting_bookings: isAcceptingBookings,
-        last_active_at: new Date().toISOString()
-      })
-      .eq('id', id)
-      .select()
-      .single();
-    
-    if (error) throw error;
     return data;
-  },
-
   /**
    * Find nearby movers using PostGIS
    */
@@ -181,6 +162,17 @@ export const moverService = {
     radiusKm: number = 20,
     minRating: number = 3.0
   ) => {
+    // Validate numeric inputs
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+      throw new Error('Invalid coordinates: latitude and longitude must be finite numbers');
+    }
+    if (latitude < -90 || latitude > 90) {
+      throw new Error('Invalid latitude: must be between -90 and 90');
+    }
+    if (longitude < -180 || longitude > 180) {
+      throw new Error('Invalid longitude: must be between -180 and 180');
+    }
+
     const { data, error } = await supabase.rpc('find_nearby_movers', {
       p_location: `POINT(${longitude} ${latitude})`,
       p_radius_km: radiusKm,
@@ -188,6 +180,8 @@ export const moverService = {
     });
     
     if (error) throw error;
+    return data || [];
+  },
     return data || [];
   },
 

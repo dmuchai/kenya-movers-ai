@@ -85,9 +85,10 @@ export const locationService = {
     if (error) throw error;
     
     // Filter by vehicle types if provided (client-side filtering)
+    // Filter by vehicle types if provided (client-side filtering)
     if (vehicleTypes && vehicleTypes.length > 0) {
       return data.filter((mover: any) => 
-        mover.vehicle_types.some((type: string) => vehicleTypes.includes(type))
+        mover.vehicle_types?.some((type: string) => vehicleTypes.includes(type))
       );
     }
     

@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS public.payments (
   commission_rate DECIMAL(5,2) NOT NULL, -- % taken by platform
   commission_amount DECIMAL(10,2) NOT NULL, -- Actual commission in currency
   mover_payout_amount DECIMAL(10,2) NOT NULL, -- Amount mover receives
-  insurance_fee DECIMAL(10,2) DEFAULT 0.00, -- Insurance portion
+  insurance_fee DECIMAL(10,2) DEFAULT 0.00 NOT NULL, -- Insurance portion
   
   -- M-Pesa Specific
   mpesa_transaction_id TEXT, -- M-Pesa confirmation code
@@ -71,8 +71,47 @@ CREATE TABLE IF NOT EXISTS public.payments (
   
   -- Constraints
   CONSTRAINT valid_commission CHECK (commission_amount >= 0 AND commission_amount <= amount),
-  CONSTRAINT valid_payout CHECK (mover_payout_amount >= 0 AND mover_payout_amount <= amount)
+  CONSTRAINT valid_payout CHECK (mover_payout_amount >= 0 AND mover_payout_amount <= amount),
+  -- Validate commission_amount matches commission_rate calculation (with 1 cent tolerance)
+  CONSTRAINT validate_commission_calculation CHECK (
+    ABS(commission_amount - (amount * commission_rate / 100)) < 0.01
+  ),
+  -- Validate total amount distribution (commission + payout + insurance ≈ amount, with 1 cent tolerance)
+  CONSTRAINT validate_amount_distribution CHECK (
+    ABS(amount - (commission_amount + mover_payout_amount + insurance_fee)) < 0.01
+  ),
+  -- Validate refund amount is non-negative and does not exceed original payment amount
+  CONSTRAINT valid_refund_amount CHECK (
+    refund_amount IS NULL OR (refund_amount >= 0 AND refund_amount <= amount)
+  )
 );
+
+-- Helper function to calculate payment distribution
+CREATE OR REPLACE FUNCTION calculate_payment_distribution(
+  p_amount DECIMAL(10,2),
+  p_commission_rate DECIMAL(5,2),
+  p_insurance_fee DECIMAL(10,2) DEFAULT 0.00
+)
+RETURNS TABLE (
+  commission_amount DECIMAL(10,2),
+  mover_payout_amount DECIMAL(10,2),
+  insurance_fee DECIMAL(10,2)
+) AS $$
+DECLARE
+  v_commission DECIMAL(10,2);
+  v_payout DECIMAL(10,2);
+BEGIN
+  -- Calculate commission (rounded to 2 decimal places)
+  v_commission := ROUND(p_amount * p_commission_rate / 100, 2);
+  
+  -- Calculate mover payout (amount - commission - insurance)
+  v_payout := p_amount - v_commission - p_insurance_fee;
+  
+  RETURN QUERY SELECT v_commission, v_payout, p_insurance_fee;
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;
+
+COMMENT ON FUNCTION calculate_payment_distribution IS 'Helper function to calculate commission, payout, and insurance distribution from total amount';
 
 -- Auto-generate payment reference
 CREATE OR REPLACE FUNCTION generate_payment_reference()
@@ -106,6 +145,13 @@ CREATE INDEX idx_payments_escrow ON public.payments(is_held_in_escrow) WHERE is_
 -- Comments
 COMMENT ON TABLE public.payments IS 'Payment transactions for bookings';
 COMMENT ON COLUMN public.payments.is_held_in_escrow IS 'Payment held until move completion';
+COMMENT ON COLUMN public.payments.commission_amount IS 'Must equal amount * commission_rate / 100 (validated with 1 cent tolerance)';
+COMMENT ON COLUMN public.payments.mover_payout_amount IS 'Amount mover receives after commission and insurance';
+COMMENT ON COLUMN public.payments.insurance_fee IS 'Insurance portion of payment (if applicable)';
+COMMENT ON COLUMN public.payments.refund_amount IS 'Refund amount (if any) - must be non-negative and cannot exceed original payment amount';
+COMMENT ON CONSTRAINT validate_commission_calculation ON public.payments IS 'Ensures commission_amount matches commission_rate percentage of total amount';
+COMMENT ON CONSTRAINT validate_amount_distribution ON public.payments IS 'Ensures amount = commission_amount + mover_payout_amount + insurance_fee (with rounding tolerance)';
+COMMENT ON CONSTRAINT valid_refund_amount ON public.payments IS 'Ensures refund_amount is non-negative and does not exceed the original payment amount';
 
 -- ============================================================================
 -- PART 6: RATINGS TABLE
@@ -176,44 +222,73 @@ DECLARE
   mover_user_id UUID;
   avg_rating DECIMAL(3,2);
   rating_count INTEGER;
+  target_rated_id UUID;
+  check_rating_type rating_type_enum;
 BEGIN
-  -- Get mover's user_id from the rated_id
-  IF TG_OP IN ('INSERT', 'UPDATE') THEN
-    SELECT user_id INTO mover_user_id 
-    FROM public.movers 
-    WHERE user_id = NEW.rated_id;
-    
-    IF mover_user_id IS NOT NULL THEN
-      -- Calculate new average rating
-      SELECT AVG(rating), COUNT(*) 
-      INTO avg_rating, rating_count
-      FROM public.ratings
-      WHERE rated_id = NEW.rated_id 
-        AND rating_type = 'customer_to_mover'
-        AND is_hidden = FALSE;
-      
-      -- Update mover's rating
-      UPDATE public.movers
-      SET rating = COALESCE(avg_rating, 0),
-          total_ratings = rating_count,
-          updated_at = NOW()
-      WHERE user_id = mover_user_id;
+  -- Determine which record to check based on operation
+  IF TG_OP = 'DELETE' THEN
+    target_rated_id := OLD.rated_id;
+    check_rating_type := OLD.rating_type;
+  ELSE
+    target_rated_id := NEW.rated_id;
+    check_rating_type := NEW.rating_type;
+  END IF;
+  
+  -- Only process customer_to_mover ratings
+  IF check_rating_type != 'customer_to_mover' THEN
+    IF TG_OP = 'DELETE' THEN
+      RETURN OLD;
+    ELSE
+      RETURN NEW;
     END IF;
   END IF;
   
-  RETURN NEW;
+  -- Get mover's user_id from the rated_id
+  SELECT user_id INTO mover_user_id 
+  FROM public.movers 
+  WHERE user_id = target_rated_id;
+  
+  IF mover_user_id IS NOT NULL THEN
+    -- Calculate new average rating
+    SELECT AVG(rating), COUNT(*) 
+    INTO avg_rating, rating_count
+    FROM public.ratings
+    WHERE rated_id = target_rated_id 
+      AND rating_type = 'customer_to_mover'
+      AND is_hidden = FALSE;
+    
+    -- Update mover's rating
+    UPDATE public.movers
+    SET rating = COALESCE(avg_rating, 0),
+        total_ratings = rating_count,
+        updated_at = NOW()
+    WHERE user_id = mover_user_id;
+  END IF;
+  
+  IF TG_OP = 'DELETE' THEN
+    RETURN OLD;
+  ELSE
+    RETURN NEW;
+  END IF;
 END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER trigger_update_mover_rating
-  AFTER INSERT OR UPDATE ON public.ratings
+  AFTER INSERT OR UPDATE OR DELETE ON public.ratings
   FOR EACH ROW
-  WHEN (NEW.rating_type = 'customer_to_mover')
+  WHEN (
+    -- For INSERT/UPDATE: check NEW.rating_type
+    (TG_OP IN ('INSERT', 'UPDATE') AND NEW.rating_type = 'customer_to_mover')
+    OR
+    -- For DELETE: check OLD.rating_type
+    (TG_OP = 'DELETE' AND OLD.rating_type = 'customer_to_mover')
+  )
   EXECUTE FUNCTION update_mover_rating();
 
 -- Comments
 COMMENT ON TABLE public.ratings IS 'Two-way ratings between customers and movers';
 COMMENT ON COLUMN public.ratings.rating_type IS 'Indicates who is rating whom';
+COMMENT ON TRIGGER trigger_update_mover_rating ON public.ratings IS 'Automatically recalculates mover average rating when customer-to-mover ratings are inserted, updated, or deleted';
 
 -- ============================================================================
 -- PART 7: MOVER LOCATIONS (Real-time GPS Tracking)
@@ -396,10 +471,26 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Schedule this to run every minute via pg_cron or cron job
+-- Enable pg_cron extension for scheduled jobs
+CREATE EXTENSION IF NOT EXISTS pg_cron;
+
+-- Schedule the expiration job to run every minute
+-- Note: On Supabase, pg_cron jobs are created in the cron schema
+-- Remove existing job if it exists to avoid duplicates
+SELECT cron.unschedule('expire-booking-requests') WHERE EXISTS (
+  SELECT 1 FROM cron.job WHERE jobname = 'expire-booking-requests'
+);
+
+-- Create the scheduled job
+SELECT cron.schedule(
+  'expire-booking-requests',                    -- Job name
+  '* * * * *',                                  -- Every minute (cron syntax)
+  $$SELECT expire_old_booking_requests()$$     -- SQL command to execute
+);
 
 -- Comments
 COMMENT ON TABLE public.booking_requests IS 'Booking requests sent to individual movers for acceptance';
+COMMENT ON FUNCTION expire_old_booking_requests IS 'Automatically expires booking requests that have passed their expiration time - scheduled to run every minute via pg_cron';
 
 -- ============================================================================
 -- PART 10: NOTIFICATIONS
@@ -450,6 +541,32 @@ CREATE INDEX idx_notifications_type ON public.notifications(type);
 
 -- Comments
 COMMENT ON TABLE public.notifications IS 'In-app and push notifications for users';
+
+-- Auto-delete expired notifications
+CREATE OR REPLACE FUNCTION delete_expired_notifications()
+RETURNS void AS $$
+BEGIN
+  DELETE FROM public.notifications
+  WHERE expires_at IS NOT NULL
+    AND expires_at < NOW();
+END;
+$$ LANGUAGE plpgsql;
+
+-- Schedule the cleanup job to run every 6 hours
+-- Remove existing job if it exists to avoid duplicates
+SELECT cron.unschedule('delete-expired-notifications') WHERE EXISTS (
+  SELECT 1 FROM cron.job WHERE jobname = 'delete-expired-notifications'
+);
+
+-- Create the scheduled job (runs at minute 0 of hours 0, 6, 12, 18)
+SELECT cron.schedule(
+  'delete-expired-notifications',               -- Job name
+  '0 */6 * * *',                                -- Every 6 hours (cron syntax)
+  $$SELECT delete_expired_notifications()$$    -- SQL command to execute
+);
+
+-- Comments
+COMMENT ON FUNCTION delete_expired_notifications IS 'Automatically deletes notifications that have passed their expiration time - scheduled to run every 6 hours via pg_cron';
 
 -- ============================================================================
 -- Continue in next file...

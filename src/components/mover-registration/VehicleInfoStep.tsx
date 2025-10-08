@@ -111,7 +111,10 @@ export default function VehicleInfoStep({ data, onUpdate, onNext }: VehicleInfoS
             type="number"
             min="0"
             value={data.max_capacity_kg || ''}
-            onChange={(e) => onUpdate({ max_capacity_kg: parseInt(e.target.value) || undefined })}
+            onChange={(e) => {
+              const value = e.target.value === '' ? undefined : parseInt(e.target.value);
+              onUpdate({ max_capacity_kg: value });
+            }}
             placeholder="e.g., 1000"
           />
           <p className="text-xs text-muted-foreground mt-1">

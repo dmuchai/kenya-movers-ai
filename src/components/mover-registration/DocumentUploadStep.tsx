@@ -2,7 +2,7 @@
  * Step 4: Document Upload
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -69,10 +69,6 @@ const DOCUMENT_FIELDS: DocumentField[] = [
 ];
 
 export default function DocumentUploadStep({ data, onUpdate, onNext }: DocumentUploadStepProps) {
-  const [profileImage, setProfileImage] = useState<File | null>(
-    data.profile_image || null
-  );
-
   const handleFileChange = (key: keyof RegistrationData['documents'], file: File | null) => {
     const updatedDocuments = { ...data.documents };
     if (file) {
@@ -84,7 +80,6 @@ export default function DocumentUploadStep({ data, onUpdate, onNext }: DocumentU
   };
 
   const handleProfileImageChange = (file: File | null) => {
-    setProfileImage(file);
     onUpdate({ profile_image: file || undefined });
   };
 
@@ -111,7 +106,7 @@ export default function DocumentUploadStep({ data, onUpdate, onNext }: DocumentU
             </p>
             
             <FileUploadField
-              file={profileImage}
+              file={data.profile_image}
               onFileChange={handleProfileImageChange}
               accept="image/*"
               label="Choose Photo"
@@ -178,6 +173,8 @@ function FileUploadField({ file, onFileChange, accept, label }: FileUploadFieldP
     if (selectedFile) {
       onFileChange(selectedFile);
     }
+    // Reset the input so selecting the same file again will fire onChange
+    e.target.value = '';
   };
 
   const handleRemove = () => {

@@ -38,7 +38,7 @@ export const storageService = {
     return {
       url: urlData.publicUrl,
       path: data.path,
-      fileName: file.name
+      fileName
     };
   },
 
