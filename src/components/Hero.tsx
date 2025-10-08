@@ -63,9 +63,17 @@ const Hero = () => {
             
             <Button 
               className="btn-secondary-enhanced w-full sm:w-auto text-lg px-8 py-4 min-h-[56px] font-semibold group"
+              style={{ 
+                background: 'linear-gradient(to right, #ffffff, #f8fafc)',
+                color: '#1e293b',
+                border: '2px solid #e2e8f0'
+              }}
+              asChild
             >
-              <Users className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform duration-300" />
-              Browse Movers
+              <Link to="/find-movers" aria-label="Browse verified movers">
+                <Users className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform duration-300" />
+                Browse Movers
+              </Link>
             </Button>
           </div>
           
