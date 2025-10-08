@@ -47,6 +47,9 @@ export default function MoverDashboard() {
     if (user) {
       fetchQuotes();
       fetchMyResponses();
+    } else {
+      // If no user, stop loading immediately
+      setLoading(false);
     }
   }, [user]);
 
@@ -67,6 +70,7 @@ export default function MoverDashboard() {
         description: "Failed to load available quotes",
         variant: "destructive"
       });
+      setLoading(false);
     }
   };
 
