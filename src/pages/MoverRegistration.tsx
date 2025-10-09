@@ -350,69 +350,107 @@ export default function MoverRegistration() {
     setIsSubmitting(true);
     
     try {
+      console.log('Starting mover registration submission...');
+      console.log('Registration data:', {
+        business_name: registrationData.business_name,
+        has_profile_image: !!registrationData.profile_image,
+        document_count: Object.keys(registrationData.documents).length,
+        vehicle_types: registrationData.vehicle_types,
+        location: registrationData.primary_location
+      });
+      
       // Get current user
       const {
         data: { user }
       } = await supabase.auth.getUser();
-      if (!user) throw new Error('User not authenticated');
+      
+      if (!user) {
+        console.error('No authenticated user found');
+        throw new Error('User not authenticated');
+      }
+      
+      console.log('User authenticated:', user.id);
 
       // Upload profile image if provided
       let profileImageUrl;
       if (registrationData.profile_image) {
-        const result = await storageService.uploadFile(
-          'mover-profiles',
-          registrationData.profile_image,
-          user.id
-        );
-        profileImageUrl = result.url;
+        console.log('Uploading profile image...');
+        try {
+          const result = await storageService.uploadFile(
+            'mover-profiles',
+            registrationData.profile_image,
+            user.id
+          );
+          profileImageUrl = result.url;
+          console.log('Profile image uploaded successfully:', profileImageUrl);
+        } catch (uploadError) {
+          console.error('Profile image upload failed:', uploadError);
+          throw new Error(`Failed to upload profile image: ${uploadError instanceof Error ? uploadError.message : 'Unknown error'}`);
+        }
       }
 
       // Upload documents in parallel for better performance
+      console.log('Uploading documents...');
       const documentUrls: Record<string, string> = {};
       const uploadPromises = Object.entries(registrationData.documents)
         .filter(([_, file]) => file)
         .map(async ([key, file]) => {
-          const result = await storageService.uploadFile(
-            'mover-documents',
-            file as File,
-            `${user.id}/documents`
-          );
-          return [key, result.url] as [string, string];
+          try {
+            const result = await storageService.uploadFile(
+              'mover-documents',
+              file as File,
+              `${user.id}/documents`
+            );
+            console.log(`Document ${key} uploaded:`, result.url);
+            return [key, result.url] as [string, string];
+          } catch (docError) {
+            console.error(`Failed to upload document ${key}:`, docError);
+            throw new Error(`Failed to upload ${key}: ${docError instanceof Error ? docError.message : 'Unknown error'}`);
+          }
         });
       
       const uploadedDocs = await Promise.all(uploadPromises);
       uploadedDocs.forEach(([key, url]) => {
         documentUrls[key] = url;
       });
+      console.log('All documents uploaded successfully:', documentUrls);
 
       // Create mover profile with all details using Supabase insert directly
+      console.log('Inserting mover profile into database...');
+      const moverData = {
+        user_id: user.id,
+        business_name: registrationData.business_name,
+        business_registration_number: registrationData.business_registration_number,
+        kra_pin: registrationData.kra_pin,
+        phone_primary: registrationData.phone_primary,
+        phone_secondary: registrationData.phone_secondary,
+        email: registrationData.email,
+        bio: registrationData.bio,
+        years_experience: registrationData.years_experience,
+        vehicle_types: registrationData.vehicle_types as any,
+        vehicle_plate_numbers: registrationData.vehicle_plate_numbers,
+        max_capacity_kg: registrationData.max_capacity_kg,
+        has_helpers: registrationData.has_helpers,
+        helper_count: registrationData.helper_count,
+        service_radius_km: registrationData.service_radius_km,
+        primary_location: `POINT(${registrationData.primary_location!.longitude.toFixed(6)} ${registrationData.primary_location!.latitude.toFixed(6)})`,
+        profile_image_url: profileImageUrl,
+        documents: documentUrls,
+        verification_status: 'documents_submitted',
+        availability_status: 'offline',
+        is_accepting_bookings: false
+      };
+      
+      console.log('Mover data to insert:', moverData);
+      
       const { error: insertError } = await supabase
         .from('movers')
-        .insert({
-          user_id: user.id,
-          business_name: registrationData.business_name,
-          business_registration_number: registrationData.business_registration_number,
-          kra_pin: registrationData.kra_pin,
-          phone_primary: registrationData.phone_primary,
-          phone_secondary: registrationData.phone_secondary,
-          email: registrationData.email,
-          bio: registrationData.bio,
-          years_experience: registrationData.years_experience,
-          vehicle_types: registrationData.vehicle_types as any,
-          vehicle_plate_numbers: registrationData.vehicle_plate_numbers,
-          max_capacity_kg: registrationData.max_capacity_kg,
-          has_helpers: registrationData.has_helpers,
-          helper_count: registrationData.helper_count,
-          service_radius_km: registrationData.service_radius_km,
-          primary_location: `POINT(${registrationData.primary_location!.longitude.toFixed(6)} ${registrationData.primary_location!.latitude.toFixed(6)})`,
-          profile_image_url: profileImageUrl,
-          documents: documentUrls,
-          verification_status: 'documents_submitted',
-          availability_status: 'offline',
-          is_accepting_bookings: false
-        });
+        .insert(moverData);
 
-      if (insertError) throw insertError;
+      if (insertError) {
+        console.error('Supabase insert error:', insertError);
+        throw new Error(`Database error: ${insertError.message} (Code: ${insertError.code})`);
+      }
 
       toast({
         title: 'Registration Submitted!',
@@ -423,10 +461,34 @@ export default function MoverRegistration() {
       navigate('/mover-dashboard');
     } catch (error) {
       console.error('Registration error:', error);
+      
+      // Enhanced error logging
+      if (error instanceof Error) {
+        console.error('Error details:', {
+          message: error.message,
+          stack: error.stack,
+          name: error.name
+        });
+      }
+      
+      // Show detailed error message
+      let errorMessage = 'Failed to submit registration';
+      if (error instanceof Error) {
+        errorMessage = error.message;
+        
+        // Provide helpful hints for common errors
+        if (error.message.includes('bucket')) {
+          errorMessage += '\n\nHint: Storage buckets may not be configured. Please run the storage migration in Supabase.';
+        } else if (error.message.includes('role') || error.message.includes('column')) {
+          errorMessage += '\n\nHint: Database schema may be incomplete. Please run all migrations in Supabase.';
+        } else if (error.message.includes('authenticated')) {
+          errorMessage += '\n\nHint: Please sign out and sign in again.';
+        }
+      }
+      
       toast({
         title: 'Registration Failed',
-        description:
-          error instanceof Error ? error.message : 'Failed to submit registration',
+        description: errorMessage,
         variant: 'destructive'
       });
     } finally {
