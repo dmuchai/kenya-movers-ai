@@ -18,12 +18,29 @@ import { NotificationCenter } from "@/components/NotificationCenter";
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
-    await signOut();
-    navigate('/');
+    if (isSigningOut) return; // Prevent multiple clicks
+    
+    setIsSigningOut(true);
+    console.log('handleSignOut called');
+    
+    try {
+      await signOut();
+      console.log('Navigation: Sign out completed, redirecting to home...');
+      navigate('/', { replace: true });
+      // Force page reload to clear any cached state
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Navigation: Sign out failed:', error);
+      // Still try to redirect even if sign out failed
+      window.location.href = '/';
+    } finally {
+      setIsSigningOut(false);
+    }
   };
 
   const navigationItems = [
@@ -96,9 +113,14 @@ const Navigation = () => {
                 <span className="text-sm text-muted-foreground">
                   Welcome, {user.email?.split('@')[0]}
                 </span>
-                <Button variant="outline" size="sm" onClick={handleSignOut}>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleSignOut}
+                  disabled={isSigningOut}
+                >
                   <LogOut className="w-4 h-4 mr-2" />
-                  Sign Out
+                  {isSigningOut ? 'Signing Out...' : 'Sign Out'}
                 </Button>
               </>
             ) : (
@@ -176,9 +198,10 @@ const Navigation = () => {
                     className="w-full min-h-[48px] text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground" 
                     size="default" 
                     onClick={handleSignOut}
+                    disabled={isSigningOut}
                   >
                     <LogOut className="w-5 h-5 mr-2" />
-                    Sign Out
+                    {isSigningOut ? 'Signing Out...' : 'Sign Out'}
                   </Button>
                 </>
               ) : (

@@ -143,8 +143,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    setProfile(null);
+    try {
+      console.log('Signing out...');
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error('Sign out error:', error);
+        throw error;
+      }
+      
+      console.log('Sign out successful');
+      setUser(null);
+      setSession(null);
+      setProfile(null);
+      setLoading(false);
+    } catch (error) {
+      console.error('Failed to sign out:', error);
+      // Force clear local state even if API call fails
+      setUser(null);
+      setSession(null);
+      setProfile(null);
+      setLoading(false);
+      throw error;
+    }
   };
 
   const isAdmin = profile?.role === 'admin' || profile?.role === 'super_admin';
