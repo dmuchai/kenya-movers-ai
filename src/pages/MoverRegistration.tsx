@@ -2,17 +2,19 @@
  * Mover Registration Page - Multi-step form for movers to register
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { moverService } from '@/services/moverService';
 import { storageService } from '@/services/storageService';
-import { Truck } from 'lucide-react';
+import { Truck, AlertCircle } from 'lucide-react';
 import Navigation from '@/components/Navigation';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 // Import step components
 import BusinessInfoStep from '@/components/mover-registration/BusinessInfoStep';
@@ -72,6 +74,7 @@ const STEPS = [
 export default function MoverRegistration() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, loading: authLoading } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [registrationData, setRegistrationData] = useState<RegistrationData>({
@@ -87,6 +90,72 @@ export default function MoverRegistration() {
 
   const progress = (currentStep / STEPS.length) * 100;
   const CurrentStepComponent = STEPS[currentStep - 1].component;
+
+  // Show loading while checking authentication
+  if (authLoading) {
+    return (
+      <>
+        <Navigation />
+        <div className="flex justify-center items-center min-h-screen">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      </>
+    );
+  }
+
+  // Require authentication to access registration
+  if (!user) {
+    return (
+      <>
+        <Navigation />
+        <div className="container max-w-3xl mx-auto py-8 px-4 pt-24">
+          <Card>
+            <CardHeader>
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-primary to-trust-blue rounded-full mx-auto mb-4">
+                <Truck className="w-8 h-8 text-white" />
+              </div>
+              <CardTitle className="text-center text-2xl">Sign In Required</CardTitle>
+              <CardDescription className="text-center">
+                You need to create an account or sign in before registering your moving company
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  <strong>Why sign in first?</strong> We need to link your mover profile to your account
+                  so you can manage your business, receive quote requests, and access your dashboard.
+                </AlertDescription>
+              </Alert>
+              
+              <div className="space-y-3">
+                <Button 
+                  className="w-full" 
+                  size="lg"
+                  onClick={() => navigate('/auth?redirect=/mover-registration')}
+                >
+                  Sign In or Create Account
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => navigate('/')}
+                >
+                  Go Back Home
+                </Button>
+              </div>
+
+              <div className="pt-4 border-t">
+                <p className="text-sm text-muted-foreground text-center">
+                  After signing in, you'll be redirected back to complete your mover registration
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </>
+    );
+  }
 
   /**
    * Validates registration data for a specific step
