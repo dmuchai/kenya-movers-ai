@@ -360,16 +360,23 @@ export default function MoverRegistration() {
       });
       
       // Get current user
-      const {
-        data: { user }
-      } = await supabase.auth.getUser();
-      
-      if (!user) {
-        console.error('No authenticated user found');
-        throw new Error('User not authenticated');
+      console.log('Fetching authenticated user...');
+      let user;
+      try {
+        const response = await supabase.auth.getUser();
+        console.log('Auth response:', response);
+        user = response.data.user;
+        
+        if (!user) {
+          console.error('No authenticated user found in response');
+          throw new Error('User not authenticated');
+        }
+        
+        console.log('User authenticated successfully:', user.id);
+      } catch (authError) {
+        console.error('Error fetching user:', authError);
+        throw new Error(`Authentication check failed: ${authError instanceof Error ? authError.message : 'Unknown error'}`);
       }
-      
-      console.log('User authenticated:', user.id);
 
       // Upload profile image if provided
       let profileImageUrl;
