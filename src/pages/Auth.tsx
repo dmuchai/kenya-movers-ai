@@ -115,16 +115,14 @@ const Auth = () => {
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-primary to-trust-blue rounded-full mx-auto mb-4">
                   <Truck className="w-8 h-8 text-white" />
                 </div>
-                <CardTitle className="text-2xl font-bold">Mover Sign In</CardTitle>
+                <CardTitle className="text-2xl font-bold">Mover Account</CardTitle>
                 <CardDescription>
-                  Sign in to access your Mover Dashboard and manage your business
+                  Create an account or sign in to register your moving company
                 </CardDescription>
-                <Alert className="mt-4 text-left">
-                  <AlertDescription>
-                    <strong>Don't have a mover account?</strong>{' '}
-                    <Link to="/mover-registration" className="text-primary font-semibold hover:underline">
-                      Register your moving company
-                    </Link>
+                <Alert className="mt-4 text-left border-primary/20 bg-primary/5">
+                  <AlertDescription className="text-sm">
+                    💡 <strong>First time here?</strong> Click the <strong>"Sign Up"</strong> tab below to create your account, 
+                    then you'll complete your mover registration.
                   </AlertDescription>
                 </Alert>
               </>
@@ -141,7 +139,7 @@ const Auth = () => {
             )}
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="signin" className="w-full">
+            <Tabs defaultValue={isMoverContext ? "signup" : "signin"} className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="signin">Sign In</TabsTrigger>
               <TabsTrigger value="signup">Sign Up</TabsTrigger>

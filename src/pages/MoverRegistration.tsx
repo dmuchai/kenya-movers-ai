@@ -119,7 +119,7 @@ export default function MoverRegistration() {
                 You need to create an account or sign in before registering your moving company
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
               <Alert>
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
@@ -128,26 +128,49 @@ export default function MoverRegistration() {
                 </AlertDescription>
               </Alert>
               
+              {/* New Users */}
               <div className="space-y-3">
+                <div className="text-center">
+                  <h3 className="font-semibold text-lg mb-1">New to MoveEasy?</h3>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Create a free account to register your moving company
+                  </p>
+                </div>
                 <Button 
-                  className="w-full" 
+                  className="w-full bg-gradient-to-r from-primary to-trust-blue hover:opacity-90" 
                   size="lg"
                   onClick={() => navigate('/auth?redirect=/mover-registration')}
                 >
-                  Sign In or Create Account
+                  Create Free Account
                 </Button>
+              </div>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">
+                    Already have an account?
+                  </span>
+                </div>
+              </div>
+
+              {/* Existing Users */}
+              <div className="space-y-3">
                 <Button 
                   variant="outline" 
-                  className="w-full"
-                  onClick={() => navigate('/')}
+                  className="w-full border-2"
+                  size="lg"
+                  onClick={() => navigate('/auth?redirect=/mover-registration')}
                 >
-                  Go Back Home
+                  Sign In to Continue
                 </Button>
               </div>
 
               <div className="pt-4 border-t">
                 <p className="text-sm text-muted-foreground text-center">
-                  After signing in, you'll be redirected back to complete your mover registration
+                  After authentication, you'll be redirected back to complete your mover registration
                 </p>
               </div>
             </CardContent>
