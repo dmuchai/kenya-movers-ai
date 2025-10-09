@@ -41,10 +41,37 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         .eq('user_id', userId)
         .single();
 
-      if (error) throw error;
-      setProfile(data as ProfileRow);
+      if (error) {
+        console.error('Profile fetch error:', error);
+        // If profile doesn't exist, create one
+        if (error.code === 'PGRST116') {
+          console.log('Profile not found, creating...');
+          const { data: newProfile, error: createError } = await supabase
+            .from('profiles')
+            .insert({
+              user_id: userId,
+              email: null,
+              full_name: null,
+              phone: null,
+              role: 'customer'
+            })
+            .select()
+            .single();
+          
+          if (createError) {
+            console.error('Failed to create profile:', createError);
+            setProfile(null);
+          } else {
+            setProfile(newProfile as ProfileRow);
+          }
+        } else {
+          throw error;
+        }
+      } else {
+        setProfile(data as ProfileRow);
+      }
     } catch (error) {
-      console.error('Error fetching profile:', error);
+      console.error('Error in fetchProfile:', error);
       setProfile(null);
     }
   };
@@ -57,11 +84,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     let mounted = true;
+    let timeoutId: NodeJS.Timeout;
+
+    // Failsafe: Force loading to false after 5 seconds
+    timeoutId = setTimeout(() => {
+      if (mounted && loading) {
+        console.warn('Auth loading timeout - forcing to false');
+        setLoading(false);
+      }
+    }, 5000);
 
     // Check for existing session first
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!mounted) return;
       
+      console.log('Auth session check:', session ? 'Authenticated' : 'Not authenticated');
       setSession(session);
       setUser(session?.user ?? null);
       
@@ -72,6 +109,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
       
       setLoading(false);
+      clearTimeout(timeoutId);
+    }).catch((error) => {
+      console.error('Session check error:', error);
+      if (mounted) {
+        setLoading(false);
+        clearTimeout(timeoutId);
+      }
     });
 
     // Set up auth state listener for future changes
@@ -79,6 +123,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       async (event, session) => {
         if (!mounted) return;
         
+        console.log('Auth state change:', event, session ? 'Authenticated' : 'Not authenticated');
         setSession(session);
         setUser(session?.user ?? null);
         
@@ -92,6 +137,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     return () => {
       mounted = false;
+      clearTimeout(timeoutId);
       subscription.unsubscribe();
     };
   }, []);
