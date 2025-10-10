@@ -87,7 +87,7 @@ const Contact = () => {
                     </div>
                     <div>
                       <p className="font-medium">Email</p>
-                      <p className="text-sm text-muted-foreground">move-easy@gmail.com</p>
+                      <p className="text-sm text-muted-foreground">movelink@gmail.com</p>
                     </div>
                   </div>
                   
@@ -138,7 +138,7 @@ const Contact = () => {
                     </a>
                   </Button>
                   <Button variant="outline" className="w-full" asChild>
-                    <a href="mailto:move-easy@gmail.com">
+                    <a href="mailto:movelink@gmail.com">
                       <Mail className="w-4 h-4 mr-2" />
                       Email
                     </a>
