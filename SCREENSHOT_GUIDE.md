@@ -1,4 +1,4 @@
-# MoveEasy Play Store Screenshots Guide
+# MoveLink Play Store Screenshots Guide
 
 ⚠️ **IMPORTANT**: All screenshots must comply with Google Play's 2:1 maximum aspect ratio requirement. Use **1080×1920px (9:16)** for guaranteed compliance.
 

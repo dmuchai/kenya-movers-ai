@@ -1,7 +1,7 @@
 # Production-Ready Real-Time Event Processing System
 
 ## Overview
-Comprehensive guide for implementing reliable, ordered, and idempotent real-time event processing in the MoveEasy marketplace platform.
+Comprehensive guide for implementing reliable, ordered, and idempotent real-time event processing in the MoveLink marketplace platform.
 
 ## Problem Statement
 

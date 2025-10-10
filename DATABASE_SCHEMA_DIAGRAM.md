@@ -1,5 +1,5 @@
 # Database Schema Diagram
-## MoveEasy Marketplace ERD (Entity Relationship Diagram)
+## MoveLink Marketplace ERD (Entity Relationship Diagram)
 
 > **                              └──────────────────────────────────────────────────────────────┘
 
@@ -37,7 +37,7 @@ KEY RELATIONSHIPS:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                        MOVEEASY DATABASE SCHEMA                              │
+│                        MOVELINK DATABASE SCHEMA                              │
 │                     Two-Sided Marketplace Platform                           │
 └─────────────────────────────────────────────────────────────────────────────┘
 

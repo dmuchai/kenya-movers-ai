@@ -1,5 +1,5 @@
 # Database Schema Redesign - Complete Package
-## MoveEasy Marketplace Platform
+## MoveLink Marketplace Platform
 
 ---
 

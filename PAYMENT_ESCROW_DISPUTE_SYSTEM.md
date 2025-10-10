@@ -1,7 +1,7 @@
 # Payment Escrow, Dispute & Cancellation System
 
 ## Overview
-Comprehensive guide for implementing a production-ready payment escrow, dispute resolution, and cancellation handling system for the MoveEasy marketplace platform.
+Comprehensive guide for implementing a production-ready payment escrow, dispute resolution, and cancellation handling system for the MoveLink marketplace platform.
 
 ## Table of Contents
 1. [Escrow Holding System](#escrow-holding-system)

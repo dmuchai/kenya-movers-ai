@@ -1,4 +1,4 @@
-// Test utilities and mock data for MoveEasy Moving Planner
+// Test utilities and mock data for MoveLink Moving Planner
 // Install @testing-library/react, @testing-library/jest-dom, and jest for full testing
 
 // Mock data for development and testing

@@ -7,7 +7,7 @@ const requiredEnvVars = {
 const optionalEnvVars = {
   VITE_GOOGLE_MAPS_API_KEY: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
   VITE_GA_TRACKING_ID: import.meta.env.VITE_GA_TRACKING_ID,
-  VITE_APP_NAME: import.meta.env.VITE_APP_NAME || 'MoveEasy Moving Planner',
+  VITE_APP_NAME: import.meta.env.VITE_APP_NAME || 'MoveLink Moving Planner',
   VITE_APP_URL: import.meta.env.VITE_APP_URL || 'http://localhost:8080',
   VITE_APP_ENV: import.meta.env.VITE_APP_ENV || 'development',
 } as const;

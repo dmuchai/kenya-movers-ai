@@ -1,4 +1,4 @@
-# Deployment Guide for MoveEasy Moving Planner
+# Deployment Guide for MoveLink Moving Planner
 
 ## 🚀 Production Deployment Checklist
 

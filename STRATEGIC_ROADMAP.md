@@ -1,4 +1,4 @@
-# MoveEasy Strategic Roadmap: MVP to Uber-Like Moving Platform
+# MoveLink Strategic Roadmap: MVP to Uber-Like Moving Platform
 ## Executive Analysis by AI Senior Engineering Consultant
 
 **Date**: October 8, 2025  

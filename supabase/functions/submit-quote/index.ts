@@ -55,7 +55,7 @@ serve(async (req) => {
       
       try {
         // Create a temporary user with a unique email
-        const tempEmail = `guest-${Date.now()}-${Math.random().toString(36).substr(2, 9)}@temp.moveeasy.app`
+        const tempEmail = `guest-${Date.now()}-${Math.random().toString(36).substr(2, 9)}@temp.movelink.app`
         const tempPassword = crypto.randomUUID()
         
         const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({

@@ -1,5 +1,5 @@
 -- ============================================================================
--- MoveEasy Database Schema Migration - Two-Sided Marketplace
+-- MoveLink Database Schema Migration - Two-Sided Marketplace
 -- ============================================================================
 -- Purpose: Transform from quote generator to Uber-like moving platform
 -- Author: AI Engineering Consultant

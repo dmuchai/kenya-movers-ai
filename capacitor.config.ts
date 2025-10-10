@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.movingplanner.app',
-  appName: 'MoveEasy',
+  appName: 'MoveLink',
   webDir: 'dist',
   server: {
     androidScheme: 'https'

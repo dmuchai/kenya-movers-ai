@@ -1,4 +1,4 @@
-# 📸 MoveEasy Screenshot Capture Guide
+# 📸 MoveLink Screenshot Capture Guide
 
 Your app is running at **http://localhost:8080** - let's capture the key screens manually!
 

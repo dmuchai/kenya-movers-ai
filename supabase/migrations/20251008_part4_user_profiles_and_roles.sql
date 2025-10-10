@@ -1,5 +1,5 @@
 -- ============================================================================
--- MoveEasy Database Schema Migration - Part 4
+-- MoveLink Database Schema Migration - Part 4
 -- User Profiles and Role-Based Access Control
 -- ============================================================================
 

@@ -1,5 +1,5 @@
 -- ============================================================================
--- MoveEasy Database Schema Migration - Part 3
+-- MoveLink Database Schema Migration - Part 3
 -- ROW LEVEL SECURITY (RLS) POLICIES
 -- ============================================================================
 
@@ -552,7 +552,7 @@ GRANT EXECUTE ON FUNCTION get_platform_stats TO authenticated;
 -- Log migration completion
 DO $$
 BEGIN
-  RAISE NOTICE 'MoveEasy Marketplace Schema Migration Completed Successfully';
+  RAISE NOTICE 'MoveLink Marketplace Schema Migration Completed Successfully';
   RAISE NOTICE 'Tables Created: movers, bookings, payments, ratings, mover_locations, mover_availability_schedule, booking_requests, notifications';
   RAISE NOTICE 'RLS Policies: Enabled and configured for all tables';
   RAISE NOTICE 'Helper Functions: Created for geospatial queries and analytics';

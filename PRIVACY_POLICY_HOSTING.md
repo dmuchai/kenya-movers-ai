@@ -1,4 +1,4 @@
-# 🔒 Privacy Policy Hosting Guide for MoveEasy
+# 🔒 Privacy Policy Hosting Guide for MoveLink
 
 ## ✅ **Privacy Policy Created**
 - ✅ **Markdown Version**: `privacy-policy.md` (for documentation)
@@ -15,7 +15,7 @@
 
 1. **Create GitHub Repository**:
    - Go to https://github.com
-   - Create new repository named `moveeasy-privacy`
+   - Create new repository named `movelink-privacy`
    - Make it public
 
 2. **Upload Privacy Policy**:
@@ -30,7 +30,7 @@
 
 4. **Your Privacy Policy URL**:
    ```
-   https://yourusername.github.io/moveeasy-privacy/
+   https://yourusername.github.io/movelink-privacy/
    ```
 
 **Time**: 5 minutes | **Cost**: Free
@@ -73,9 +73,9 @@
 - **Kenyaweb**: KES 180/month
 
 **Steps**:
-1. Buy hosting + domain (e.g., moveeasy.co.ke)
+1. Buy hosting + domain (e.g., movelink.co.ke)
 2. Upload `privacy-policy.html`
-3. Access at: `https://moveeasy.co.ke/privacy-policy.html`
+3. Access at: `https://movelink.co.ke/privacy-policy.html`
 
 ---
 
@@ -88,8 +88,8 @@
 
 2. **Create New Repository**
    ```
-   Repository name: moveeasy-privacy
-   Description: Privacy Policy for MoveEasy App
+   Repository name: movelink-privacy
+   Description: Privacy Policy for MoveLink App
    ✅ Public
    ✅ Add README file
    ```
@@ -112,7 +112,7 @@
    - Wait 2-3 minutes
    - Your privacy policy will be live at:
    ```
-   https://yourusername.github.io/moveeasy-privacy/
+   https://yourusername.github.io/movelink-privacy/
    ```
 
 ---
@@ -121,7 +121,7 @@
 
 ### **Privacy Policy URL** (use your actual URL):
 ```
-https://yourusername.github.io/moveeasy-privacy/
+https://yourusername.github.io/movelink-privacy/
 ```
 
 ### **What to Enter in Play Store**:

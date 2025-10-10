@@ -1,4 +1,4 @@
-# 📸 MoveEasy Screenshot Quick Reference
+# 📸 MoveLink Screenshot Quick Reference
 
 ## 🚀 Your App is Running
 **URL**: http://localhost:8080 ✅

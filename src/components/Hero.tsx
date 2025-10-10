@@ -106,7 +106,7 @@ const Hero = () => {
           {/* Enhanced Trust Indicators */}
           <div className="pt-16 animate-slide-in-up" style={{ animationDelay: '0.8s' }}>
             <div className="text-subtle text-center mb-8">
-              Why choose MoveEasy?
+              Why choose MoveLink?
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
               <div className="card-enhanced group p-8 hover-lift">

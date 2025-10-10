@@ -34,7 +34,7 @@ const Terms = () => {
               <section>
                 <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Acceptance of Terms</h2>
                 <p className="text-gray-700 mb-4">
-                  By accessing and using MoveEasy Moving Planner services, you accept and agree to be bound 
+                  By accessing and using MoveLink Moving Planner services, you accept and agree to be bound 
                   by the terms and provision of this agreement. If you do not agree to these terms, 
                   please do not use our services.
                 </p>
@@ -47,7 +47,7 @@ const Terms = () => {
               <section>
                 <h2 className="text-2xl font-semibold text-gray-900 mb-4">2. Service Description</h2>
                 <p className="text-gray-700 mb-4">
-                  MoveEasy Moving Planner provides an online platform that connects customers with professional 
+                  MoveLink Moving Planner provides an online platform that connects customers with professional 
                   moving companies across Kenya. Our services include:
                 </p>
                 <ul className="list-disc pl-6 text-gray-700 mb-4 space-y-1">
@@ -146,7 +146,7 @@ const Terms = () => {
                 <h2 className="text-2xl font-semibold text-gray-900 mb-4">7. Intellectual Property Rights</h2>
                 <h3 className="text-xl font-medium text-gray-900 mb-3">Platform Content</h3>
                 <p className="text-gray-700 mb-4">
-                  All content, trademarks, logos, and intellectual property on the MoveEasy Moving Planner platform 
+                  All content, trademarks, logos, and intellectual property on the MoveLink Moving Planner platform 
                   are owned by us or our licensors and are protected by Kenyan and international copyright laws.
                 </p>
 
@@ -212,7 +212,7 @@ const Terms = () => {
               <section>
                 <h2 className="text-2xl font-semibold text-gray-900 mb-4">10. Limitation of Liability</h2>
                 <p className="text-gray-700 mb-4">
-                  To the maximum extent permitted by Kenyan law, MoveEasy Moving Planner shall not be liable for:
+                  To the maximum extent permitted by Kenyan law, MoveLink Moving Planner shall not be liable for:
                 </p>
                 <ul className="list-disc pl-6 text-gray-700 mb-4 space-y-1">
                   <li>Indirect, incidental, special, consequential, or punitive damages</li>
@@ -281,7 +281,7 @@ const Terms = () => {
                     <strong>Phone:</strong> <a href="tel:+254700123456" className="text-blue-600 hover:underline">+254 700 123 456</a>
                   </p>
                   <p className="text-gray-700">
-                    <strong>Address:</strong> MoveEasy Moving Planner<br />
+                    <strong>Address:</strong> MoveLink Moving Planner<br />
                     Westlands Business Center, Waiyaki Way<br />
                     Westlands, Nairobi, Kenya
                   </p>

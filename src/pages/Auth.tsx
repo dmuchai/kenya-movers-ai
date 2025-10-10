@@ -131,7 +131,7 @@ const Auth = () => {
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-primary to-secondary rounded-full mx-auto mb-4">
                   <Users className="w-8 h-8 text-white" />
                 </div>
-                <CardTitle className="text-2xl font-bold">Welcome to MoveEasy</CardTitle>
+                <CardTitle className="text-2xl font-bold">Welcome to MoveLink</CardTitle>
                 <CardDescription>
                   Sign in to your account or create a new one to get started
                 </CardDescription>

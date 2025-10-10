@@ -1,7 +1,7 @@
-# MoveEasy App Icons & Assets Summary
+# MoveLink App Icons & Assets Summary
 
 ## 📱 App Icon Details
-- **App Name**: MoveEasy
+- **App Name**: MoveLink
 - **Theme**: Moving truck with colorful boxes, professional gradient background
 - **Primary Colors**: Indigo (#4F46E5) to Purple (#7C3AED) gradient
 - **Style**: Modern, clean, with moving theme

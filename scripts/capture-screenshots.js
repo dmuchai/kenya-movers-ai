@@ -1,5 +1,5 @@
 /**
- * Playwright script to capture Play Store screenshots for MoveEasy app
+ * Playwright script to capture Play Store screenshots for MoveLink app
  * Generates mobile-optimized screenshots demonstrating key app features
  */
 

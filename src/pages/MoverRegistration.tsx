@@ -228,7 +228,7 @@ export default function MoverRegistration() {
               {/* New Users */}
               <div className="space-y-3">
                 <div className="text-center">
-                  <h3 className="font-semibold text-lg mb-1">New to MoveEasy?</h3>
+                  <h3 className="font-semibold text-lg mb-1">New to MoveLink?</h3>
                   <p className="text-sm text-muted-foreground mb-3">
                     Create a free account to register your moving company
                   </p>

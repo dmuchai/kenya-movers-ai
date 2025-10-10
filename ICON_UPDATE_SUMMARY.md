@@ -30,7 +30,7 @@ Created XML configuration for adaptive icons:
 - `mipmap-anydpi-v26/ic_launcher.xml`
 - `mipmap-anydpi-v26/ic_launcher_round.xml`
 
-**Background Color:** `#4F46E5` (MoveEasy brand purple)
+**Background Color:** `#4F46E5` (MoveLink brand purple)
 
 ### 3. **Web/PWA Icons Updated**
 
@@ -103,12 +103,12 @@ generate-android-icons.sh (new automation script)
 ## How Icons Look
 
 ### Android Launcher
-- **Square Icon:** MoveEasy truck logo on white background
+- **Square Icon:** MoveLink truck logo on white background
 - **Round Icon:** Same logo, cropped to circle shape
 - **Adaptive Icon:** Logo on brand purple background (#4F46E5)
 
 ### Web/Browser
-- **Tab Icon:** Favicon shows MoveEasy truck
+- **Tab Icon:** Favicon shows MoveLink truck
 - **iOS Home Screen:** 180x180 icon with proper sizing
 - **PWA Install:** Uses 192x192 and 512x512 icons
 
@@ -120,7 +120,7 @@ generate-android-icons.sh (new automation script)
    adb install android/app/build/outputs/apk/debug/app-debug.apk
    ```
 
-2. Check the home screen - icon should show MoveEasy truck logo
+2. Check the home screen - icon should show MoveLink truck logo
 
 3. Long-press the icon - should see adaptive icon animation
 
@@ -188,4 +188,4 @@ For future icon updates, ensure:
 
 ---
 
-**Summary:** All app icons have been successfully updated to use the MoveEasy truck branding across Android app and web/PWA. The APK builds successfully and is ready for testing or release.
+**Summary:** All app icons have been successfully updated to use the MoveLink truck branding across Android app and web/PWA. The APK builds successfully and is ready for testing or release.

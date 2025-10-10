@@ -1,5 +1,5 @@
 # TypeScript Types Usage Guide
-## MoveEasy Marketplace Database Integration
+## MoveLink Marketplace Database Integration
 
 This guide shows you how to use the TypeScript types with your new database schema.
 

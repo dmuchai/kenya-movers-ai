@@ -28,10 +28,10 @@ android {
     signingConfigs {
         release {
             if (keystorePropertiesFile.exists()) {
-                keyAlias keystoreProperties['MOVEEASY_UPLOAD_KEY_ALIAS']
-                keyPassword keystoreProperties['MOVEEASY_UPLOAD_KEY_PASSWORD']
-                storeFile file(keystoreProperties['MOVEEASY_UPLOAD_STORE_FILE'])
-                storePassword keystoreProperties['MOVEEASY_UPLOAD_STORE_PASSWORD']
+                keyAlias keystoreProperties['MOVELINK_UPLOAD_KEY_ALIAS']
+                keyPassword keystoreProperties['MOVELINK_UPLOAD_KEY_PASSWORD']
+                storeFile file(keystoreProperties['MOVELINK_UPLOAD_STORE_FILE'])
+                storePassword keystoreProperties['MOVELINK_UPLOAD_STORE_PASSWORD']
             }
         }
     }

@@ -1,11 +1,11 @@
-# Privacy Policy for MoveEasy - Kenya Moving Planner
+# Privacy Policy for MoveLink - Kenya Moving Planner
 
 **Effective Date**: October 3, 2025
 **Last Updated**: October 3, 2025
 
 ## Introduction
 
-MoveEasy ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application MoveEasy - Kenya Moving Planner (the "App").
+MoveLink ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application MoveLink - Kenya Moving Planner (the "App").
 
 ## Information We Collect
 
@@ -41,7 +41,7 @@ We share your moving request details (locations, property type, contact informat
 
 **Alternative Option**: You may choose to receive anonymized quotes without sharing direct contact details. In this case, moving companies provide quotes through our platform, and you can choose to reveal your contact information only to selected providers.
 
-**Consent Management**: You provide explicit, informed consent when submitting a quote request. **Lawful Basis**: Article 5(1)(a) of Kenya DPA 2019 - processing based on your explicit consent. You can modify your sharing preferences in app settings or withdraw consent by contacting us at privacy@moveeasy.co.ke. **Consent Records**: We maintain detailed logs of when, how, and what consent was provided, including timestamp, IP address, and consent version for legal compliance and audit purposes.
+**Consent Management**: You provide explicit, informed consent when submitting a quote request. **Lawful Basis**: Article 5(1)(a) of Kenya DPA 2019 - processing based on your explicit consent. You can modify your sharing preferences in app settings or withdraw consent by contacting us at privacy@movelink.co.ke. **Consent Records**: We maintain detailed logs of when, how, and what consent was provided, including timestamp, IP address, and consent version for legal compliance and audit purposes.
 
 ### With Service Providers
 We may share information with third-party service providers who assist us in:
@@ -71,7 +71,7 @@ In the unlikely event of a data breach that poses a risk to your personal inform
 
 #### How You Will Be Notified
 - **Email Notification**: We will send a detailed notification to your registered email address
-- **In-App Alert**: A prominent notification will appear when you next open the MoveEasy app
+- **In-App Alert**: A prominent notification will appear when you next open the MoveLink app
 - **Website Notice**: A public notice will be posted on our website privacy page
 
 #### Notification Timeline
@@ -79,16 +79,16 @@ In the unlikely event of a data breach that poses a risk to your personal inform
 - **User Notification**: We will notify affected users without undue delay, typically within 72 hours of confirming the breach affects personal data
 
 #### What You Should Do After Notification
-1. **Change Your Password**: If the breach involves account credentials, immediately change your MoveEasy app password
+1. **Change Your Password**: If the breach involves account credentials, immediately change your MoveLink app password
 2. **Monitor Your Accounts**: Watch for unusual activity on accounts where you used similar login information
 3. **Review Moving Requests**: Check your recent moving quotes and requests for any unauthorized changes
 4. **Contact Support**: Reach out to our security team if you notice suspicious activity or have concerns
 5. **Stay Informed**: Monitor our communications for updates on the incident and remediation steps
 
 #### Breach Response Contact
-- **Security Team**: security@moveeasy.co.ke
-- **Data Protection Officer**: dpo@moveeasy.co.ke
-- **24/7 Support**: Use the emergency contact feature in the MoveEasy app
+- **Security Team**: security@movelink.co.ke
+- **Data Protection Officer**: dpo@movelink.co.ke
+- **24/7 Support**: Use the emergency contact feature in the MoveLink app
 - **Phone**: +254 700 123 456 (business hours: 8 AM - 6 PM EAT)
 
 We maintain detailed incident response procedures and will provide regular updates until the matter is fully resolved.
@@ -117,14 +117,14 @@ To exercise any of your data protection rights, please contact us with the follo
 
 #### Required Information for Requests
 - **Full Name**: Your complete legal name as registered
-- **Account Identifier**: Email address or phone number associated with your MoveEasy account
+- **Account Identifier**: Email address or phone number associated with your MoveLink account
 - **Identity Verification**: Copy of government-issued ID (passport, national ID, or driving license)
 - **Specific Request**: Clear description of the right you wish to exercise and any relevant details
 - **Preferred Response Method**: How you would like to receive our response (email, postal mail, or in-app notification)
 
 #### Contact Methods
-- **Email**: privacy@moveeasy.co.ke or dpo@moveeasy.co.ke
-- **Postal Address**: MoveEasy Technologies Ltd, Data Protection Officer, Westlands Office Park, Block C, 3rd Floor, Waiyaki Way, Westlands, P.O. Box 12345-00100, Nairobi, Kenya
+- **Email**: privacy@movelink.co.ke or dpo@movelink.co.ke
+- **Postal Address**: MoveLink Technologies Ltd, Data Protection Officer, Westlands Office Park, Block C, 3rd Floor, Waiyaki Way, Westlands, P.O. Box 12345-00100, Nairobi, Kenya
 - **Phone**: +254 700 123 456 (business hours: 8 AM - 6 PM EAT)
 
 #### Response Timeline
@@ -173,7 +173,7 @@ We retain your information for as long as necessary to:
 
 ### User-Initiated Deletion
 
-You can request deletion of your personal data at any time by contacting us at **privacy@moveeasy.co.ke** or **dpo@moveeasy.co.ke**. We will process deletion requests within 30 days, subject to legal retention requirements.
+You can request deletion of your personal data at any time by contacting us at **privacy@movelink.co.ke** or **dpo@movelink.co.ke**. We will process deletion requests within 30 days, subject to legal retention requirements.
 
 ### Third-Party Data Handling
 
@@ -185,7 +185,7 @@ For data already shared with moving service providers or other third parties:
 
 ## Children's Privacy
 
-MoveEasy is not intended for children under 18 years of age. We do not knowingly collect personal information from children under 18 without verifiable parental consent as required by Kenya's Data Protection Act, 2019, Section 31. 
+MoveLink is not intended for children under 18 years of age. We do not knowingly collect personal information from children under 18 without verifiable parental consent as required by Kenya's Data Protection Act, 2019, Section 31. 
 
 **Parental Consent Requirements**: If a child under 18 wishes to use our services:
 - Written consent from parent/guardian is required before any data processing
@@ -248,11 +248,11 @@ We may update this Privacy Policy from time to time. We will notify you of any m
 
 If you have questions about this Privacy Policy or our privacy practices, please contact us:
 
-**MoveEasy Support**
-- **Email**: privacy@moveeasy.co.ke
-- **Address**: MoveEasy Technologies Ltd, Westlands Office Park, Block C, 3rd Floor, Waiyaki Way, Westlands, P.O. Box 12345-00100, Nairobi, Kenya
-- **Data Protection Officer**: dpo@moveeasy.co.ke
-- **In-App Contact**: Use the contact form in the MoveEasy app
+**MoveLink Support**
+- **Email**: privacy@movelink.co.ke
+- **Address**: MoveLink Technologies Ltd, Westlands Office Park, Block C, 3rd Floor, Waiyaki Way, Westlands, P.O. Box 12345-00100, Nairobi, Kenya
+- **Data Protection Officer**: dpo@movelink.co.ke
+- **In-App Contact**: Use the contact form in the MoveLink app
 
 ## Kenya Data Protection Compliance
 
@@ -262,7 +262,7 @@ This privacy policy complies with the Data Protection Act, 2019 of Kenya and oth
 
 ## Consent
 
-When you first use the MoveEasy app, we will ask for your explicit consent to:
+When you first use the MoveLink app, we will ask for your explicit consent to:
 
 ### Required Consent (Essential Services)
 - **Process your personal information** to provide moving services and generate quotes
@@ -294,8 +294,8 @@ You can provide consent for different types of data processing independently:
 ### How to Withdraw Consent
 You can withdraw your consent at any time by:
 - **In-App Settings**: Use the Privacy & Consent section in app settings
-- **Email Request**: Contact us at privacy@moveeasy.co.ke
-- **Data Protection Officer**: Email dpo@moveeasy.co.ke
+- **Email Request**: Contact us at privacy@movelink.co.ke
+- **Data Protection Officer**: Email dpo@movelink.co.ke
 - **Written Request**: Send a letter to our registered address
 
 **Important**: Withdrawing consent will not affect the lawfulness of processing based on consent before its withdrawal. Some services may no longer be available if you withdraw essential consents.

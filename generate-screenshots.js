@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Automated Screenshot Generator for MoveEasy App
+ * Automated Screenshot Generator for MoveLink App
  * Captures key screens for Play Store submission
  */
 

@@ -1,11 +1,11 @@
 # Database Schema Migration Guide
-## MoveEasy Marketplace - Uber-like Moving Platform
+## MoveLink Marketplace - Uber-like Moving Platform
 
 ---
 
 ## 📋 Overview
 
-This guide walks you through executing the comprehensive database schema redesign that transforms MoveEasy from a quote generator to a full two-sided marketplace platform.
+This guide walks you through executing the comprehensive database schema redesign that transforms MoveLink from a quote generator to a full two-sided marketplace platform.
 
 ---
 

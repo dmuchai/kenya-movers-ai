@@ -4,7 +4,7 @@
 INSERT INTO profiles (user_id, email, first_name, last_name, phone_number, created_at, updated_at)
 VALUES (
   '00000000-0000-0000-0000-000000000000',
-  'anonymous@moveeasy.app',
+  'anonymous@movelink.app',
   'Anonymous',
   'User',
   NULL,

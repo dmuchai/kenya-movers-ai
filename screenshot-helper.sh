@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# 📸 MoveEasy Screenshot Capture Helper
+# 📸 MoveLink Screenshot Capture Helper
 # Interactive guide for taking Play Store screenshots
 
-echo "🎯 MoveEasy Screenshot Capture Guide"
+echo "🎯 MoveLink Screenshot Capture Guide"
 echo "======================================"
 echo ""
 echo "Your app is running at: http://localhost:8080"

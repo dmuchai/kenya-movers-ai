@@ -9,7 +9,7 @@ const Privacy = () => {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="bg-white rounded-lg shadow-sm p-8">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">Privacy Policy</h1>
-            <h2 className="text-xl text-blue-600 font-semibold mb-8">MoveEasy - Kenya Moving Planner</h2>
+            <h2 className="text-xl text-blue-600 font-semibold mb-8">MoveLink - Kenya Moving Planner</h2>
             
             <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-8">
               <p className="text-sm text-gray-700">
@@ -22,7 +22,7 @@ const Privacy = () => {
               <section>
                 <h2 className="text-2xl font-semibold text-gray-900 mb-4">Introduction</h2>
                 <p className="text-gray-700 leading-relaxed">
-                  MoveEasy ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application MoveEasy - Kenya Moving Planner (the "App").
+                  MoveLink ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application MoveLink - Kenya Moving Planner (the "App").
                 </p>
               </section>
 
@@ -73,7 +73,7 @@ const Privacy = () => {
                   <strong>Alternative Option:</strong> You may choose to receive anonymized quotes without sharing direct contact details. In this case, moving companies provide quotes through our platform, and you can choose to reveal your contact information only to selected providers.
                 </p>
                 <p className="text-gray-700 mb-4">
-                  <strong>Consent Management:</strong> You provide consent when submitting a quote request and can modify your sharing preferences in app settings or withdraw consent by contacting us at privacy@moveeasy.co.ke.
+                  <strong>Consent Management:</strong> You provide consent when submitting a quote request and can modify your sharing preferences in app settings or withdraw consent by contacting us at privacy@movelink.co.ke.
                 </p>
 
                 <h3 className="text-xl font-medium text-gray-900 mb-3">With Service Providers</h3>
@@ -145,7 +145,7 @@ const Privacy = () => {
 
                 <h3 className="text-xl font-medium text-gray-900 mb-3">User-Initiated Deletion</h3>
                 <p className="text-gray-700 mb-4">
-                  You can request deletion of your personal data at any time by contacting us at <strong>privacy@moveeasy.co.ke</strong> or <strong>dpo@moveeasy.co.ke</strong>. We will process deletion requests within 30 days, subject to legal retention requirements.
+                  You can request deletion of your personal data at any time by contacting us at <strong>privacy@movelink.co.ke</strong> or <strong>dpo@movelink.co.ke</strong>. We will process deletion requests within 30 days, subject to legal retention requirements.
                 </p>
 
                 <h3 className="text-xl font-medium text-gray-900 mb-3">Third-Party Data Handling</h3>
@@ -161,7 +161,7 @@ const Privacy = () => {
               <section>
                 <h2 className="text-2xl font-semibold text-gray-900 mb-4">Children's Privacy</h2>
                 <p className="text-gray-700 mb-4">
-                  MoveEasy is not intended for children under 18 years of age. We do not knowingly collect personal information from children under 18. If we discover that a child under 18 has provided us with personal information, we will delete it immediately unless we have verifiable consent from the child's parent or guardian as required by Kenya's Data Protection Act, 2019. Processing personal data of a child under 18 will only occur with the consent of their parent or guardian in accordance with the Act.
+                  MoveLink is not intended for children under 18 years of age. We do not knowingly collect personal information from children under 18. If we discover that a child under 18 has provided us with personal information, we will delete it immediately unless we have verifiable consent from the child's parent or guardian as required by Kenya's Data Protection Act, 2019. Processing personal data of a child under 18 will only occur with the consent of their parent or guardian in accordance with the Act.
                 </p>
               </section>
 
@@ -188,11 +188,11 @@ const Privacy = () => {
                   If you have questions about this Privacy Policy or our privacy practices, please contact us:
                 </p>
                 <div className="text-gray-700">
-                  <p><strong>MoveEasy Support</strong></p>
-                  <p><strong>Email:</strong> privacy@moveeasy.co.ke</p>
-                  <p><strong>Address:</strong> MoveEasy Technologies Ltd, Westlands Office Park, Block C, 3rd Floor, Waiyaki Way, Westlands, P.O. Box 12345-00100, Nairobi, Kenya</p>
-                  <p><strong>Data Protection Officer:</strong> dpo@moveeasy.co.ke</p>
-                  <p><strong>In-App Contact:</strong> Use the contact form in the MoveEasy app</p>
+                  <p><strong>MoveLink Support</strong></p>
+                  <p><strong>Email:</strong> privacy@movelink.co.ke</p>
+                  <p><strong>Address:</strong> MoveLink Technologies Ltd, Westlands Office Park, Block C, 3rd Floor, Waiyaki Way, Westlands, P.O. Box 12345-00100, Nairobi, Kenya</p>
+                  <p><strong>Data Protection Officer:</strong> dpo@movelink.co.ke</p>
+                  <p><strong>In-App Contact:</strong> Use the contact form in the MoveLink app</p>
                 </div>
               </section>
 
@@ -206,13 +206,13 @@ const Privacy = () => {
               <section>
                 <h2 className="text-2xl font-semibold text-gray-900 mb-4">Consent</h2>
                 <p className="text-gray-700 mb-4">
-                  By using the MoveEasy app, you consent to the collection and use of your information as described in this Privacy Policy.
+                  By using the MoveLink app, you consent to the collection and use of your information as described in this Privacy Policy.
                 </p>
               </section>
 
               <div className="border-t-2 border-gray-200 pt-8 mt-8 text-center text-gray-600">
                 <p><em>This Privacy Policy is governed by the laws of Kenya.</em></p>
-                <p className="mt-2">© 2025 MoveEasy - Kenya Moving Planner</p>
+                <p className="mt-2">© 2025 MoveLink - Kenya Moving Planner</p>
               </div>
             </div>
           </div>

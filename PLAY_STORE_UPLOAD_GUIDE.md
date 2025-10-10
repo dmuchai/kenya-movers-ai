@@ -1,4 +1,4 @@
-# 🚀 MoveEasy - Google Play Store Upload Guide
+# 🚀 MoveLink - Google Play Store Upload Guide
 
 ## ✅ **Pre-Upload Verification**
 
@@ -23,7 +23,7 @@
 ### **STEP 2: Create New App**
 1. **Click**: "Create app" button
 2. **Fill in details**:
-   - **App name**: `MoveEasy - Kenya Moving Planner`
+   - **App name**: `MoveLink - Kenya Moving Planner`
    - **Default language**: English (United States)
    - **App or game**: App
    - **Free or paid**: Free
@@ -45,7 +45,7 @@
 5. **Release notes** (copy-paste this):
 
 ```
-🎉 Welcome to MoveEasy!
+🎉 Welcome to MoveLink!
 
 Kenya's new way to find trusted moving services. Get instant quotes, compare movers, and book your next move with confidence.
 
@@ -66,7 +66,7 @@ Perfect for house moves, office relocations, and furniture moving anywhere in Ke
 1. **Go to**: "Store presence" → "Main store listing"
 
 #### **App Details**
-- **App name**: `MoveEasy - Kenya Moving Planner`
+- **App name**: `MoveLink - Kenya Moving Planner`
 - **Short description** (copy-paste):
 ```
 Find trusted movers in Kenya. Get instant quotes for house & office moves.
@@ -76,7 +76,7 @@ Find trusted movers in Kenya. Get instant quotes for house & office moves.
 ```
 🏠 Moving Made Simple in Kenya
 
-MoveEasy is Kenya's premier moving planning app that connects you with trusted, professional moving services across the country. Whether you're relocating your home or office, our smart platform makes finding reliable movers effortless.
+MoveLink is Kenya's premier moving planning app that connects you with trusted, professional moving services across the country. Whether you're relocating your home or office, our smart platform makes finding reliable movers effortless.
 
 ✨ Key Features:
 
@@ -107,7 +107,7 @@ Designed for Kenyan users with:
 🔒 Secure & Private
 Your personal information is protected with enterprise-grade security. We never share your data with unauthorized parties.
 
-🌟 Why Choose MoveEasy?
+🌟 Why Choose MoveLink?
 
 ✅ Save Time: Get multiple quotes in minutes, not days
 ✅ Save Money: Compare prices from different movers  
@@ -124,7 +124,7 @@ Your personal information is protected with enterprise-grade security. We never 
 
 Perfect for students moving between universities, families relocating for work, businesses changing offices, or anyone needing professional moving services in Kenya.
 
-Download MoveEasy today and experience stress-free moving!
+Download MoveLink today and experience stress-free moving!
 ```
 
 #### **Graphics**
@@ -236,7 +236,7 @@ Download MoveEasy today and experience stress-free moving!
 
 ## 🚀 **Ready to Launch!**
 
-Your **MoveEasy** app is **100% ready** for Google Play Store submission!
+Your **MoveLink** app is **100% ready** for Google Play Store submission!
 
 **Start here**: https://play.google.com/console
 

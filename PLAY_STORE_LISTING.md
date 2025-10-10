@@ -1,7 +1,7 @@
-# MoveEasy - Play Store Listing Content
+# MoveLink - Play Store Listing Content
 
 ## 📱 App Title
-**MoveEasy - Kenya Moving Planner**
+**MoveLink - Kenya Moving Planner**
 *(30 characters max - currently 29)*
 
 ## 📝 Short Description  
@@ -14,7 +14,7 @@
 
 **🏠 Moving Made Simple in Kenya**
 
-MoveEasy is Kenya's premier moving planning app that connects you with trusted, professional moving services across the country. Whether you're relocating your home or office, our smart platform makes finding reliable movers effortless.
+MoveLink is Kenya's premier moving planning app that connects you with trusted, professional moving services across the country. Whether you're relocating your home or office, our smart platform makes finding reliable movers effortless.
 
 **✨ Key Features:**
 
@@ -45,7 +45,7 @@ Designed for Kenyan users with:
 🔒 **Secure & Private**
 Your personal information is protected with enterprise-grade security. We never share your data with unauthorized parties.
 
-**🌟 Why Choose MoveEasy?**
+**🌟 Why Choose MoveLink?**
 
 ✅ **Save Time**: Get multiple quotes in minutes, not days
 ✅ **Save Money**: Compare prices from different movers  
@@ -62,7 +62,7 @@ Your personal information is protected with enterprise-grade security. We never 
 
 Perfect for students moving between universities, families relocating for work, businesses changing offices, or anyone needing professional moving services in Kenya.
 
-**Download MoveEasy today and experience stress-free moving!**
+**Download MoveLink today and experience stress-free moving!**
 
 ---
 
@@ -91,7 +91,7 @@ moving, movers, relocation, Kenya, Nairobi, Mombasa, house moving, office reloca
 **URL**: https://moving-planner-ke.vercel.app
 
 ### Support Email
-**Email**: support@moveeasy.co.ke
+**Email**: support@movelink.co.ke
 
 ## 🎨 Visual Assets Checklist
 
@@ -124,7 +124,7 @@ moving, movers, relocation, Kenya, Nairobi, Mombasa, house moving, office reloca
 - **Rollout**: 100% (full release)
 
 ### Release Notes
-"🎉 Welcome to MoveEasy! Kenya's new way to find trusted moving services. Get instant quotes, compare movers, and book your next move with confidence."
+"🎉 Welcome to MoveLink! Kenya's new way to find trusted moving services. Get instant quotes, compare movers, and book your next move with confidence."
 
 ## 📋 Pre-Submission Checklist
 

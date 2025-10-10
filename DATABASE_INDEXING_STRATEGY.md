@@ -1,7 +1,7 @@
-# Database Indexing Strategy for MoveEasy Platform
+# Database Indexing Strategy for MoveLink Platform
 
 ## Overview
-Comprehensive indexing strategy for the MoveEasy marketplace database, optimized for common query patterns in a two-sided marketplace with real-time tracking and payment processing.
+Comprehensive indexing strategy for the MoveLink marketplace database, optimized for common query patterns in a two-sided marketplace with real-time tracking and payment processing.
 
 ## Index Categories
 

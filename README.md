@@ -1,7 +1,7 @@
 
-# MoveEasy Moving Planner
+# MoveLink Moving Planner
 
-MoveEasy Moving Planner is a modern web application for instant, AI-powered moving quotes in Kenya. It features live location autocomplete, dynamic quote estimation, mover profiles, and a seamless user experience for both customers and moving companies.
+MoveLink Moving Planner is a modern web application for instant, AI-powered moving quotes in Kenya. It features live location autocomplete, dynamic quote estimation, mover profiles, and a seamless user experience for both customers and moving companies.
 
 ---
 

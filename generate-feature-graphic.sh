@@ -60,7 +60,7 @@ convert -size ${FEATURE_WIDTH}x${FEATURE_HEIGHT} \
     \( play-store-icon.png -resize 180x180 \) \
     -geometry +80+160 -composite \
     \( -background none -fill "$TEXT_COLOR" -font Arial-Bold -pointsize 64 \
-       label:"MoveEasy" \) \
+       label:"MoveLink" \) \
     -geometry +300+140 -composite \
     \( -background none -fill "$SECONDARY_TEXT" -font Arial -pointsize 28 \
        label:"Kenya Moving Planner" \) \
@@ -87,7 +87,7 @@ else
         \( play-store-icon.png -resize 200x200 \) \
         -gravity west -geometry +100+0 -composite \
         \( -background none -fill "$TEXT_COLOR" -pointsize 72 \
-           label:"MoveEasy" \) \
+           label:"MoveLink" \) \
         -gravity center -geometry +150+0 -composite \
         feature-graphic.png
     

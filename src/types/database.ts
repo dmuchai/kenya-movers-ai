@@ -1,5 +1,5 @@
 /**
- * TypeScript Types for MoveEasy Marketplace Database Schema
+ * TypeScript Types for MoveLink Marketplace Database Schema
  * 
  * Auto-generated from Supabase schema
  * These types match the database schema created in migration files

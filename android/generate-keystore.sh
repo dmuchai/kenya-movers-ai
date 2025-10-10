@@ -1,18 +1,18 @@
 #!/bin/bash
 
-# MoveEasy Release Keystore Generation Script
+# MoveLink Release Keystore Generation Script
 # This creates the keystore needed to sign your production app
 
 echo "=========================================="
-echo "MoveEasy Release Keystore Generator"
+echo "MoveLink Release Keystore Generator"
 echo "=========================================="
 echo ""
 echo "⚠️  IMPORTANT: Save the passwords and information you enter!"
 echo "    You'll need them every time you update the app."
 echo ""
 echo "Generating keystore with:"
-echo "  - Keystore name: moveeasy-release-key.keystore"
-echo "  - Alias: moveeasy-key-alias"
+echo "  - Keystore name: movelink-release-key.keystore"
+echo "  - Alias: movelink-key-alias"
 echo "  - Validity: 10,000 days (27+ years)"
 echo ""
 echo "You will be prompted for:"
@@ -25,8 +25,8 @@ read -p "Press Enter to continue..."
 keytool -genkeypair \
   -v \
   -storetype PKCS12 \
-  -keystore moveeasy-release-key.keystore \
-  -alias moveeasy-key-alias \
+  -keystore movelink-release-key.keystore \
+  -alias movelink-key-alias \
   -keyalg RSA \
   -keysize 2048 \
   -validity 10000
@@ -35,7 +35,7 @@ if [ $? -eq 0 ]; then
     echo ""
     echo "✅ Keystore generated successfully!"
     echo ""
-    echo "📁 Location: $(pwd)/moveeasy-release-key.keystore"
+    echo "📁 Location: $(pwd)/movelink-release-key.keystore"
     echo ""
     echo "🔒 CRITICAL: Back up this file and passwords securely!"
     echo "   - Store keystore in a safe location (outside of git)"

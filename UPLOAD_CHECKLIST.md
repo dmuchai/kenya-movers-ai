@@ -1,4 +1,4 @@
-# 📋 MoveEasy Play Store Upload Checklist
+# 📋 MoveLink Play Store Upload Checklist
 
 ## 🎯 **Quick Upload Steps**
 
@@ -14,7 +14,7 @@
 - [ ] **Screenshots**: All 5 files from `play-store-screenshots/`
 
 ### ✅ **App Information**
-- [ ] **Name**: `MoveEasy - Kenya Moving Planner`
+- [ ] **Name**: `MoveLink - Kenya Moving Planner`
 - [ ] **Category**: Business
 - [ ] **Short Description**: `Find trusted movers in Kenya. Get instant quotes for house & office moves.`
 - [ ] **Full Description**: Copy from `PLAY_STORE_UPLOAD_GUIDE.md`

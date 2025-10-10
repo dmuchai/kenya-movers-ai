@@ -378,6 +378,6 @@ You now have a fully functional two-sided marketplace for moving services with:
 
 **🎊 Congratulations on completing Phase 1!**
 
-Your MoveEasy marketplace is now ready for movers to register and customers to book moving services. The foundation is solid, scalable, and production-ready.
+Your MoveLink marketplace is now ready for movers to register and customers to book moving services. The foundation is solid, scalable, and production-ready.
 
 Ready to build Phase 2? 🚀
