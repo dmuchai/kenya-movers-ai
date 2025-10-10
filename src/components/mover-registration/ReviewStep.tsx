@@ -197,16 +197,7 @@ export default function ReviewStep({ data, onUpdate, onNext }: ReviewStepProps) 
         </Card>
       </div>
 
-      {/* Submit Button */}
-      <div className="flex justify-end pt-4">
-        <Button 
-          onClick={onNext}
-          size="lg"
-          className="min-w-[200px]"
-        >
-          Submit Application
-        </Button>
-      </div>
+      {/* Note: Submit button is in the main form navigation, not here */}
     </div>
   );
 }
