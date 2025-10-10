@@ -1,11 +1,23 @@
 #!/bin/bash
 
-# Generate Android launcher icons from play-store-icon.png
+# Generate Android launcher icons from MoveLink icon
 # This script creates all required icon sizes for Android
 
 set -e
 
-SOURCE_ICON="play-store-icon.png"
+# Check for source icon - try multiple names
+if [ -f "movelink-icon.png" ]; then
+    SOURCE_ICON="movelink-icon.png"
+elif [ -f "play-store-icon.png" ]; then
+    SOURCE_ICON="play-store-icon.png"
+elif [ -f "app-icon.png" ]; then
+    SOURCE_ICON="app-icon.png"
+else
+    echo "❌ Error: No source icon found!"
+    echo "Please provide one of: movelink-icon.png, play-store-icon.png, or app-icon.png"
+    exit 1
+fi
+
 ANDROID_RES="android/app/src/main/res"
 
 # Check if source icon exists
