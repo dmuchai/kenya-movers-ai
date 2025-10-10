@@ -459,6 +459,23 @@ export default function MoverRegistration() {
         throw new Error(`Database error: ${insertError.message} (Code: ${insertError.code})`);
       }
 
+      console.log('Mover profile created successfully');
+
+      // Update user's role to 'mover' in profiles table
+      console.log('Updating user role to mover...');
+      const { error: roleUpdateError } = await supabase
+        .from('profiles')
+        .update({ role: 'mover' })
+        .eq('user_id', user.id);
+
+      if (roleUpdateError) {
+        console.error('Failed to update role:', roleUpdateError);
+        // Don't throw error - registration succeeded, role update is secondary
+        console.warn('Mover profile created but role update failed. Admin may need to update manually.');
+      } else {
+        console.log('User role updated to mover successfully');
+      }
+
       toast({
         title: 'Registration Submitted!',
         description:
