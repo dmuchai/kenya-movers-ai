@@ -88,16 +88,113 @@ export default function MoverRegistration() {
     documents: {}
   });
 
+  const [hasExistingRegistration, setHasExistingRegistration] = useState(false);
+  const [checkingRegistration, setCheckingRegistration] = useState(true);
+
   const progress = (currentStep / STEPS.length) * 100;
   const CurrentStepComponent = STEPS[currentStep - 1].component;
 
-  // Show loading while checking authentication
-  if (authLoading) {
+  // Check if user already has a mover registration
+  useEffect(() => {
+    const checkExistingRegistration = async () => {
+      if (!user) {
+        setCheckingRegistration(false);
+        return;
+      }
+
+      try {
+        const { data: moverData, error } = await supabase
+          .from('movers')
+          .select('id, verification_status')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (error && error.code !== 'PGRST116') {
+          console.error('Error checking mover registration:', error);
+        }
+
+        if (moverData) {
+          console.log('Existing mover registration found:', moverData);
+          setHasExistingRegistration(true);
+        }
+      } catch (error) {
+        console.error('Failed to check registration:', error);
+      } finally {
+        setCheckingRegistration(false);
+      }
+    };
+
+    checkExistingRegistration();
+  }, [user]);
+
+  // Show loading while checking authentication or existing registration
+  if (authLoading || checkingRegistration) {
     return (
       <>
         <Navigation />
         <div className="flex justify-center items-center min-h-screen">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      </>
+    );
+  }
+
+  // Check if user already has a mover registration
+  if (hasExistingRegistration) {
+    return (
+      <>
+        <Navigation />
+        <div className="container max-w-3xl mx-auto py-8 px-4 pt-24">
+          <Card>
+            <CardHeader>
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-primary to-trust-blue rounded-full mx-auto mb-4">
+                <Truck className="w-8 h-8 text-white" />
+              </div>
+              <CardTitle className="text-center text-2xl">Registration Already Submitted</CardTitle>
+              <CardDescription className="text-center">
+                You have already submitted a mover registration application
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  Your application has been submitted and is being reviewed by our verification team.
+                  You cannot submit a new registration while your current application is being processed.
+                </AlertDescription>
+              </Alert>
+
+              <div className="space-y-3">
+                <div className="text-center">
+                  <h3 className="font-semibold text-lg mb-1">What happens next?</h3>
+                  <ul className="text-sm text-muted-foreground space-y-2 text-left max-w-md mx-auto">
+                    <li>• Our team will review your documents and information</li>
+                    <li>• You'll receive an email notification about your verification status</li>
+                    <li>• The review process typically takes 24-48 hours</li>
+                    <li>• Once approved, you can start accepting bookings</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                <Button 
+                  className="w-full" 
+                  size="lg"
+                  onClick={() => navigate('/mover-dashboard')}
+                >
+                  Go to Mover Dashboard
+                </Button>
+                <Button 
+                  variant="outline"
+                  className="w-full" 
+                  size="lg"
+                  onClick={() => navigate('/')}
+                >
+                  Back to Home
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </>
     );
