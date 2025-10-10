@@ -28,19 +28,25 @@ const Navigation = () => {
     setIsSigningOut(true);
     console.log('handleSignOut called');
     
+    // Set a timeout as failsafe - if sign out takes too long, force redirect anyway
+    const timeoutId = setTimeout(() => {
+      console.warn('Sign out timeout - forcing redirect');
+      window.location.href = '/';
+    }, 3000); // 3 second timeout
+    
     try {
       await signOut();
       console.log('Navigation: Sign out completed, redirecting to home...');
-      navigate('/', { replace: true });
-      // Force page reload to clear any cached state
+      clearTimeout(timeoutId);
+      // Force page reload to clear all state
       window.location.href = '/';
     } catch (error) {
       console.error('Navigation: Sign out failed:', error);
-      // Still try to redirect even if sign out failed
+      clearTimeout(timeoutId);
+      // Still redirect even if sign out failed
       window.location.href = '/';
-    } finally {
-      setIsSigningOut(false);
     }
+    // Note: finally block not needed since window.location.href will reload the page
   };
 
   const navigationItems = [

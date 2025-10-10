@@ -149,10 +149,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       if (error) {
         console.error('Sign out error:', error);
-        throw error;
+        // Don't throw - just log and continue
+      } else {
+        console.log('Sign out successful');
       }
       
-      console.log('Sign out successful');
+      // Always clear local state regardless of API success
       setUser(null);
       setSession(null);
       setProfile(null);
@@ -164,7 +166,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setSession(null);
       setProfile(null);
       setLoading(false);
-      throw error;
     }
   };
 
