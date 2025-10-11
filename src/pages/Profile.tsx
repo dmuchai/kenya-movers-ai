@@ -31,6 +31,9 @@ export default function Profile() {
   useEffect(() => {
     if (user) {
       fetchProfile();
+    } else {
+      // If no user, stop loading to show auth required message
+      setLoading(false);
     }
   }, [user]);
 
@@ -104,6 +107,24 @@ export default function Profile() {
     }));
   };
 
+  if (!user) {
+    return (
+      <>
+        <Navigation />
+        <div className="container mx-auto py-8 px-4 pt-24 pb-24 md:pb-8">
+          <Card className="max-w-2xl mx-auto">
+            <CardContent className="text-center py-12">
+              <h3 className="text-lg font-semibold mb-2">Authentication Required</h3>
+              <p className="text-muted-foreground mb-4">Please sign in to view and edit your profile.</p>
+              <Button onClick={() => window.location.href = '/auth'}>Sign In</Button>
+            </CardContent>
+          </Card>
+        </div>
+        <BottomNavigation />
+      </>
+    );
+  }
+
   if (loading) {
     return (
       <>
@@ -111,6 +132,7 @@ export default function Profile() {
         <div className="flex justify-center items-center min-h-[400px] pt-20">
           <Loader2 className="h-8 w-8 animate-spin" />
         </div>
+        <BottomNavigation />
       </>
     );
   }

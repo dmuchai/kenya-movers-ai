@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { ReviewForm } from "@/components/ReviewForm";
 import Navigation from "@/components/Navigation";
+import BottomNavigation from "@/components/BottomNavigation";
 
 interface Quote {
   id: string;
@@ -32,7 +33,10 @@ const QuoteHistory = () => {
   const [showReviewForm, setShowReviewForm] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
     fetchQuotes();
 
@@ -124,14 +128,16 @@ const QuoteHistory = () => {
     return (
       <>
         <Navigation />
-        <div className="max-w-4xl mx-auto p-6 pt-24">
+        <div className="max-w-4xl mx-auto p-6 pt-24 pb-24 md:pb-8">
           <Card>
             <CardContent className="text-center py-12">
               <h3 className="text-lg font-semibold mb-2">Authentication Required</h3>
-              <p className="text-muted-foreground">Please sign in to view your quote history.</p>
+              <p className="text-muted-foreground mb-4">Please sign in to view your quote history.</p>
+              <Button onClick={() => window.location.href = '/auth'}>Sign In</Button>
             </CardContent>
           </Card>
         </div>
+        <BottomNavigation />
       </>
     );
   }
@@ -140,7 +146,7 @@ const QuoteHistory = () => {
     return (
       <>
         <Navigation />
-        <div className="max-w-4xl mx-auto p-6 pt-24">
+        <div className="max-w-4xl mx-auto p-6 pt-24 pb-24 md:pb-8">
           <div className="animate-pulse space-y-4">
             {[1, 2, 3].map((i) => (
             <Card key={i}>
@@ -152,6 +158,7 @@ const QuoteHistory = () => {
           ))}
           </div>
         </div>
+        <BottomNavigation />
       </>
     );
   }
@@ -159,7 +166,7 @@ const QuoteHistory = () => {
   return (
     <>
       <Navigation />
-      <div className="max-w-4xl mx-auto p-6 pt-24">
+      <div className="max-w-4xl mx-auto p-6 pt-24 pb-24 md:pb-8">
         <div className="mb-6">
           <h2 className="text-2xl font-bold mb-2">Quote History</h2>
           <p className="text-muted-foreground">
@@ -290,6 +297,7 @@ const QuoteHistory = () => {
         </div>
       )}
       </div>
+      <BottomNavigation />
     </>
   );
 };
