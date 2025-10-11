@@ -312,42 +312,7 @@ Does your app collect or share user data: Yes
 ```
 
 **Release notes (English):**
-```
-🎉 Welcome to MoveLink!
-
-Introducing the easiest way to find and book trusted movers in Kenya.
-
-✨ What's New in v1.0.0:
-
-📱 Find Trusted Movers
-• Browse verified moving companies near you
-• View detailed profiles and ratings
-• Compare services and prices
-
-💰 Get Instant Quotes
-• Request quotes from multiple movers
-• Compare prices side-by-side
-• No hidden fees
-
-⭐ Read Reviews
-• Real reviews from verified customers
-• See ratings and past performance
-• Make informed decisions
-
-🔐 Secure Booking
-• Easy in-app booking
-• Safe payment processing
-• Real-time confirmations
-
-📍 Location-Based
-• Find movers in your area
-• Coverage across Kenya
-• Nairobi, Mombasa, Kisumu & more
-
-Got questions? Contact us at support@movelink.co.ke
-
-Thank you for choosing MoveLink! 🚚
-```
+![alt text](image.png)
 
 #### 5.3 Rollout
 

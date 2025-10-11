@@ -2,10 +2,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import Footer from "@/components/Footer";
+import { useEffect } from "react";
+import { setupBackButtonHandler, setupKeyboardHandlers, cleanupMobileListeners } from "@/lib/mobile-utils";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import QuoteHistory from "./pages/QuoteHistory";
@@ -36,6 +38,48 @@ const queryClient = new QueryClient({
   },
 });
 
+const AppContent = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Setup mobile-specific handlers
+    setupBackButtonHandler(navigate);
+    setupKeyboardHandlers();
+
+    // Cleanup on unmount
+    return () => {
+      cleanupMobileListeners();
+    };
+  }, [navigate]);
+
+  return (
+    <div className="min-h-screen flex flex-col safe-area-inset">
+      <div className="flex-1">
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/quotes" element={<QuoteHistory />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/mover-dashboard" element={<MoverDashboard />} />
+          <Route path="/mover-registration" element={<MoverRegistration />} />
+          <Route path="/find-movers" element={<FindMovers />} />
+          <Route path="/help" element={<Help />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/cookies" element={<Cookies />} />
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </div>
+      {/* Hide footer on mobile to keep focus on main actions */}
+      <div className="hidden md:block">
+        <Footer />
+      </div>
+    </div>
+  );
+};
+
 const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
@@ -44,30 +88,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <div className="min-h-screen flex flex-col">
-              <div className="flex-1">
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/quotes" element={<QuoteHistory />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/mover-dashboard" element={<MoverDashboard />} />
-                  <Route path="/mover-registration" element={<MoverRegistration />} />
-                  <Route path="/find-movers" element={<FindMovers />} />
-                  <Route path="/help" element={<Help />} />
-                  <Route path="/contact" element={<Contact />} />
-                  <Route path="/privacy" element={<Privacy />} />
-                  <Route path="/terms" element={<Terms />} />
-                  <Route path="/cookies" element={<Cookies />} />
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </div>
-              {/* Hide footer on mobile to keep focus on main actions */}
-              <div className="hidden md:block">
-                <Footer />
-              </div>
-            </div>
+            <AppContent />
           </BrowserRouter>
         </TooltipProvider>
       </AuthProvider>

@@ -264,11 +264,22 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
   const handleSubmit = async () => {
     // Validate all steps before submission
     if (!validateAllSteps()) {
+      // Find the first step with errors
+      const firstErrorStep = Object.keys(stepErrors).find(key => stepErrors[parseInt(key)]);
+      const errorMessages = Object.values(fieldErrors).filter(msg => msg);
+      
       toast({
-        title: "Please complete all required fields",
-        description: "Check the highlighted fields and try again.",
+        title: "Please fix the following errors:",
+        description: errorMessages.length > 0 
+          ? errorMessages.slice(0, 3).join(". ") + (errorMessages.length > 3 ? "..." : "")
+          : "Check the highlighted fields and try again.",
         variant: "destructive",
       });
+      
+      // Navigate to first step with errors
+      if (firstErrorStep) {
+        setStep(parseInt(firstErrorStep));
+      }
       return;
     }
 
