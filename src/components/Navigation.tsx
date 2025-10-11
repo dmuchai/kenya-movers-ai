@@ -10,7 +10,7 @@ import {
   Phone,
   LogOut
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
@@ -21,6 +21,14 @@ const Navigation = () => {
   const [isSigningOut, setIsSigningOut] = useState(false);
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+
+  // Debug logging for mobile menu
+  useEffect(() => {
+    if (isMenuOpen) {
+      console.log('Mobile menu opened. User state:', user ? 'Logged in' : 'Not logged in');
+      console.log('User email:', user?.email);
+    }
+  }, [isMenuOpen, user]);
 
   const handleSignOut = async () => {
     if (isSigningOut) return; // Prevent multiple clicks
@@ -154,10 +162,19 @@ const Navigation = () => {
 
         {/* Mobile Navigation */}
         <div className={cn(
-          "md:hidden transition-all duration-300 overflow-hidden",
-          isMenuOpen ? "max-h-[600px] pb-4" : "max-h-0"
+          "md:hidden transition-all duration-300 overflow-y-auto",
+          isMenuOpen ? "max-h-[calc(100vh-64px)] pb-4" : "max-h-0 overflow-hidden"
         )}>
-          <div className="space-y-1 pt-2 px-4">
+          <div className="space-y-1 pt-2 px-4 pb-8">
+            {/* User Status Indicator */}
+            {user && (
+              <div className="mb-3 px-4 py-3 bg-primary/10 rounded-lg border border-primary/20">
+                <p className="text-sm font-medium text-primary">
+                  ✓ Signed in as {user.email?.split('@')[0]}
+                </p>
+              </div>
+            )}
+            
             {navigationItems
               .filter(item => !item.authRequired || user)
               .map((item) => (
@@ -196,14 +213,17 @@ const Navigation = () => {
             <div className="pt-4 space-y-3 border-t border-border/50 mt-4">
               {user ? (
                 <>
-                  <div className="px-4 py-2 text-base text-muted-foreground bg-muted/30 rounded-lg">
-                    Welcome, {user.email?.split('@')[0]}
+                  <div className="px-4 py-3 text-base font-medium text-foreground bg-primary/10 rounded-lg border border-primary/20">
+                    👤 {user.email?.split('@')[0] || 'User'}
                   </div>
                   <Button 
-                    variant="outline" 
-                    className="w-full min-h-[48px] text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground" 
-                    size="default" 
-                    onClick={handleSignOut}
+                    variant="destructive" 
+                    className="w-full min-h-[52px] text-base font-semibold" 
+                    size="lg" 
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      handleSignOut();
+                    }}
                     disabled={isSigningOut}
                   >
                     <LogOut className="w-5 h-5 mr-2" />
@@ -213,10 +233,10 @@ const Navigation = () => {
               ) : (
                 <>
                   <Button variant="outline" className="w-full min-h-[48px]" size="default" asChild>
-                    <Link to="/auth">Sign In</Link>
+                    <Link to="/auth" onClick={() => setIsMenuOpen(false)}>Sign In</Link>
                   </Button>
                   <Button variant="hero" className="w-full min-h-[48px]" size="default" asChild>
-                    <Link to="/?quote=start">Get Quote</Link>
+                    <Link to="/?quote=start" onClick={() => setIsMenuOpen(false)}>Get Quote</Link>
                   </Button>
                 </>
               )}
