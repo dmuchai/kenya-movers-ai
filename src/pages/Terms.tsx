@@ -272,16 +272,16 @@ const Terms = () => {
                 <h2 className="text-2xl font-semibold text-gray-900 mb-4">14. Contact Information</h2>
                 <div className="bg-blue-50 p-4 rounded-lg">
                   <p className="text-gray-700 mb-2">
-                    <strong>Legal Inquiries:</strong> <a href="mailto:legal@kenyamoversai.com" className="text-blue-600 hover:underline">legal@kenyamoversai.com</a>
+                    <strong>Legal Inquiries:</strong> <a href="mailto:legal@move-link.co.ke" className="text-blue-600 hover:underline">legal@move-link.co.ke</a>
                   </p>
                   <p className="text-gray-700 mb-2">
-                    <strong>General Support:</strong> <a href="mailto:support@kenyamoversai.com" className="text-blue-600 hover:underline">support@kenyamoversai.com</a>
+                    <strong>General Support:</strong> <a href="mailto:support@move-link.co.ke" className="text-blue-600 hover:underline">support@move-link.co.ke</a>
                   </p>
                   <p className="text-gray-700 mb-2">
                     <strong>Phone:</strong> <a href="tel:+254700123456" className="text-blue-600 hover:underline">+254 700 123 456</a>
                   </p>
                   <p className="text-gray-700">
-                    <strong>Address:</strong> MoveLink Moving Planner<br />
+                    <strong>Address:</strong> MoveLink Technologies Ltd<br />
                     Westlands Business Center, Waiyaki Way<br />
                     Westlands, Nairobi, Kenya
                   </p>
