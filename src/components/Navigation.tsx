@@ -241,6 +241,29 @@ const Navigation = () => {
                 </>
               )}
             </div>
+
+            {/* Legal Links Section */}
+            <div className="pt-4 border-t border-border/50 mt-4">
+              <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                Legal & Privacy
+              </div>
+              <div className="space-y-1">
+                <Link
+                  to="/privacy"
+                  className="flex items-center gap-4 p-4 rounded-lg text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all min-h-[48px]"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Privacy Policy
+                </Link>
+                <Link
+                  to="/terms"
+                  className="flex items-center gap-4 p-4 rounded-lg text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all min-h-[48px]"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Terms & Conditions
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </div>

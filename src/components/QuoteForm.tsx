@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -60,6 +61,7 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
     movingDate: null as Date | null,
     additionalServices: [] as string[],
     specialRequirements: "",
+    acceptTerms: false,
     inventory: {
       beds: 0,
       fridge: false,
@@ -195,6 +197,11 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
             errors.contactPhone = "Phone number is required";
             isValid = false;
           }
+        }
+        // Validate terms acceptance for all users
+        if (!formData.acceptTerms) {
+          errors.acceptTerms = "You must accept the Terms & Conditions and Privacy Policy to continue";
+          isValid = false;
         }
         break;
       default:
@@ -933,6 +940,33 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
                 )}
               </div>
             </div>
+
+            {/* Terms & Privacy Consent */}
+            <div className="p-4 bg-muted/30 rounded-lg border border-border">
+              <div className="flex items-start space-x-3">
+                <Checkbox 
+                  id="acceptTerms" 
+                  checked={formData.acceptTerms}
+                  onCheckedChange={(v) => updateFormData("acceptTerms", Boolean(v))}
+                  className="mt-1"
+                />
+                <div className="flex-1">
+                  <Label htmlFor="acceptTerms" className="text-sm leading-relaxed cursor-pointer">
+                    I agree to the{" "}
+                    <Link to="/terms" className="text-primary font-medium underline hover:text-primary/80" target="_blank">
+                      Terms & Conditions
+                    </Link>{" "}
+                    and{" "}
+                    <Link to="/privacy" className="text-primary font-medium underline hover:text-primary/80" target="_blank">
+                      Privacy Policy
+                    </Link>
+                  </Label>
+                  {fieldErrors.acceptTerms && (
+                    <p className="text-xs text-destructive mt-1">{fieldErrors.acceptTerms}</p>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         );
 
@@ -1027,10 +1061,11 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
                 <LoadingButton
                   onClick={handleSubmit}
                   loading={loading}
+                  disabled={!formData.acceptTerms || loading}
                   loadingText={submitMessage || "Submitting..."}
                   variant="default"
                   size="lg"
-                  className="flex items-center gap-2 min-h-[48px] px-6 bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 hover:scale-[1.02]"
+                  className="flex items-center gap-2 min-h-[48px] px-6 bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Submit Quote
                   <ArrowRight className="w-4 h-4" />
