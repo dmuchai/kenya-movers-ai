@@ -55,8 +55,11 @@ const Index = () => {
     const params = new URLSearchParams(location.search);
     if (params.get("quote") === "start") {
       setCurrentView("quote");
+    } else if (location.pathname === "/" && !params.get("quote")) {
+      // Reset to hero when navigating to home without query params
+      setCurrentView("hero");
     }
-  }, [location.search]);
+  }, [location.search, location.pathname]);
   return (
     <div className="min-h-screen bg-background">
       <Navigation />

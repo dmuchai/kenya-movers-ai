@@ -2,7 +2,7 @@
 -- Add Inventory Fields to Quotes Table
 -- ============================================================================
 -- Purpose: Store detailed inventory information for accurate quote estimation
--- Author: MoveLink Engineering
+-- Author: MoveLink Technologies Ltd
 -- Date: October 12, 2025
 -- 
 -- This migration adds:

@@ -10,7 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
-import { MapPin, Home, Building, Calendar as CalendarIcon, Package, ArrowRight, ChevronLeft, User } from "lucide-react";
+import { MapPin, Home, Building, Calendar as CalendarIcon, Package, ArrowRight, ChevronLeft, User, Upload, X, Image as ImageIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,6 +23,7 @@ import { LoadingButton, LoadingOverlay, PulsingDot } from "@/components/ui/loadi
 import { useLoading } from "@/hooks/useLoading";
 import { useSwipeNavigation } from "@/hooks/useSwipeable";
 import { useHapticForm } from "@/hooks/useHapticFeedback";
+import { uploadMultiplePhotos, deleteQuotePhoto } from "@/lib/photoUpload";
 
 interface QuoteFormProps {
   onSubmit: (data: any) => void;
@@ -39,6 +40,10 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
   const [submitProgress, setSubmitProgress] = useState(0);
   const [submitMessage, setSubmitMessage] = useState("");
   const { onFieldChange, onStepComplete, onError } = useHapticForm();
+  
+  // Photo upload state
+  const [uploadingPhotos, setUploadingPhotos] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 });
 
   // Enhanced form data state
   const [formData, setFormData] = useState({
@@ -127,6 +132,74 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
       ...prev, 
       inventory: { ...prev.inventory, [item]: value }
     }));
+  };
+
+  // Handle photo uploads
+  const handlePhotoUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    
+    setUploadingPhotos(true);
+    setUploadProgress({ current: 0, total: files.length });
+    
+    try {
+      const fileArray = Array.from(files);
+      const userId = user?.id || 'guest';
+      const quoteId = 'temp'; // Will be updated with actual quote ID after submission
+      
+      const uploadedUrls = await uploadMultiplePhotos(
+        fileArray,
+        userId,
+        quoteId,
+        (current, total) => {
+          setUploadProgress({ current, total });
+        }
+      );
+      
+      // Add uploaded URLs to existing photos
+      const existingPhotos = formData.inventory.bulkyItemPhotos || [];
+      updateInventory("bulkyItemPhotos", [...existingPhotos, ...uploadedUrls]);
+      
+      toast({
+        title: "Photos uploaded successfully",
+        description: `${uploadedUrls.length} photo(s) uploaded`,
+      });
+    } catch (error) {
+      console.error('Photo upload error:', error);
+      toast({
+        title: "Upload failed",
+        description: error instanceof Error ? error.message : "Failed to upload photos",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingPhotos(false);
+      setUploadProgress({ current: 0, total: 0 });
+    }
+  };
+
+  // Handle photo deletion
+  const handlePhotoDelete = async (photoUrl: string) => {
+    try {
+      const success = await deleteQuotePhoto(photoUrl);
+      
+      if (success) {
+        const updatedPhotos = formData.inventory.bulkyItemPhotos.filter(url => url !== photoUrl);
+        updateInventory("bulkyItemPhotos", updatedPhotos);
+        
+        toast({
+          title: "Photo deleted",
+          description: "Photo removed successfully",
+        });
+      } else {
+        throw new Error('Delete failed');
+      }
+    } catch (error) {
+      console.error('Photo delete error:', error);
+      toast({
+        title: "Delete failed",
+        description: "Failed to delete photo",
+        variant: "destructive",
+      });
+    }
   };
 
   // Validation functions
@@ -799,26 +872,75 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
 
             {/* Photo upload for bulky items */}
             <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
-              <Label className="mb-2 block font-semibold text-foreground">Bulky or Special Items (Optional)</Label>
+              <Label className="mb-2 block font-semibold text-foreground flex items-center gap-2">
+                <ImageIcon className="w-5 h-5 text-primary" />
+                Bulky or Special Items (Optional)
+              </Label>
               <p className="text-sm text-muted-foreground mb-3">
-                Upload photos of large or unusual items for a more accurate quote
+                Upload photos of large or unusual items for a more accurate quote (Max 5MB per photo, JPEG/PNG/WebP)
               </p>
-              <Input 
-                type="file" 
-                accept="image/*" 
-                multiple 
-                onChange={(e) => {
-                  const files = Array.from(e.target.files || []);
-                  // For now, store file names. In production, upload to Supabase Storage
-                  const fileNames = files.map(f => f.name);
-                  updateInventory("bulkyItemPhotos", fileNames);
-                }}
-                className="cursor-pointer"
-              />
+              
+              {/* Upload button */}
+              <div className="mb-3">
+                <label htmlFor="photo-upload" className={cn(
+                  "inline-flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-dashed border-primary/30 bg-white hover:bg-primary/5 cursor-pointer transition-colors",
+                  uploadingPhotos && "opacity-50 cursor-not-allowed"
+                )}>
+                  <Upload className="w-4 h-4 text-primary" />
+                  <span className="text-sm font-medium text-foreground">
+                    {uploadingPhotos ? `Uploading ${uploadProgress.current}/${uploadProgress.total}...` : 'Choose Photos'}
+                  </span>
+                </label>
+                <Input 
+                  id="photo-upload"
+                  type="file" 
+                  accept="image/jpeg,image/jpg,image/png,image/webp,image/heic" 
+                  multiple 
+                  onChange={(e) => handlePhotoUpload(e.target.files)}
+                  disabled={uploadingPhotos}
+                  className="hidden"
+                />
+              </div>
+              
+              {/* Photo thumbnails */}
               {formData.inventory.bulkyItemPhotos.length > 0 && (
-                <p className="text-xs text-muted-foreground mt-2">
-                  {formData.inventory.bulkyItemPhotos.length} photo(s) selected
-                </p>
+                <div className="space-y-2">
+                  <p className="text-xs font-medium text-muted-foreground">
+                    {formData.inventory.bulkyItemPhotos.length} photo(s) uploaded
+                  </p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {formData.inventory.bulkyItemPhotos.map((photoUrl, index) => (
+                      <div key={index} className="relative group aspect-square rounded-lg overflow-hidden border border-border">
+                        <img 
+                          src={photoUrl} 
+                          alt={`Bulky item ${index + 1}`}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handlePhotoDelete(photoUrl)}
+                          className="absolute top-1 right-1 p-1 bg-destructive text-destructive-foreground rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/90"
+                          aria-label="Delete photo"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {/* Upload progress */}
+              {uploadingPhotos && (
+                <div className="mt-2">
+                  <div className="w-full bg-secondary rounded-full h-2">
+                    <div
+                      className="h-full bg-primary rounded-full transition-all duration-300"
+                      style={{ width: `${(uploadProgress.current / uploadProgress.total) * 100}%` }}
+                    />
+                  </div>
+                </div>
               )}
             </div>
           </div>
