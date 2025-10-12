@@ -309,17 +309,27 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
         property_size: currentPropertySizeDB,
         additional_services: formData.additionalServices,
         special_requirements: formData.specialRequirements || null,
+        // Property access details
+        current_property_type: formData.currentPropertyType || null,
+        destination_property_type: formData.destinationPropertyType || null,
+        current_floor: parseInt(formData.currentFloor) || 0,
+        destination_floor: parseInt(formData.destinationFloor) || 0,
+        elevator_current: formData.elevatorCurrent,
+        elevator_destination: formData.elevatorDestination,
+        // Detailed inventory
+        inventory: formData.inventory,
+        // Terms acceptance timestamp
+        terms_accepted_at: formData.acceptTerms ? new Date().toISOString() : null,
       };
       
       // Add user_id if logged in, otherwise prepare data for anonymous submission
       if (user) {
         quoteInsertData.user_id = user.id;
       } else {
-        // For anonymous quotes, store contact info in special_requirements
-        const contactInfo = `Contact: ${formData.contactName || 'Guest'} | Email: ${formData.contactEmail || 'N/A'} | Phone: ${formData.contactPhone || 'N/A'}`;
-        quoteInsertData.special_requirements = formData.specialRequirements 
-          ? `${formData.specialRequirements}\n\n${contactInfo}`
-          : contactInfo;
+        // For anonymous quotes, store contact info in dedicated columns
+        quoteInsertData.contact_name = formData.contactName || null;
+        quoteInsertData.contact_email = formData.contactEmail || null;
+        quoteInsertData.contact_phone = formData.contactPhone || null;
         // Note: user_id will be handled by the edge function for anonymous quotes
       }
       
