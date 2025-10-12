@@ -55,8 +55,8 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
     destinationPropertyType: "",
     currentFloor: "",
     destinationFloor: "",
-    elevatorCurrent: false,
-    elevatorDestination: false,
+    elevatorCurrent: "no" as "yes" | "no",
+    elevatorDestination: "no" as "yes" | "no",
     movingDate: null as Date | null,
     additionalServices: [] as string[],
     specialRequirements: "",
@@ -65,13 +65,16 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
       fridge: false,
       fridgeLiters: 0,
       washingMachine: false,
-      sofaSeats: 0,
-      sofaShape: "",
+      sofaSet: false,
+      sofaConfiguration: "",
       tv: false,
       tvInches: 0,
-      diningTable: false,
+      diningSet: false,
+      diningChairs: 0,
       wardrobe: 0,
-      boxes: 0,
+      cooker: false,
+      cookerType: "",
+      bulkyItemPhotos: [] as string[],
     }
   });
 
@@ -605,13 +608,29 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex items-center space-x-2">
-                <Checkbox id="elevatorCurrent" checked={formData.elevatorCurrent} onCheckedChange={(v) => updateFormData("elevatorCurrent", Boolean(v))} />
-                <Label htmlFor="elevatorCurrent">Elevator at current location</Label>
+              <div>
+                <Label className="mb-2 block">Elevator at current location?</Label>
+                <Select value={formData.elevatorCurrent} onValueChange={(v: "yes" | "no") => updateFormData("elevatorCurrent", v)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="yes">Yes</SelectItem>
+                    <SelectItem value="no">No</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox id="elevatorDestination" checked={formData.elevatorDestination} onCheckedChange={(v) => updateFormData("elevatorDestination", Boolean(v))} />
-                <Label htmlFor="elevatorDestination">Elevator at destination</Label>
+              <div>
+                <Label className="mb-2 block">Elevator at destination?</Label>
+                <Select value={formData.elevatorDestination} onValueChange={(v: "yes" | "no") => updateFormData("elevatorDestination", v)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="yes">Yes</SelectItem>
+                    <SelectItem value="no">No</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </div>
@@ -627,65 +646,163 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label className="mb-2 block">Beds</Label>
+                <Label className="mb-2 block">Number of Beds</Label>
                 <Input type="number" min={0} value={formData.inventory.beds}
-                  onChange={(e) => updateInventory("beds", Number(e.target.value))} />
+                  onChange={(e) => updateInventory("beds", Number(e.target.value))} 
+                  placeholder="e.g., 2"
+                />
               </div>
               <div>
-                <Label className="mb-2 block">Wardrobes</Label>
+                <Label className="mb-2 block">Number of Wardrobes</Label>
                 <Input type="number" min={0} value={formData.inventory.wardrobe}
-                  onChange={(e) => updateInventory("wardrobe", Number(e.target.value))} />
-              </div>
-              <div>
-                <Label className="mb-2 block">Sofa seats (total)</Label>
-                <Input type="number" min={0} value={formData.inventory.sofaSeats}
-                  onChange={(e) => updateInventory("sofaSeats", Number(e.target.value))} />
-              </div>
-              <div>
-                <Label className="mb-2 block">Boxes (estimate)</Label>
-                <Input type="number" min={0} value={formData.inventory.boxes}
-                  onChange={(e) => updateInventory("boxes", Number(e.target.value))} />
+                  onChange={(e) => updateInventory("wardrobe", Number(e.target.value))} 
+                  placeholder="e.g., 3"
+                />
               </div>
             </div>
 
             <div className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <Checkbox id="fridge" checked={formData.inventory.fridge}
-                  onCheckedChange={(v) => updateInventory("fridge", Boolean(v))} />
-                <Label htmlFor="fridge">Fridge</Label>
-              </div>
-              {formData.inventory.fridge && (
-                <div className="pl-6">
-                  <Label className="mb-2 block">Fridge size (liters)</Label>
-                  <Input type="number" min={0} value={formData.inventory.fridgeLiters}
-                    onChange={(e) => updateInventory("fridgeLiters", Number(e.target.value))} />
+              {/* Sofa Set */}
+              <div className="p-4 bg-muted/30 rounded-lg border border-border">
+                <div className="flex items-center space-x-2 mb-3">
+                  <Checkbox id="sofaSet" checked={formData.inventory.sofaSet}
+                    onCheckedChange={(v) => updateInventory("sofaSet", Boolean(v))} />
+                  <Label htmlFor="sofaSet" className="font-semibold">Sofa Set</Label>
                 </div>
-              )}
-
-              <div className="flex items-center space-x-2">
-                <Checkbox id="tv" checked={formData.inventory.tv}
-                  onCheckedChange={(v: boolean) => updateInventory("tv", v)} />
-                <Label htmlFor="tv">TV</Label>
+                {formData.inventory.sofaSet && (
+                  <div className="pl-6 space-y-3">
+                    <Label className="mb-2 block text-sm">Sofa Configuration</Label>
+                    <Select value={formData.inventory.sofaConfiguration} 
+                      onValueChange={(v) => updateInventory("sofaConfiguration", v)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select configuration" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="3-seater">3-seater (single piece)</SelectItem>
+                        <SelectItem value="5-seater-3-1-1">5-seater (3-1-1)</SelectItem>
+                        <SelectItem value="5-seater-3-2">5-seater (3-2)</SelectItem>
+                        <SelectItem value="7-seater-3-3-1">7-seater (3-3-1)</SelectItem>
+                        <SelectItem value="7-seater-3-2-2">7-seater (3-2-2)</SelectItem>
+                        <SelectItem value="9-seater">9-seater</SelectItem>
+                        <SelectItem value="other">Other (specify in special requirements)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
               </div>
-              {formData.inventory.tv && (
-                <div className="pl-6">
-                  <Label className="mb-2 block">TV size (inches)</Label>
-                  <Input type="number" min={0} value={formData.inventory.tvInches}
-                    onChange={(e) => updateInventory("tvInches", Number(e.target.value))} />
+
+              {/* Dining Set */}
+              <div className="p-4 bg-muted/30 rounded-lg border border-border">
+                <div className="flex items-center space-x-2 mb-3">
+                  <Checkbox id="diningSet" checked={formData.inventory.diningSet}
+                    onCheckedChange={(v) => updateInventory("diningSet", Boolean(v))} />
+                  <Label htmlFor="diningSet" className="font-semibold">Dining Set</Label>
                 </div>
+                {formData.inventory.diningSet && (
+                  <div className="pl-6">
+                    <Label className="mb-2 block text-sm">Number of Chairs</Label>
+                    <Input type="number" min={0} max={20} value={formData.inventory.diningChairs}
+                      onChange={(e) => updateInventory("diningChairs", Number(e.target.value))} 
+                      placeholder="e.g., 6"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Fridge */}
+              <div className="p-4 bg-muted/30 rounded-lg border border-border">
+                <div className="flex items-center space-x-2 mb-3">
+                  <Checkbox id="fridge" checked={formData.inventory.fridge}
+                    onCheckedChange={(v) => updateInventory("fridge", Boolean(v))} />
+                  <Label htmlFor="fridge" className="font-semibold">Fridge</Label>
+                </div>
+                {formData.inventory.fridge && (
+                  <div className="pl-6">
+                    <Label className="mb-2 block text-sm">Fridge Capacity (liters)</Label>
+                    <Input type="number" min={0} value={formData.inventory.fridgeLiters}
+                      onChange={(e) => updateInventory("fridgeLiters", Number(e.target.value))} 
+                      placeholder="e.g., 200"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* TV */}
+              <div className="p-4 bg-muted/30 rounded-lg border border-border">
+                <div className="flex items-center space-x-2 mb-3">
+                  <Checkbox id="tv" checked={formData.inventory.tv}
+                    onCheckedChange={(v: boolean) => updateInventory("tv", v)} />
+                  <Label htmlFor="tv" className="font-semibold">TV</Label>
+                </div>
+                {formData.inventory.tv && (
+                  <div className="pl-6">
+                    <Label className="mb-2 block text-sm">TV Size (inches)</Label>
+                    <Input type="number" min={0} value={formData.inventory.tvInches}
+                      onChange={(e) => updateInventory("tvInches", Number(e.target.value))} 
+                      placeholder="e.g., 55"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Washing Machine */}
+              <div className="p-4 bg-muted/30 rounded-lg border border-border">
+                <div className="flex items-center space-x-2">
+                  <Checkbox id="wm" checked={formData.inventory.washingMachine}
+                    onCheckedChange={(v) => updateInventory("washingMachine", Boolean(v))} />
+                  <Label htmlFor="wm" className="font-semibold">Washing Machine</Label>
+                </div>
+              </div>
+
+              {/* Cooker */}
+              <div className="p-4 bg-muted/30 rounded-lg border border-border">
+                <div className="flex items-center space-x-2 mb-3">
+                  <Checkbox id="cooker" checked={formData.inventory.cooker}
+                    onCheckedChange={(v) => updateInventory("cooker", Boolean(v))} />
+                  <Label htmlFor="cooker" className="font-semibold">Cooker</Label>
+                </div>
+                {formData.inventory.cooker && (
+                  <div className="pl-6">
+                    <Label className="mb-2 block text-sm">Cooker Type</Label>
+                    <Select value={formData.inventory.cookerType} 
+                      onValueChange={(v) => updateInventory("cookerType", v)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="gas">Gas Cooker</SelectItem>
+                        <SelectItem value="electric">Electric Cooker</SelectItem>
+                        <SelectItem value="gas-electric">Gas & Electric</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Photo upload for bulky items */}
+            <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
+              <Label className="mb-2 block font-semibold text-foreground">Bulky or Special Items (Optional)</Label>
+              <p className="text-sm text-muted-foreground mb-3">
+                Upload photos of large or unusual items for a more accurate quote
+              </p>
+              <Input 
+                type="file" 
+                accept="image/*" 
+                multiple 
+                onChange={(e) => {
+                  const files = Array.from(e.target.files || []);
+                  // For now, store file names. In production, upload to Supabase Storage
+                  const fileNames = files.map(f => f.name);
+                  updateInventory("bulkyItemPhotos", fileNames);
+                }}
+                className="cursor-pointer"
+              />
+              {formData.inventory.bulkyItemPhotos.length > 0 && (
+                <p className="text-xs text-muted-foreground mt-2">
+                  {formData.inventory.bulkyItemPhotos.length} photo(s) selected
+                </p>
               )}
-
-              <div className="flex items-center space-x-2">
-                <Checkbox id="wm" checked={formData.inventory.washingMachine}
-                  onCheckedChange={(v) => updateInventory("washingMachine", Boolean(v))} />
-                <Label htmlFor="wm">Washing Machine</Label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox id="dt" checked={formData.inventory.diningTable}
-                  onCheckedChange={(v) => updateInventory("diningTable", Boolean(v))} />
-                <Label htmlFor="dt">Dining Table</Label>
-              </div>
             </div>
           </div>
         );

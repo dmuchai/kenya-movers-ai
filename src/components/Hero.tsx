@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, MapPin, Calculator, Users, Sparkles, TrendingUp } from "lucide-react";
+import { ArrowRight, MapPin, Calculator, Users, Sparkles, Shield, Award, CheckCircle, Clock } from "lucide-react";
 import heroImage from "@/assets/hero-moving-truck.jpg";
 import { Link } from "react-router-dom";
 
@@ -27,26 +27,43 @@ const Hero = () => {
         <div className="space-y-8 animate-slide-in-up">
           {/* Enhanced Badge */}
           <div className="inline-flex items-center gap-2 bg-white/95 backdrop-blur-md rounded-full px-6 py-3 text-sm font-semibold text-primary shadow-lg border border-primary/10 hover:shadow-xl transition-all duration-300">
-            <Sparkles className="w-4 h-4 text-trust-blue" />
-            Trusted by 10,000+ customers across Kenya
-            <TrendingUp className="w-4 h-4 text-success" />
+            <Shield className="w-4 h-4 text-trust-blue" />
+            Trusted by 10,000+ Kenyans
+            <CheckCircle className="w-4 h-4 text-success" />
           </div>
           
           {/* Enhanced Main Heading with Better Typography */}
           <h1 className="text-hero animate-fade-in-scale" style={{ animationDelay: '0.2s' }}>
-            Moving Made{" "}
+            Find{" "}
             <span className="relative">
               <span className="bg-gradient-to-r from-primary via-trust-blue to-primary bg-clip-text text-transparent animate-shimmer">
-                Effortless
+                Professional, Reliable, Trusted
               </span>
               <div className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-primary/30 to-trust-blue/30 rounded-full"></div>
             </span>
+            {" "}Movers
           </h1>
           
           <p className="text-xl md:text-2xl text-neutral-600 max-w-4xl mx-auto leading-relaxed animate-slide-in-up font-medium" style={{ animationDelay: '0.4s' }}>
-            Get instant AI-powered quotes from Kenya's most trusted moving companies. 
-            <span className="text-primary font-semibold"> Compare prices, read reviews, and book in minutes.</span>
+            Connect with <span className="text-trust-blue font-semibold">verified, professional moving companies</span> you can trust.
+            Get instant quotes, compare services, and move with confidence.
           </p>
+          
+          {/* Trust Indicators Pills */}
+          <div className="flex flex-wrap justify-center gap-3 pt-4 animate-slide-in-up" style={{ animationDelay: '0.5s' }}>
+            <div className="inline-flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 text-sm font-medium text-neutral-700 shadow-md border border-primary/10">
+              <Shield className="w-4 h-4 text-trust-blue" />
+              Licensed & Insured
+            </div>
+            <div className="inline-flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 text-sm font-medium text-neutral-700 shadow-md border border-primary/10">
+              <Award className="w-4 h-4 text-warm-orange" />
+              Top-Rated Service
+            </div>
+            <div className="inline-flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 text-sm font-medium text-neutral-700 shadow-md border border-primary/10">
+              <CheckCircle className="w-4 h-4 text-success" />
+              Background Checked
+            </div>
+          </div>
           
           {/* Enhanced CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6 animate-slide-in-up" style={{ animationDelay: '0.6s' }}>
@@ -105,32 +122,59 @@ const Hero = () => {
           
           {/* Enhanced Trust Indicators */}
           <div className="pt-16 animate-slide-in-up" style={{ animationDelay: '0.8s' }}>
-            <div className="text-subtle text-center mb-8">
-              Why choose MoveLink?
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-bold text-foreground mb-2">Your Move, Your Peace of Mind</h2>
+              <p className="text-neutral-600">We only work with the best so you don't have to worry</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              <div className="card-enhanced group p-8 hover-lift">
-                <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary-light rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <Calculator className="w-8 h-8 text-white" />
+              <div className="card-enhanced group p-8 hover-lift border-2 border-trust-blue/20">
+                <div className="w-16 h-16 bg-gradient-to-br from-trust-blue to-trust-blue-light rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <Shield className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="font-bold text-xl mb-3 text-foreground">AI-Powered Estimates</h3>
-                <p className="text-neutral-600 leading-relaxed">Get accurate, instant pricing based on your specific moving requirements using advanced algorithms</p>
+                <h3 className="font-bold text-xl mb-3 text-foreground">100% Professional</h3>
+                <p className="text-neutral-600 leading-relaxed">Every mover is licensed, insured, and background-checked. Your belongings are in safe, trained hands.</p>
               </div>
               
-              <div className="card-enhanced group p-8 hover-lift">
-                <div className="w-16 h-16 bg-gradient-to-br from-trust-blue to-trust-blue-light rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <Users className="w-8 h-8 text-white" />
+              <div className="card-enhanced group p-8 hover-lift border-2 border-primary/20">
+                <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary-light rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <Award className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="font-bold text-xl mb-3 text-foreground">Verified Companies</h3>
-                <p className="text-neutral-600 leading-relaxed">Only pre-screened, licensed, and highly-rated moving companies with proven track records</p>
+                <h3 className="font-bold text-xl mb-3 text-foreground">Proven Reliability</h3>
+                <p className="text-neutral-600 leading-relaxed">Only top-rated companies with verified reviews and consistent on-time delivery track records.</p>
               </div>
               
-              <div className="card-enhanced group p-8 hover-lift">
-                <div className="w-16 h-16 bg-gradient-to-br from-warm-orange to-warm-orange-light rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <MapPin className="w-8 h-8 text-white" />
+              <div className="card-enhanced group p-8 hover-lift border-2 border-success/20">
+                <div className="w-16 h-16 bg-gradient-to-br from-success to-success rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <CheckCircle className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="font-bold text-xl mb-3 text-foreground">Kenya-Wide Coverage</h3>
-                <p className="text-neutral-600 leading-relaxed">Comprehensive coverage across Nairobi, Mombasa, Kisumu, Nakuru, and all major Kenyan cities</p>
+                <h3 className="font-bold text-xl mb-3 text-foreground">Trusted by Thousands</h3>
+                <p className="text-neutral-600 leading-relaxed">Join 10,000+ satisfied customers who chose professional, stress-free moving experiences.</p>
+              </div>
+            </div>
+            
+            {/* Additional Benefits Section */}
+            <div className="mt-12 max-w-4xl mx-auto">
+              <div className="card-enhanced p-6 bg-gradient-to-r from-neutral-50 to-white border border-neutral-200">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                      <Clock className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-1">Quick Response Time</h4>
+                      <p className="text-sm text-neutral-600">Get quotes within minutes and schedule your move at your convenience</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-trust-blue/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                      <MapPin className="w-5 h-5 text-trust-blue" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-1">All Over Kenya</h4>
+                      <p className="text-sm text-neutral-600">Coverage in Nairobi, Mombasa, Kisumu, and 44+ cities nationwide</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
