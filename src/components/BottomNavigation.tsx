@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Home, Calculator, History, User, Menu, Phone, HelpCircle } from "lucide-react";
+import { Home, Calculator, History, User, Menu, Phone, HelpCircle, Shield, FileText } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -122,6 +122,47 @@ const BottomNavigation = () => {
                 <div className="text-sm text-neutral-500">Speak to our team</div>
               </div>
             </Link>
+
+            {/* Legal & Privacy Section */}
+            <div className="pt-4 mt-4 border-t border-neutral-200">
+              <div className="px-2 pb-2 text-xs font-semibold text-neutral-400 uppercase tracking-wide">
+                Legal & Privacy
+              </div>
+              
+              <Link
+                to="/privacy"
+                className="flex items-center gap-4 p-4 rounded-xl text-foreground hover:bg-primary/5 transition-all duration-200 group border border-transparent hover:border-primary/10"
+                onClick={() => {
+                  handleNavClick();
+                  setShowFullMenu(false);
+                }}
+              >
+                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center group-hover:bg-primary/20 transition-colors duration-200">
+                  <Shield className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <div className="font-semibold text-foreground">Privacy Policy</div>
+                  <div className="text-sm text-neutral-500">How we protect your data</div>
+                </div>
+              </Link>
+              
+              <Link
+                to="/terms"
+                className="flex items-center gap-4 p-4 rounded-xl text-foreground hover:bg-trust-blue/5 transition-all duration-200 group border border-transparent hover:border-trust-blue/10"
+                onClick={() => {
+                  handleNavClick();
+                  setShowFullMenu(false);
+                }}
+              >
+                <div className="w-10 h-10 bg-trust-blue/10 rounded-xl flex items-center justify-center group-hover:bg-trust-blue/20 transition-colors duration-200">
+                  <FileText className="w-5 h-5 text-trust-blue" />
+                </div>
+                <div>
+                  <div className="font-semibold text-foreground">Terms of Service</div>
+                  <div className="text-sm text-neutral-500">Our terms and conditions</div>
+                </div>
+              </Link>
+            </div>
           </div>
         </div>
       )}

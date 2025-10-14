@@ -8,7 +8,9 @@ import {
   Users, 
   HelpCircle,
   Phone,
-  LogOut
+  LogOut,
+  Shield,
+  FileText
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -163,9 +165,9 @@ const Navigation = () => {
         {/* Mobile Navigation */}
         <div className={cn(
           "md:hidden transition-all duration-300 overflow-y-auto",
-          isMenuOpen ? "max-h-[calc(100vh-64px)] pb-4" : "max-h-0 overflow-hidden"
+          isMenuOpen ? "max-h-[calc(100vh-64px)] pb-8" : "max-h-0 overflow-hidden"
         )}>
-          <div className="space-y-1 pt-2 px-4 pb-8">
+          <div className="space-y-1 pt-2 px-4 pb-12">
             {/* User Status Indicator */}
             {user && (
               <div className="mb-3 px-4 py-3 bg-primary/10 rounded-lg border border-primary/20">
@@ -250,17 +252,19 @@ const Navigation = () => {
               <div className="space-y-1">
                 <Link
                   to="/privacy"
-                  className="flex items-center gap-4 p-4 rounded-lg text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all min-h-[48px]"
+                  className="flex items-center gap-4 p-4 rounded-lg text-base font-medium text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all min-h-[52px]"
                   onClick={() => setIsMenuOpen(false)}
                 >
+                  <Shield className="w-6 h-6" />
                   Privacy Policy
                 </Link>
                 <Link
                   to="/terms"
-                  className="flex items-center gap-4 p-4 rounded-lg text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all min-h-[48px]"
+                  className="flex items-center gap-4 p-4 rounded-lg text-base font-medium text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all min-h-[52px]"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Terms & Conditions
+                  <FileText className="w-6 h-6" />
+                  Terms of Service
                 </Link>
               </div>
             </div>
