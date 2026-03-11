@@ -65,6 +65,8 @@ const QuoteHistory = () => {
       supabase.removeChannel(channel);
     };
   }, [user, authLoading]);
+
+  const fetchQuotes = async () => {
     if (!user) return;
 
     try {
