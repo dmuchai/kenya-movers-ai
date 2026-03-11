@@ -26,13 +26,16 @@ interface Quote {
 }
 
 const QuoteHistory = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [loading, setLoading] = useState(true);
   const [showReviewForm, setShowReviewForm] = useState<string | null>(null);
 
   useEffect(() => {
+    // Wait for auth to finish before acting
+    if (authLoading) return;
+
     if (!user) {
       setLoading(false);
       return;
@@ -61,9 +64,7 @@ const QuoteHistory = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user]);
-
-  const fetchQuotes = async () => {
+  }, [user, authLoading]);
     if (!user) return;
 
     try {
@@ -123,6 +124,27 @@ const QuoteHistory = () => {
         return 'bg-gray-100 text-gray-800 border-gray-300';
     }
   };
+
+  if (authLoading) {
+    return (
+      <>
+        <Navigation />
+        <div className="max-w-4xl mx-auto p-6 pt-24 pb-24 md:pb-8">
+          <div className="animate-pulse space-y-4">
+            {[1, 2, 3].map((i) => (
+            <Card key={i}>
+              <CardContent className="p-6">
+                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+              </CardContent>
+            </Card>
+          ))}
+          </div>
+        </div>
+        <BottomNavigation />
+      </>
+    );
+  }
 
   if (!user) {
     return (

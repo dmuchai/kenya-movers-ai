@@ -9,7 +9,7 @@ interface ProfileRow {
   user_id: string;
   email: string | null;
   full_name: string | null;
-  phone: string | null;
+  phone_number: string | null;
   role?: UserRole;
   created_at?: string;
   updated_at?: string;
@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               user_id: userId,
               email: null,
               full_name: null,
-              phone: null,
+              phone_number: null,
               role: 'customer'
             })
             .select()

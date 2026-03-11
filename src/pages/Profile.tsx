@@ -18,7 +18,7 @@ interface Profile {
 }
 
 export default function Profile() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -29,13 +29,16 @@ export default function Profile() {
   });
 
   useEffect(() => {
+    // Wait for auth to finish initializing before deciding
+    if (authLoading) return;
+
     if (user) {
       fetchProfile();
     } else {
-      // If no user, stop loading to show auth required message
+      // Auth is done loading and there's no user
       setLoading(false);
     }
-  }, [user]);
+  }, [user, authLoading]);
 
   const fetchProfile = async () => {
     try {
@@ -106,6 +109,19 @@ export default function Profile() {
       [field]: value
     }));
   };
+
+  // Show spinner while auth is initializing
+  if (authLoading) {
+    return (
+      <>
+        <Navigation />
+        <div className="flex justify-center items-center min-h-[400px] pt-20">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+        <BottomNavigation />
+      </>
+    );
+  }
 
   if (!user) {
     return (

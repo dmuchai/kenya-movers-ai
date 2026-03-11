@@ -35,7 +35,7 @@ interface QuoteResponse {
 }
 
 export default function MoverDashboard() {
-  const { user, profile } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const [availableQuotes, setAvailableQuotes] = useState<Quote[]>([]);
   const [myResponses, setMyResponses] = useState<QuoteResponse[]>([]);
@@ -46,6 +46,9 @@ export default function MoverDashboard() {
 
   useEffect(() => {
     const checkMoverStatus = async () => {
+      // Wait for auth to finish before acting
+      if (authLoading) return;
+
       if (user) {
         // Check if user has a mover profile
         const { data: moverData } = await supabase
@@ -63,13 +66,13 @@ export default function MoverDashboard() {
           setLoading(false);
         }
       } else {
-        // If no user, stop loading immediately
+        // Auth is done, no user
         setLoading(false);
       }
     };
     
     checkMoverStatus();
-  }, [user]);
+  }, [user, authLoading]);
 
   const fetchQuotes = async () => {
     try {
@@ -167,7 +170,7 @@ export default function MoverDashboard() {
     });
   };
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <>
         <Navigation />
