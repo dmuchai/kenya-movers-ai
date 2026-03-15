@@ -1,2 +1,5 @@
 [functions.places]
 verify_jwt = false
+
+[functions.distance-matrix]
+verify_jwt = false
