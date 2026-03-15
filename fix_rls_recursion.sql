@@ -56,6 +56,10 @@ DROP POLICY IF EXISTS "Users can insert own profile" ON public.profiles;
 DROP POLICY IF EXISTS "Enable read access for own profile" ON public.profiles;
 DROP POLICY IF EXISTS "Enable update for users based on user_id" ON public.profiles;
 DROP POLICY IF EXISTS "Enable insert for authenticated users only" ON public.profiles;
+-- Drop remaining old public-role policies visible in verification output
+DROP POLICY IF EXISTS "Users can view their own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Users can update their own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Users can insert their own profile" ON public.profiles;
 
 -- STEP 3: Ensure RLS is enabled
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
