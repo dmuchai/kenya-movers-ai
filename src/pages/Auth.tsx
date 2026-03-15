@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import Navigation from '@/components/Navigation';
 import BottomNavigation from '@/components/BottomNavigation';
 import { Truck, Users } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
@@ -27,14 +28,14 @@ const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const { user } = useAuth();
+
   useEffect(() => {
-    // Check if user is already logged in
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        navigate('/');
-      }
-    });
-  }, [navigate]);
+    // Redirect whenever auth state resolves to a logged-in user
+    if (user) {
+      navigate(redirectTo || '/', { replace: true });
+    }
+  }, [user, navigate, redirectTo]);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();

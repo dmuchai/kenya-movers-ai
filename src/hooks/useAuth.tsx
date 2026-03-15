@@ -183,12 +183,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // 2) Force-clear any lingering auth keys in browser storage synchronously
     clearSupabaseStoredSession();
 
-    // 3) Fire Supabase revocation without awaiting — best-effort, never blocks UI
+    // 3) Fire local-scope revocation without awaiting — best-effort, never blocks UI
+    // NOTE: Do NOT fire global scope in the background; it resolves asynchronously and
+    // can trigger onAuthStateChange(SIGNED_OUT) after a subsequent sign-in, logging the
+    // new session out immediately.
     supabase.auth.signOut({ scope: 'local' }).catch((err) =>
       console.warn('Local sign out warning (non-blocking):', err)
-    );
-    supabase.auth.signOut({ scope: 'global' }).catch((err) =>
-      console.warn('Global sign out warning (non-blocking):', err)
     );
 
     console.log('Sign out completed (state cleared immediately)');
