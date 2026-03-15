@@ -66,7 +66,7 @@ const BottomNavigation = () => {
       {showFullMenu && !user && (
         <div className="fixed inset-0 bg-black/50 z-40 md:hidden animate-in fade-in duration-200" onClick={() => setShowFullMenu(false)}>
           <div 
-            {...swipeHandlers.ref}
+            ref={swipeHandlers.ref as any}
             className="fixed bottom-20 left-4 right-4 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-6 space-y-4 animate-in slide-in-from-bottom-4 duration-300 border border-white/20"
           >
             {/* Swipe indicator */}

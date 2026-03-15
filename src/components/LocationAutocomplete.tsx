@@ -86,7 +86,14 @@ export default function LocationAutocomplete({ label, placeholder, value, onChan
       <div className="relative">
         <Input
           value={query !== "" ? query : displayText}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => {
+            const nextQuery = e.target.value;
+            setQuery(nextQuery);
+
+            if (value && nextQuery !== displayText) {
+              onChange(null);
+            }
+          }}
           onFocus={() => setOpen(true)}
           placeholder={placeholder || "Search address, estate or landmark"}
           className="h-11 pl-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20"

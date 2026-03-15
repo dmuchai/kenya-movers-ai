@@ -737,15 +737,15 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label className="mb-2 block">Number of Beds</Label>
-                <Input type="number" min={0} value={formData.inventory.beds}
-                  onChange={(e) => updateInventory("beds", Number(e.target.value))} 
+                <Input type="number" min={0} value={formData.inventory.beds || ""}
+                  onChange={(e) => updateInventory("beds", e.target.value === "" ? 0 : Number(e.target.value))} 
                   placeholder="e.g., 2"
                 />
               </div>
               <div>
                 <Label className="mb-2 block">Number of Wardrobes</Label>
-                <Input type="number" min={0} value={formData.inventory.wardrobe}
-                  onChange={(e) => updateInventory("wardrobe", Number(e.target.value))} 
+                <Input type="number" min={0} value={formData.inventory.wardrobe || ""}
+                  onChange={(e) => updateInventory("wardrobe", e.target.value === "" ? 0 : Number(e.target.value))} 
                   placeholder="e.g., 3"
                 />
               </div>
@@ -791,8 +791,8 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
                 {formData.inventory.diningSet && (
                   <div className="pl-6">
                     <Label className="mb-2 block text-sm">Number of Chairs</Label>
-                    <Input type="number" min={0} max={20} value={formData.inventory.diningChairs}
-                      onChange={(e) => updateInventory("diningChairs", Number(e.target.value))} 
+                    <Input type="number" min={0} max={20} value={formData.inventory.diningChairs || ""}
+                      onChange={(e) => updateInventory("diningChairs", e.target.value === "" ? 0 : Number(e.target.value))} 
                       placeholder="e.g., 6"
                     />
                   </div>
@@ -809,8 +809,8 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
                 {formData.inventory.fridge && (
                   <div className="pl-6">
                     <Label className="mb-2 block text-sm">Fridge Capacity (liters)</Label>
-                    <Input type="number" min={0} value={formData.inventory.fridgeLiters}
-                      onChange={(e) => updateInventory("fridgeLiters", Number(e.target.value))} 
+                    <Input type="number" min={0} value={formData.inventory.fridgeLiters || ""}
+                      onChange={(e) => updateInventory("fridgeLiters", e.target.value === "" ? 0 : Number(e.target.value))} 
                       placeholder="e.g., 200"
                     />
                   </div>
@@ -827,8 +827,8 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
                 {formData.inventory.tv && (
                   <div className="pl-6">
                     <Label className="mb-2 block text-sm">TV Size (inches)</Label>
-                    <Input type="number" min={0} value={formData.inventory.tvInches}
-                      onChange={(e) => updateInventory("tvInches", Number(e.target.value))} 
+                    <Input type="number" min={0} value={formData.inventory.tvInches || ""}
+                      onChange={(e) => updateInventory("tvInches", e.target.value === "" ? 0 : Number(e.target.value))} 
                       placeholder="e.g., 55"
                     />
                   </div>
@@ -1127,7 +1127,7 @@ const QuoteForm = ({ onSubmit }: QuoteFormProps) => {
           </CardHeader>
           
           {/* Enhanced form content with swipe navigation */}
-          <CardContent className="p-6" {...swipeHandlers.ref}>
+          <CardContent className="p-6" ref={swipeHandlers.ref as any}>
             {/* Swipe hint indicator */}
             <div className="text-center mb-4 md:hidden">
               <div className="text-xs text-neutral-400 font-medium">

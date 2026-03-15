@@ -50,7 +50,7 @@ export default function FindMovers() {
   const { toast } = useToast();
   const [searchLocation, setSearchLocation] = useState<LocationValue | null>(null);
   const [searchRadius, setSearchRadius] = useState(20);
-  const [selectedVehicleTypes, setSelectedVehicleTypes] = useState<string[]>([]);
+  const [selectedVehicleType, setSelectedVehicleType] = useState<string | null>(null);
   const [movers, setMovers] = useState<NearbyMover[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
@@ -65,13 +65,22 @@ export default function FindMovers() {
       return;
     }
 
+    if (!selectedVehicleType) {
+      toast({
+        title: 'Vehicle Type Required',
+        description: 'Please select a vehicle type before searching',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     setIsSearching(true);
     try {
       const results = await locationService.findNearbyMovers(
         searchLocation.location.lat,
         searchLocation.location.lng,
         searchRadius,
-        selectedVehicleTypes.length > 0 ? selectedVehicleTypes : undefined
+        selectedVehicleType ? [selectedVehicleType] : undefined
       );
 
       // Validate response has expected structure
@@ -134,11 +143,7 @@ export default function FindMovers() {
   };
 
   const toggleVehicleType = (type: string) => {
-    setSelectedVehicleTypes(prev =>
-      prev.includes(type)
-        ? prev.filter(t => t !== type)
-        : [...prev, type]
-    );
+    setSelectedVehicleType((prev) => (prev === type ? null : type));
   };
 
   return (
@@ -168,16 +173,27 @@ export default function FindMovers() {
                 value={searchLocation}
                 onChange={setSearchLocation}
               />
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full mt-2"
-                onClick={handleUseCurrentLocation}
-                disabled={isLoadingLocation}
-              >
-                <Navigation className="mr-2 h-4 w-4" />
-                {isLoadingLocation ? 'Getting Location...' : 'Use Current Location'}
-              </Button>
+              <div className="grid grid-cols-2 gap-2 mt-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  onClick={handleUseCurrentLocation}
+                  disabled={isLoadingLocation}
+                >
+                  <Navigation className="mr-2 h-4 w-4" />
+                  {isLoadingLocation ? 'Getting...' : 'Use Current'}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => setSearchLocation(null)}
+                  disabled={isLoadingLocation || !searchLocation}
+                >
+                  Clear Location
+                </Button>
+              </div>
             </div>
 
             {/* Search Radius */}
@@ -217,19 +233,20 @@ export default function FindMovers() {
                   >
                     <Checkbox
                       id={`vehicle-${vehicle.value}`}
-                      checked={selectedVehicleTypes.includes(vehicle.value)}
+                      checked={selectedVehicleType === vehicle.value}
                       onCheckedChange={() => toggleVehicleType(vehicle.value)}
                     />
                     <span className="text-sm">{vehicle.label}</span>
                   </label>
                 ))}
               </div>
+              <p className="text-xs text-muted-foreground mt-2">Select one vehicle type to refine results.</p>
             </div>
 
             <Button
               className="w-full"
               onClick={handleSearch}
-              disabled={isSearching || !searchLocation}
+              disabled={isSearching || !searchLocation || !selectedVehicleType}
             >
               {isSearching ? 'Searching...' : 'Search Movers'}
             </Button>

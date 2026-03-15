@@ -75,18 +75,8 @@ const FormProgress = ({
     { title: "Services", description: "Extra Services" }
   ];
 
-  const progress = (currentStep / totalSteps) * 100;
-
   return (
     <div className={cn("w-full", className)}>
-      {/* Progress bar */}
-      <div className="relative w-full h-2 bg-gray-200 rounded-full mb-6 overflow-hidden">
-        <div 
-          className="absolute top-0 left-0 h-full bg-gradient-to-r from-primary to-primary/80 rounded-full transition-all duration-500 ease-out"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
-
       {/* Steps */}
       <div className="flex justify-between items-start relative">
         {/* Connection lines */}

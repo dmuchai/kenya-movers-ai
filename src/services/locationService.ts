@@ -122,8 +122,31 @@ export const locationService = {
     latitude: number,
     longitude: number
   ): Promise<string> => {
-    // This would use Google Maps Geocoding API
-    // For now, return coordinates as string
-    return `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`,
+        {
+          signal: controller.signal,
+          headers: {
+            Accept: 'application/json'
+          }
+        }
+      );
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`Reverse geocode failed with status ${response.status}`);
+      }
+
+      const result = await response.json();
+      return result?.display_name || `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+    } catch (error) {
+      console.warn('Reverse geocoding failed, using coordinates fallback', error);
+      return `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+    }
   }
 };

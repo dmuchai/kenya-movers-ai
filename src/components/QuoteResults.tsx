@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -22,7 +22,7 @@ import {
 import { cn } from "@/lib/utils";
 import { sendWhatsAppMessage } from '@/services/api';
 import { SkeletonQuoteCard, SkeletonMoverProfile } from "@/components/ui/skeleton";
-import { LoadingButton, ComponentLoader } from "@/components/ui/loading";
+import { LoadingButton } from "@/components/ui/loading";
 
 interface QuoteResultsProps {
   quoteData: any;
@@ -34,6 +34,7 @@ interface QuoteResultsProps {
 const QuoteResults = ({ quoteData, onBookMover, onCompare, loading = false }: QuoteResultsProps) => {
   const [savedMovers, setSavedMovers] = useState<string[]>([]);
   const [sendingMessage, setSendingMessage] = useState<string | null>(null);
+  const [showComparison, setShowComparison] = useState(false);
 
   const aiEstimate = quoteData.aiEstimate?.total || 0;
   const breakdown = quoteData.aiEstimate?.breakdown || [];
@@ -85,6 +86,28 @@ const QuoteResults = ({ quoteData, onBookMover, onCompare, loading = false }: Qu
       badges: ["Established 2010"]
     }
   ];
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('saved-movers');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          setSavedMovers(parsed);
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to load saved movers from storage', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('saved-movers', JSON.stringify(savedMovers));
+    } catch (error) {
+      console.warn('Failed to persist saved movers', error);
+    }
+  }, [savedMovers]);
 
   const toggleSaved = (moverId: string) => {
     setSavedMovers(prev => 
@@ -184,11 +207,13 @@ const QuoteResults = ({ quoteData, onBookMover, onCompare, loading = false }: Qu
                 const phone = window.prompt('Enter WhatsApp number (E.164, e.g. 2547XXXXXXXX)');
                 if (!phone) return;
                 try {
+                  const normalizedPhone = phone.replace(/[^\d]/g, '').replace(/^0/, '254');
                   const msg = `Moving estimate: KSH ${aiEstimate.toLocaleString()} for ${quoteData.propertySize} ${quoteData.fromLocation} -> ${quoteData.toLocation}${distanceText ? ' ('+distanceText+')' : ''}.`;
-                  await sendWhatsAppMessage({ to: phone, text: msg });
+                  await sendWhatsAppMessage({ to: normalizedPhone, text: msg });
                   alert('WhatsApp message sent');
                 } catch (e) {
-                  alert('Failed to send WhatsApp message');
+                  const fallbackPhone = phone.replace(/[^\d]/g, '').replace(/^0/, '254');
+                  window.open(`https://wa.me/${fallbackPhone}?text=${encodeURIComponent(`Moving estimate: KSH ${aiEstimate.toLocaleString()} for ${quoteData.propertySize} ${quoteData.fromLocation} -> ${quoteData.toLocation}${distanceText ? ' ('+distanceText+')' : ''}.`)}`, '_blank');
                   console.error(e);
                 }
               }}
@@ -200,17 +225,58 @@ const QuoteResults = ({ quoteData, onBookMover, onCompare, loading = false }: Qu
         </CardContent>
       </Card>
 
+      {savedMovers.length > 0 && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="text-lg">Saved Movers</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {savedMovers.map((moverId) => {
+                const mover = movingCompanies.find((company) => company.id === moverId);
+                if (!mover) return null;
+                return (
+                  <Badge key={moverId} variant="secondary" className="px-3 py-1">
+                    {mover.name}
+                  </Badge>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Company Quotes Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-2xl font-bold">Company Quotes</h2>
           <p className="text-muted-foreground">Compare offers from verified movers</p>
         </div>
-        <Button variant="outline" onClick={onCompare} className="flex items-center gap-2">
+        <Button variant="outline" onClick={() => { setShowComparison((prev) => !prev); onCompare(); }} className="flex items-center gap-2">
           <Award className="w-4 h-4" />
-          Compare All
+          {showComparison ? 'Hide Comparison' : 'Compare All'}
         </Button>
       </div>
+
+      {showComparison && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="text-lg">Comparison View</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-3 md:grid-cols-3">
+              {movingCompanies.map((company) => (
+                <div key={`compare-${company.id}`} className="rounded-lg border p-4">
+                  <p className="font-semibold">{company.name}</p>
+                  <p className="text-sm text-muted-foreground">Rating: {company.rating} ({company.reviews})</p>
+                  <p className="text-sm text-muted-foreground">Duration: {company.duration}</p>
+                  <p className="mt-2 text-lg font-bold text-primary">KSH {company.price.toLocaleString()}</p>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Company Cards */}
       <div className="space-y-4">
@@ -391,7 +457,7 @@ const QuoteResults = ({ quoteData, onBookMover, onCompare, loading = false }: Qu
             <Users className="w-4 h-4 mr-2" />
             Talk to Expert
           </Button>
-          <Button onClick={onCompare}>
+          <Button onClick={() => { setShowComparison(true); onCompare(); }}>
             <Award className="w-4 h-4 mr-2" />
             Compare All Quotes
           </Button>

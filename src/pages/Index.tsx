@@ -40,10 +40,7 @@ const Index = () => {
   };
 
   const handleCompare = () => {
-    toast({
-      title: "Comparison View",
-      description: "Compare all quotes side by side.",
-    });
+    return;
   };
 
   const startQuote = () => {
