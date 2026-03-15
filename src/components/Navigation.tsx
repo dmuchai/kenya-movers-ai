@@ -38,25 +38,14 @@ const Navigation = () => {
     setIsSigningOut(true);
     console.log('handleSignOut called');
     
-    // Set a timeout as failsafe - if sign out takes too long, force redirect anyway
-    const timeoutId = setTimeout(() => {
-      console.warn('Sign out timeout - forcing redirect');
-      navigate('/', { replace: true });
-    }, 3000); // 3 second timeout
-    
     try {
       await signOut();
-      console.log('Navigation: Sign out completed, redirecting to home...');
-      clearTimeout(timeoutId);
-      setIsMenuOpen(false);
-      navigate('/', { replace: true });
     } catch (error) {
-      console.error('Navigation: Sign out failed:', error);
-      clearTimeout(timeoutId);
-      // Still redirect even if sign out failed
-      navigate('/', { replace: true });
+      console.error('Navigation: Sign out error (non-fatal):', error);
     } finally {
       setIsSigningOut(false);
+      setIsMenuOpen(false);
+      navigate('/', { replace: true });
     }
   };
 

@@ -175,33 +175,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const signOut = async () => {
-    try {
-      console.log('Signing out...');
-      // 1) Always clear local session first so UI reliably logs out immediately
-      const { error: localSignOutError } = await supabase.auth.signOut({ scope: 'local' });
-      if (localSignOutError) {
-        console.error('Local sign out error:', localSignOutError);
-      }
+    console.log('Signing out...');
 
-      // 2) Force-clear any lingering auth keys in browser storage
-      clearSupabaseStoredSession();
+    // 1) Clear React auth state immediately — UI must not wait for network
+    clearAuthState();
 
-      // 3) Try global revocation as best effort (do not block logout UX)
-      const { error: globalSignOutError } = await supabase.auth.signOut({ scope: 'global' });
-      if (globalSignOutError) {
-        console.warn('Global sign out warning:', globalSignOutError);
-      }
+    // 2) Force-clear any lingering auth keys in browser storage synchronously
+    clearSupabaseStoredSession();
 
-      console.log('Sign out completed');
+    // 3) Fire Supabase revocation without awaiting — best-effort, never blocks UI
+    supabase.auth.signOut({ scope: 'local' }).catch((err) =>
+      console.warn('Local sign out warning (non-blocking):', err)
+    );
+    supabase.auth.signOut({ scope: 'global' }).catch((err) =>
+      console.warn('Global sign out warning (non-blocking):', err)
+    );
 
-      // Always clear local React state regardless of API success
-      clearAuthState();
-    } catch (error) {
-      console.error('Failed to sign out:', error);
-      clearSupabaseStoredSession();
-      // Force clear local state even if API call fails
-      clearAuthState();
-    }
+    console.log('Sign out completed (state cleared immediately)');
   };
 
   const isAdmin = profile?.role === 'admin' || profile?.role === 'super_admin';
