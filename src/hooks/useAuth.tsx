@@ -33,6 +33,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [profile, setProfile] = useState<ProfileRow | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const withTimeout = async <T,>(promise: Promise<T>, timeoutMs = 8000): Promise<T> => {
+    return new Promise((resolve, reject) => {
+      const timeoutId = setTimeout(() => {
+        reject(new Error('Request timeout. Please try again.'));
+      }, timeoutMs);
+
+      promise
+        .then((result) => {
+          clearTimeout(timeoutId);
+          resolve(result);
+        })
+        .catch((error) => {
+          clearTimeout(timeoutId);
+          reject(error);
+        });
+    });
+  };
+
   const clearAuthState = () => {
     setUser(null);
     setSession(null);
@@ -65,38 +83,47 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const fetchProfile = async (userId: string) => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', userId)
-        .single();
+      const { data, error } = await withTimeout(
+        supabase
+          .from('profiles')
+          .select('*')
+          .eq('user_id', userId)
+          .maybeSingle(),
+        8000
+      );
 
       if (error) {
         console.error('Profile fetch error:', error);
-        // If profile doesn't exist, create one
-        if (error.code === 'PGRST116') {
-          console.log('Profile not found, creating...');
-          const { data: newProfile, error: createError } = await supabase
+        throw error;
+      }
+
+      if (!data) {
+        console.log('Profile not found, creating...');
+        const { data: newProfile, error: createError } = await withTimeout(
+          supabase
             .from('profiles')
-            .insert({
-              user_id: userId,
-              email: null,
-              full_name: null,
-              phone_number: null,
-              role: 'customer'
-            })
+            .upsert(
+              {
+                user_id: userId,
+                email: null,
+                full_name: null,
+                phone_number: null,
+                role: 'customer'
+              },
+              { onConflict: 'user_id' }
+            )
             .select()
-            .single();
-          
-          if (createError) {
-            console.error('Failed to create profile:', createError);
-            setProfile(null);
-          } else {
-            setProfile(newProfile as ProfileRow);
-          }
-        } else {
-          throw error;
+            .single(),
+          8000
+        );
+
+        if (createError) {
+          console.error('Failed to create profile:', createError);
+          setProfile(null);
+          return;
         }
+
+        setProfile(newProfile as ProfileRow);
       } else {
         setProfile(data as ProfileRow);
       }
@@ -115,10 +142,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     let mounted = true;
     let timeoutId: NodeJS.Timeout;
+    let authResolved = false;
+
+    const applyAuthState = (nextSession: Session | null) => {
+      if (!mounted) return;
+
+      authResolved = true;
+      clearTimeout(timeoutId);
+
+      console.log('Applying auth state:', nextSession ? 'Authenticated' : 'Not authenticated');
+      setSession(nextSession);
+      setUser(nextSession?.user ?? null);
+      setLoading(false);
+
+      if (nextSession?.user) {
+        void fetchProfile(nextSession.user.id);
+      } else {
+        setProfile(null);
+      }
+    };
 
     // Failsafe: Force loading to false after 5 seconds
     timeoutId = setTimeout(() => {
-      if (mounted && loading) {
+      if (mounted && !authResolved) {
         console.warn('Auth loading timeout - forcing to false');
         setLoading(false);
       }
@@ -127,22 +173,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Check for existing session first
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!mounted) return;
-      
+
       console.log('Auth session check:', session ? 'Authenticated' : 'Not authenticated');
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        await fetchProfile(session.user.id);
-      } else {
-        setProfile(null);
-      }
-      
-      setLoading(false);
-      clearTimeout(timeoutId);
+      applyAuthState(session);
     }).catch((error) => {
       console.error('Session check error:', error);
       if (mounted) {
+        authResolved = true;
         setLoading(false);
         clearTimeout(timeoutId);
       }
@@ -152,18 +189,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (!mounted) return;
-        
-        console.log('Auth state change:', event, session ? 'Authenticated' : 'Not authenticated');
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          await fetchProfile(session.user.id);
-        } else {
-          setProfile(null);
-        }
 
-        setLoading(false);
+        console.log('Auth state change:', event, session ? 'Authenticated' : 'Not authenticated');
+        applyAuthState(session);
       }
     );
 

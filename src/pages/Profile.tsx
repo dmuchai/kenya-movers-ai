@@ -18,7 +18,7 @@ interface Profile {
 }
 
 export default function Profile() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, profile: authProfile, loading: authLoading, refreshProfile } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -50,13 +50,23 @@ export default function Profile() {
     // Wait for auth to finish initializing before deciding
     if (authLoading) return;
 
+    if (authProfile) {
+      setProfile({
+        full_name: authProfile.full_name || '',
+        phone_number: authProfile.phone_number || '',
+        preferred_contact_method: 'email'
+      });
+      setLoading(false);
+      return;
+    }
+
     if (user) {
       fetchProfile();
     } else {
       // Auth is done loading and there's no user
       setLoading(false);
     }
-  }, [user, authLoading]);
+  }, [user, authLoading, authProfile]);
 
   const fetchProfile = async () => {
     try {
@@ -107,6 +117,8 @@ export default function Profile() {
         });
 
       if (error) throw error;
+
+      await refreshProfile();
 
       toast({
         title: "Success",
