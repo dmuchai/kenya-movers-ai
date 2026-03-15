@@ -44,25 +44,56 @@ export default function MoverDashboard() {
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
   const [showResponseForm, setShowResponseForm] = useState(false);
 
+  const withTimeout = async <T,>(promise: Promise<T>, timeoutMs = 10000): Promise<T> => {
+    return new Promise((resolve, reject) => {
+      const timeoutId = setTimeout(() => {
+        reject(new Error('Request timeout. Please try again.'));
+      }, timeoutMs);
+
+      promise
+        .then((result) => {
+          clearTimeout(timeoutId);
+          resolve(result);
+        })
+        .catch((error) => {
+          clearTimeout(timeoutId);
+          reject(error);
+        });
+    });
+  };
+
   useEffect(() => {
     const checkMoverStatus = async () => {
       // Wait for auth to finish before acting
       if (authLoading) return;
 
       if (user) {
-        // Check if user has a mover profile
-        const { data: moverData } = await supabase
-          .from('movers')
-          .select('id')
-          .eq('user_id', user.id)
-          .maybeSingle();
-        
-        setIsMover(!!moverData);
-        
-        if (moverData) {
-          fetchQuotes();
-          fetchMyResponses();
-        } else {
+        try {
+          // Check if user has a mover profile
+          const { data: moverData } = await withTimeout(
+            supabase
+              .from('movers')
+              .select('id')
+              .eq('user_id', user.id)
+              .maybeSingle(),
+            10000
+          );
+
+          setIsMover(!!moverData);
+
+          if (moverData) {
+            fetchQuotes();
+            fetchMyResponses();
+          } else {
+            setLoading(false);
+          }
+        } catch (error) {
+          console.error('Error checking mover status:', error);
+          toast({
+            title: 'Error',
+            description: 'Failed to verify mover account status',
+            variant: 'destructive'
+          });
           setLoading(false);
         }
       } else {
@@ -76,11 +107,14 @@ export default function MoverDashboard() {
 
   const fetchQuotes = async () => {
     try {
-      const { data, error } = await supabase
-        .from('quotes')
-        .select('*')
-        .eq('status', 'pending')
-        .order('created_at', { ascending: false });
+      const { data, error } = await withTimeout(
+        supabase
+          .from('quotes')
+          .select('*')
+          .eq('status', 'pending')
+          .order('created_at', { ascending: false }),
+        10000
+      );
 
       if (error) throw error;
       setAvailableQuotes(data || []);
@@ -98,22 +132,28 @@ export default function MoverDashboard() {
   const fetchMyResponses = async () => {
     try {
       // First get the mover profile to filter responses
-      const { data: moverData } = await supabase
-        .from('movers')
-        .select('id')
-        .eq('user_id', user?.id)
-        .maybeSingle();
+      const { data: moverData } = await withTimeout(
+        supabase
+          .from('movers')
+          .select('id')
+          .eq('user_id', user?.id)
+          .maybeSingle(),
+        10000
+      );
 
       if (!moverData) {
         setMyResponses([]);
         return;
       }
 
-      const { data, error } = await supabase
-        .from('quote_responses')
-        .select('*')
-        .eq('mover_id', moverData.id)
-        .order('created_at', { ascending: false });
+      const { data, error } = await withTimeout(
+        supabase
+          .from('quote_responses')
+          .select('*')
+          .eq('mover_id', moverData.id)
+          .order('created_at', { ascending: false }),
+        10000
+      );
 
       if (error) throw error;
 

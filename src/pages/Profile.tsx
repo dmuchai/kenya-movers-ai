@@ -28,6 +28,24 @@ export default function Profile() {
     preferred_contact_method: 'email'
   });
 
+  const withTimeout = async <T,>(promise: Promise<T>, timeoutMs = 10000): Promise<T> => {
+    return new Promise((resolve, reject) => {
+      const timeoutId = setTimeout(() => {
+        reject(new Error('Request timeout. Please try again.'));
+      }, timeoutMs);
+
+      promise
+        .then((result) => {
+          clearTimeout(timeoutId);
+          resolve(result);
+        })
+        .catch((error) => {
+          clearTimeout(timeoutId);
+          reject(error);
+        });
+    });
+  };
+
   useEffect(() => {
     // Wait for auth to finish initializing before deciding
     if (authLoading) return;
@@ -42,11 +60,14 @@ export default function Profile() {
 
   const fetchProfile = async () => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('full_name, phone_number, preferred_contact_method')
-        .eq('user_id', user?.id)
-        .single();
+      const { data, error } = await withTimeout(
+        supabase
+          .from('profiles')
+          .select('full_name, phone_number, preferred_contact_method')
+          .eq('user_id', user?.id)
+          .single(),
+        10000
+      );
 
       if (error && error.code !== 'PGRST116') {
         throw error;

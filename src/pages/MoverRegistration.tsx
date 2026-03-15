@@ -91,6 +91,24 @@ export default function MoverRegistration() {
   const [hasExistingRegistration, setHasExistingRegistration] = useState(false);
   const [checkingRegistration, setCheckingRegistration] = useState(true);
 
+  const withTimeout = async <T,>(promise: Promise<T>, timeoutMs = 10000): Promise<T> => {
+    return new Promise((resolve, reject) => {
+      const timeoutId = setTimeout(() => {
+        reject(new Error('Request timeout. Please try again.'));
+      }, timeoutMs);
+
+      promise
+        .then((result) => {
+          clearTimeout(timeoutId);
+          resolve(result);
+        })
+        .catch((error) => {
+          clearTimeout(timeoutId);
+          reject(error);
+        });
+    });
+  };
+
   const progress = (currentStep / STEPS.length) * 100;
   const CurrentStepComponent = STEPS[currentStep - 1].component;
 
@@ -103,11 +121,14 @@ export default function MoverRegistration() {
       }
 
       try {
-        const { data: moverData, error } = await supabase
-          .from('movers')
-          .select('id, verification_status')
-          .eq('user_id', user.id)
-          .maybeSingle();
+        const { data: moverData, error } = await withTimeout(
+          supabase
+            .from('movers')
+            .select('id, verification_status')
+            .eq('user_id', user.id)
+            .maybeSingle(),
+          10000
+        );
 
         if (error && error.code !== 'PGRST116') {
           console.error('Error checking mover registration:', error);

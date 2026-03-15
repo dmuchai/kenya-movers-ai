@@ -33,6 +33,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [profile, setProfile] = useState<ProfileRow | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const clearAuthState = () => {
+    setUser(null);
+    setSession(null);
+    setProfile(null);
+    setLoading(false);
+  };
+
   const fetchProfile = async (userId: string) => {
     try {
       const { data, error } = await supabase
@@ -132,6 +139,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         } else {
           setProfile(null);
         }
+
+        setLoading(false);
       }
     );
 
@@ -145,27 +154,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signOut = async () => {
     try {
       console.log('Signing out...');
-      const { error } = await supabase.auth.signOut();
-      
-      if (error) {
-        console.error('Sign out error:', error);
-        // Don't throw - just log and continue
+      const { error: globalSignOutError } = await supabase.auth.signOut({ scope: 'global' });
+
+      if (globalSignOutError) {
+        console.error('Global sign out error:', globalSignOutError);
+
+        // Ensure local session is removed even if global revocation fails
+        const { error: localSignOutError } = await supabase.auth.signOut({ scope: 'local' });
+        if (localSignOutError) {
+          console.error('Local sign out fallback error:', localSignOutError);
+        } else {
+          console.log('Local sign out fallback successful');
+        }
       } else {
         console.log('Sign out successful');
       }
-      
-      // Always clear local state regardless of API success
-      setUser(null);
-      setSession(null);
-      setProfile(null);
-      setLoading(false);
+
+      // Always clear local React state regardless of API success
+      clearAuthState();
     } catch (error) {
       console.error('Failed to sign out:', error);
       // Force clear local state even if API call fails
-      setUser(null);
-      setSession(null);
-      setProfile(null);
-      setLoading(false);
+      clearAuthState();
     }
   };
 
