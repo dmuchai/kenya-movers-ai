@@ -1,6 +1,13 @@
 // Supabase Edge Function: places
 // Google Places API integration for location autocomplete and details
 
+// Deno global — declared here so the project TypeScript config doesn't error;
+// at runtime this is provided by the Deno runtime on Supabase Edge Functions.
+declare const Deno: {
+  serve: (handler: (req: Request) => Promise<Response> | Response) => void;
+  env: { get: (key: string) => string | undefined };
+};
+
 export interface AutocompleteRequest {
   action: 'autocomplete'
   input: string
@@ -23,7 +30,7 @@ const corsHeaders = {
 
 const jsonHeaders = { ...corsHeaders, 'Content-Type': 'application/json' }
 
-Deno.serve(async (req) => {
+Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
   if (req.method !== 'POST') return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers: jsonHeaders })
 
@@ -276,7 +283,8 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({ error: 'Invalid action' }), { status: 400, headers: jsonHeaders })
 
   } catch (error) {
-    console.error('Places API Error:', error)
-    return new Response(JSON.stringify({ error: 'Failed to process request', details: error.message }), { status: 500, headers: jsonHeaders })
+    const err = error instanceof Error ? error : new Error(String(error))
+    console.error('Places API Error:', err)
+    return new Response(JSON.stringify({ error: 'Failed to process request', details: err.message }), { status: 500, headers: jsonHeaders })
   }
 })
