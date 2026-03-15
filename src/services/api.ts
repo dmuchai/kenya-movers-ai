@@ -127,15 +127,61 @@ export async function invokeAIQuoteEstimation(input: any & { distance_meters?: n
 export interface PlaceSuggestion { description: string; place_id: string }
 export interface PlaceDetails { place_id: string; description: string; formatted_address: string; location: { lat: number; lng: number } }
 
-export async function placesAutocomplete(input: string) {
-  const { data, error } = await supabase.functions.invoke('places', {
-    body: { action: 'autocomplete', input }
-  })
-  if (error) throw error
-  return (data?.predictions || []) as PlaceSuggestion[]
+// Kenya bounding box for Photon / OSM fallback
+const KE_BBOX = '33.9,-4.7,41.9,4.6' // minLon,minLat,maxLon,maxLat
+
+async function photonAutocomplete(input: string): Promise<PlaceSuggestion[]> {
+  try {
+    const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(input)}&lang=en&limit=5&bbox=${KE_BBOX}`
+    const resp = await fetch(url, { signal: AbortSignal.timeout(6000) })
+    if (!resp.ok) return []
+    const json = await resp.json()
+    const features: any[] = json.features || []
+    return features.map((f) => {
+      const p = f.properties || {}
+      const parts = [p.name, p.street, p.city, p.county, p.country].filter(Boolean)
+      const description = parts.join(', ')
+      const [lng, lat] = f.geometry?.coordinates || [0, 0]
+      // Encode lat/lng/address into a photon: place_id so getPlaceDetails needs no extra call
+      const payload = btoa(JSON.stringify({ lat, lng, description }))
+      return { description, place_id: `photon_${payload}` }
+    })
+  } catch {
+    return []
+  }
 }
 
-export async function getPlaceDetails(place_id: string) {
+export async function placesAutocomplete(input: string): Promise<PlaceSuggestion[]> {
+  // 1. Try Google Places via edge function
+  try {
+    const { data, error } = await supabase.functions.invoke('places', {
+      body: { action: 'autocomplete', input }
+    })
+    if (!error) {
+      const predictions = (data?.predictions || []) as PlaceSuggestion[]
+      if (predictions.length > 0) return predictions
+    }
+  } catch {
+    // fall through to OSM
+  }
+
+  // 2. Fallback: Photon / OpenStreetMap (free, no API key)
+  return photonAutocomplete(input)
+}
+
+export async function getPlaceDetails(place_id: string): Promise<PlaceDetails> {
+  // Photon results have all details encoded in the place_id — no extra request needed
+  if (place_id.startsWith('photon_')) {
+    try {
+      const payload = place_id.slice('photon_'.length)
+      const { lat, lng, description } = JSON.parse(atob(payload))
+      return { place_id, description, formatted_address: description, location: { lat, lng } }
+    } catch {
+      throw new Error('Failed to decode Photon place_id')
+    }
+  }
+
+  // Google place_id — call edge function
   const { data, error } = await supabase.functions.invoke('places', {
     body: { action: 'details', place_id }
   })
