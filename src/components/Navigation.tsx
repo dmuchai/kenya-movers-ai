@@ -41,22 +41,23 @@ const Navigation = () => {
     // Set a timeout as failsafe - if sign out takes too long, force redirect anyway
     const timeoutId = setTimeout(() => {
       console.warn('Sign out timeout - forcing redirect');
-      window.location.href = '/';
+      navigate('/', { replace: true });
     }, 3000); // 3 second timeout
     
     try {
       await signOut();
       console.log('Navigation: Sign out completed, redirecting to home...');
       clearTimeout(timeoutId);
-      // Force page reload to clear all state
-      window.location.href = '/';
+      setIsMenuOpen(false);
+      navigate('/', { replace: true });
     } catch (error) {
       console.error('Navigation: Sign out failed:', error);
       clearTimeout(timeoutId);
       // Still redirect even if sign out failed
-      window.location.href = '/';
+      navigate('/', { replace: true });
+    } finally {
+      setIsSigningOut(false);
     }
-    // Note: finally block not needed since window.location.href will reload the page
   };
 
   const navigationItems = [
@@ -155,7 +156,10 @@ const Navigation = () => {
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden min-h-[44px] min-w-[44px]" // Improved touch target
+            className={cn(
+              "md:hidden min-h-[44px] min-w-[44px]",
+              !user && "hidden"
+            )} // Improved touch target
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}

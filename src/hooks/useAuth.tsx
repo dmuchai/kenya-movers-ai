@@ -40,6 +40,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setLoading(false);
   };
 
+  const clearSupabaseStoredSession = () => {
+    try {
+      const keysToRemove: string[] = [];
+
+      for (let index = 0; index < localStorage.length; index += 1) {
+        const key = localStorage.key(index);
+        if (!key) continue;
+
+        const isSupabaseAuthKey =
+          key.startsWith('sb-') &&
+          (key.includes('auth-token') || key.includes('code-verifier') || key.endsWith('-user'));
+
+        if (isSupabaseAuthKey) {
+          keysToRemove.push(key);
+        }
+      }
+
+      keysToRemove.forEach((key) => localStorage.removeItem(key));
+    } catch (error) {
+      console.warn('Failed to clear Supabase local session storage:', error);
+    }
+  };
+
   const fetchProfile = async (userId: string) => {
     try {
       const { data, error } = await supabase
@@ -154,26 +177,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signOut = async () => {
     try {
       console.log('Signing out...');
-      const { error: globalSignOutError } = await supabase.auth.signOut({ scope: 'global' });
-
-      if (globalSignOutError) {
-        console.error('Global sign out error:', globalSignOutError);
-
-        // Ensure local session is removed even if global revocation fails
-        const { error: localSignOutError } = await supabase.auth.signOut({ scope: 'local' });
-        if (localSignOutError) {
-          console.error('Local sign out fallback error:', localSignOutError);
-        } else {
-          console.log('Local sign out fallback successful');
-        }
-      } else {
-        console.log('Sign out successful');
+      // 1) Always clear local session first so UI reliably logs out immediately
+      const { error: localSignOutError } = await supabase.auth.signOut({ scope: 'local' });
+      if (localSignOutError) {
+        console.error('Local sign out error:', localSignOutError);
       }
+
+      // 2) Force-clear any lingering auth keys in browser storage
+      clearSupabaseStoredSession();
+
+      // 3) Try global revocation as best effort (do not block logout UX)
+      const { error: globalSignOutError } = await supabase.auth.signOut({ scope: 'global' });
+      if (globalSignOutError) {
+        console.warn('Global sign out warning:', globalSignOutError);
+      }
+
+      console.log('Sign out completed');
 
       // Always clear local React state regardless of API success
       clearAuthState();
     } catch (error) {
       console.error('Failed to sign out:', error);
+      clearSupabaseStoredSession();
       // Force clear local state even if API call fails
       clearAuthState();
     }
